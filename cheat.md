@@ -1322,6 +1322,12 @@ S3 storage tiers / classes
   - Assign separate security groups
 # CloudFormation
 -  Template – template 
+   - Description Declaration
+   - Format Version Declaration 
+   - Parameters
+   - Resources 
+   - Mappings 
+   - Outputs
 - Stack – provisioned 
 - Json and yaml 
 - Mandatory fields – aws resource 
