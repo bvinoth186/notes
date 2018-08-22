@@ -1473,6 +1473,7 @@ S3 storage tiers / classes
   - Smallest amount of capacity unit can be purchased is 100 (both reads and writes)
   - Max size of item in dynamoDB = 400 kb
   - Number if attributes item can have = no limit, but total size including attribute names and values should not exclude 400 KB
+  - Result set from a scan per call is limited to 1 MB, use LastEvaluateKey to reterive more results
   - 
 - SWF
   - Max 100 SWF domains
