@@ -1426,6 +1426,18 @@ S3 storage tiers / classes
   - Application auto scaling api
 - EC2 Auto Scaling can also detect when an instance is unhealthy, terminate it, and launch an instance to replace it.
 
+# Shared Responsibility 
+-	AWS 
+  -	Decommissioning Storage devices  
+  -	Securing physical access to AWS resources 
+  -	Virtualization infrastructure 
+-	Customer 
+  - Security group & ACL settings
+  -	Patch management on EC2 instances
+  -	Life cycle management if IAM credentials
+  -	Encryption of EBS volumes 
+
+
 # Acronym 
 
 - IOPS – Input Output per Second
