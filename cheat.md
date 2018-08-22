@@ -9,7 +9,7 @@
 - Elastic BeanStalk
 - Lamda
 - Lightsail – Virtual private service, fixed IP address 
-- Batch – not important,  Batch computing in cloud 
+- Batch –  Batch computing in cloud 
 # Storage *
 - S3 – simple storage service, object based stored, bucket
 - EFS – Elastic File System -  Network based storage 
@@ -37,7 +37,6 @@
 
 # Developer Tools 
 
-- Not important 
 - CodeStar – colabrating code
 - CodeCommit – store code. Version controller 
 - Code Build
@@ -63,7 +62,6 @@
 
 # Machine Learning 
 
-- Not important
 - Sagemaker – 
 - Comprehend 
 - Deeplens – physical hardware – camara
@@ -104,7 +102,7 @@
 - AWS Appsync – automatically updates the data (offline).  
 - Device Farm 
 - Mobile Analytics 
-- Not important 
+
 # AR / VR 
 - Sumerian – code name 
 # Application Integration*
@@ -457,10 +455,8 @@ service httpd start
 chkconfig httpd on
 aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
 
-# PHP SDK
-- Aws PHP SDK install
-- https://github.com/acloudguru/s3
-Instance Meta data and User Data
+# Meta Data
+
 - curl http://169.254.169.254/latest/meta-data/
 - ami-id
 - ami-launch-index
