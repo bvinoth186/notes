@@ -736,6 +736,7 @@ S3 storage tiers / classes
 - S3 bucket ownership is NOT transferable. Owner can grant access to others
 - Referrer policy – to allows access from specific domains only 
 - 409 conflict error – when bucket you trying to delete is not empty through api. But through console, you can delete the non-empty bucket 
+- S3 does support redirects 
 # CoundFront
 -  CDN 
 - Can be used to deliver static, dynamic, streaming and interactive content 
@@ -946,7 +947,7 @@ S3 storage tiers / classes
 - For message size larger then 256Kb use Amazon SQS Extended client library for Java – this library lets you to send a sqs message that contains reference of object in S3 that can be large as 2 GB
 - Types 
   - Standard queues (default) – order is not guaranteed, message delivered at least once
-  - FIFO queues (First – In – First – Out) – order guaranteed. Limited to 300 tps, message delivered once, no duplicates 
+  - FIFO queues (First – In – First – Out) – order guaranteed. Limited to 300 tps, message delivered once, no duplicates (ends with .fifo extension
 - Messages can be kept in queue from 1 min to 14 days
 - Default retention period is 4 days 
 - Visibility Timeout – amount of time the message is invisible in sqs queue.  If the message once pulled it will be invisible. If the message is processed within visibility timeout, message will be deleted from sqs otherwise message will became visible for next thread to process
@@ -1458,13 +1459,20 @@ S3 storage tiers / classes
 - CIDR - Classless Inter-Domain Routing
 - NAT – Network Address Translation 
 
-# Limits 
+# Limits
+- EC2
+  - 5 elastic ip address
+  - uptime SLA for EC2 and EBS - 99.95
 - S3 
   - 100 buckets per account – can increase by contacting AWS
   - No limit 
   - 1 object – 0 bytes t0 5 TB
   - Single put max size is 5 GB
   - Amazon recommends Multipart upload for more then 100 MB
+  - S3 standared - 99.99% Availiabilty, 99.999999999 Durability
+  - S3 IA- 99.99% Availiabilty, 99.999999999 Durability
+  - S3 onezone IA - 99.5% Availiabilty, 99.999999999 Durability
+  - S3 RRS - 99.99% Availiabilty, 99.99 Durability
 - DynamoDB
   - 256 tables per region – can increase by contacting AWS
   - 5 local secondary index – cannot increase secondary index (both local & global) 
@@ -1474,7 +1482,11 @@ S3 storage tiers / classes
   - Max size of item in dynamoDB = 400 kb
   - Number if attributes item can have = no limit, but total size including attribute names and values should not exclude 400 KB
   - Result set from a scan per call is limited to 1 MB, use LastEvaluateKey to reterive more results
-  - 
+  - Capacity unit calculation, unless its mentioned - Strongly consistent 
+  - can support maximum of 3000 read capacity units and 1000 write capacity units 
+  - Max length of sort key value - 1024 bytes
+  - Max length of sort key value - 2048 bytes
+  
 - SWF
   - Max 100 SWF domains
   - Max 10000 workflow and activity types (in total)
