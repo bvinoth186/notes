@@ -111,9 +111,11 @@
 - SNS – Notification service 
 - SQS -  Decoupling 
 - SWF – Simple Workflow Service 
+
 # Customer Engagement 
 - Amazon Connect
 - SES - Simple Email Service 
+
 # Business Productivity 
 - Alexa for Business 
 - Chime – Video conference like xoom
@@ -156,6 +158,9 @@
 - Programmatic -  Access Key Id &  Secret Access Key 
 - Console – User & Password
 - For region specific settings, add conditions as part of policy
+- For new users by default no permissions
+- https://<yourcompany or accountNo>.signin.aws.amazon.com/console - IAM users signin link
+- Power user - Access to all the AWS resources except management of groups,users with in IAM
 
 # STS – Security Token Service
 - Grants users limited & temp access to AWS resources
@@ -636,6 +641,7 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
   - Version Id – versioning 
   - Meta data
   - Sub resources – bucket specific configuration (policies, access control lists), CORS, transfer acceleration 
+  - Torrent
 
 
 - Built for 99.99 % availability 
@@ -662,7 +668,7 @@ S3 storage tiers / classes
   - 99.5 % availability only 
   - 99.9999999999 % durability  
   - Cost is 20% less the S3-IA
-- Reduced Redundancy Storage 
+- Reduced Redundancy Storage (legacy - one zone IA)
   - 99.99 % availability
   - 99.99 % durability only
   - Used for data that can be created if lost 
@@ -715,6 +721,8 @@ S3 storage tiers / classes
 - S3 versioning 
   - Once enabled ypu cant disable. You can only suspend it 
   - Version no for objects before enabling versioning will be null
+  - Can enable MFA for any deletes
+  - each version is charageble 
 - S3 life cycle management 
   - Eg : Move the file to S3-IA after 30 days and move to Glacier after 60 days 
   - Can delete permenantly after x days 
@@ -737,6 +745,11 @@ S3 storage tiers / classes
 - Referrer policy – to allows access from specific domains only 
 - 409 conflict error – when bucket you trying to delete is not empty through api. But through console, you can delete the non-empty bucket 
 - S3 does support redirects 
+- Costs are as follows( from most expensive to least) 
+  - 1. S3-RRS .024 
+  - 2. S3 .023 
+  - 3. S3-IA .0125 
+  - 4. S3OneZone IA .01.
 # CoundFront
 -  CDN 
 - Can be used to deliver static, dynamic, streaming and interactive content 
@@ -744,13 +757,16 @@ S3 storage tiers / classes
 - Edge location – location where content is cached.  Different from Region / AZ
 - Edge locations are not just read only. We can put the objects to sync to origin. 
 - Edge Location will cache the content for the first time use, and serve the content from edge location for the subsequent requests. Request will not goto server. Improve latency 
-- TTL - time to live – objects are cached for the life of TTL
+- TTL - time to live – objects are cached for the life of TTL. by default 24 hours
 - Manually clearing cache is allowed. But its chargeable
 -  Origin – Origin of the files, CDN will distribute. This can be S3 or Ec2 or Elastic Load balancer or Route 53, Can work with non aws services as well
 - Distribution – name of CDN, which consists of collection of edge locations
   - Web distribution  - for websites, http/https
   - RTMP	- for media streaming. Audio/Video
-- S3 transfer acceleration make a use of cloudfront to accelerate transfer from S3 to end user.  Say for example, if geographically distributed users are uploading multiple files to S3 which is located in UK region. Instead of uploading the files to S3 directly, they can upload to their nearest edge location and then edge locations accelerate the transfer to S3 trough optimized aws network.  Eg.  prefix.s3-accelerate.amazonaws.com
+- S3 transfer acceleration make a use of cloudfront to accelerate transfer from S3 to end user.  
+- Say for example, if geographically distributed users are uploading multiple files to S3 which is located in UK region. 
+- Instead of uploading the files to S3 directly, they can upload to their nearest edge location and then edge locations accelerate the transfer to S3 trough optimized aws network.  
+- Eg.  prefix.s3-accelerate.amazonaws.com
 - S3 - https://s3-eu-west-1.amazonaws.com/test
   - https
 - Website - http://test.s3-website-eu-west-1.amazonaws.com
@@ -778,18 +794,65 @@ S3 storage tiers / classes
     - So add random prefix to key names, to prevent multiple objects stored in the same partition 
     -  
 - https://aws.amazon.com/s3/faqs/
+
+
 # Storage Gateway
 - To back up the data
+- availiable for download as image
+- You can install on a host on your datacenter 
+- supports either VMware ESXi or Microsoft Hyper-V
+- once installed, associate with aws service through activation process
 - Replicates data from your own data center (on premise) to AWS. You install it as a host on your data center.
-- 3 types 
-  - Gateway Stored Volumes - To keep your entire data set on site. SG then bacs this data up asynchronously to Amazon S3. GS volumes provide durable and inexpensive off-site backups that you can recover locally or on Amazon EC2.
-  - Gateway Cached Volumes - Only your most frequently accessed data is stored. Your entire data set is stored in S3. You don't have to go out and buy large SAN arrays for your office/data center, so you can get significant cost savings. If you lose internet connectivity however, you will not be able to access all of your data.
-  - Gateway Virtual Tape Libraries (VTL) - Limitless collection or VT. Each VT can be stored in a VTL. If it is stored in Glacier, is it a VT Shelf. If you use products like NetBackup etc you can do away with this and just the VTL. It will get rid of your physical tapes and create the virtual ones.
+- 4 types 
+  - File Gateway (NFS)
+    - Stores flat files directly in S3
+	- Word, pdf, image, video 
+  - Volumes Gateway (iSCSI)
+	- block based 
+	- disk volumes 
+	- OS, sql server stored in virtual hard disk 
+	- Stores into S3 in the form of EBS snapshots
+	- its blockbased. so cant store into S3 directly 
+	- snapshots are incremental
+	  - Stored Volumes 
+	    - Entire data is stored in on site (on prime) and SG then backups this data up asynchronously to Amazon S3 (as EBS snapshot). 
+		- GS volumes provide durable and inexpensive off-site backups that you can recover locally or on Amazon EC2.
+		- 1 GB to 16 GB
+	  - Cached Volumes 
+	    - Only your most frequently accessed data is stored in on prime and Your entire data set is stored in S3 (as EBS snapshot). 
+		- You don't have to go out and buy large SAN arrays for your office/data center, so you can get significant cost savings. 
+		- If you lose internet connectivity however, you will not be able to access all of your data.
+		- 1 GB to 32 GB
+  - Tape Gateway (VTL)
+    - Used for backup
+    - Limitless collection or VT. Each VT can be stored in a VTL. If it is stored in Glacier, is it a VT Shelf. 
+	- If you use products like NetBackup etc you can do away with this and just the VTL. It will get rid of your physical tapes and create the virtual ones.
+	- supported by Netbackup, Backup Exec, Veeam
+  
+  
 # SnowBall
+- previously import/export disk (legacy)
+- can transfer your data (both import and export) in aws using amazon's high speed internal network avoiding internet
 - Snowball
+  - onBoard storage
+  - Petabyte-scale data transport solution 
+  - 80 TB snowball in all regions
+  - tamper resistant enclosures
+  - 256 bit encryption 
+  - Trusted platform module (TPM)
+  - once data transfer completed, aws does the erasure of snowball appliance
 - Snowball Edge 
+  - onBoard storage and compute capabilities
+  - AZ in on prime (like)
+  - can ensure to continue run your applications even they are not able to access cloud. can collect transfer the data to aws later
+  - 100 TB data transfer device
 - SnowMobile
+  - Exabyte-scale data transport solution
+  - can transfer upto 100 PetaByte per snow mobile
+  - 45 foot long shipping container truck 
+  - secure, fast and cost effective
 - Snowball can import to S3 and export from S3
+- if your data is in glacier then export to S3 and export using snowball
 
 # Dynamo DB
 - No SQL DB 
