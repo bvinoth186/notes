@@ -211,6 +211,7 @@
 - Vulnerability and penetration test to Other resources are prohibited 
 - If the instance is terminated, you can find the reasons under ‘State transition reason’ label
 - By default all accounts are limited to 5 elastic ip addresses per region 
+- Xen - underlying hypervisor 
 
 # Instance Families 
 - D2 – Density – File servers / Dataware / Hadoop
@@ -348,6 +349,7 @@
 - AMI are regional, AMI can be launched where it’s stored. 
 - AMI can be copied to another region, using console, cli and aws EC2 api’s  
 - Snapshot of RAID array – take an application consistent snapshot.   Stop the application and flush all cashes to disk.  (Freeze the file system 0r unmount the RAID array or stop EC2 before snapshot) – stop any kind of IO 	
+- you cant delete the snapshot of EBS volume that is used as root device of a registered AMI
 # Encrypt EBS Volume
 
 - While creating volume, option to encrypt.  Volumes can be attached or detached to running EC2 (Volume and EC2 should be in same AZ)
@@ -364,7 +366,9 @@
 - create file system – mkfs –t ext4 /dev/xvdf
 - to mount go to root and -  mount {/dev/xvdf}  /filesystem (create filesystem dir in root)
 - to unmount – umount –d {/dev/xvdf}  
+
 # RDS 
+
 - Relational Database Service 
 - SQLServer 
 - Oracle
@@ -405,8 +409,25 @@
   - Auto failure detection and recovery 
 - Scaling is not automated. User has to do some clicks
 - When creating RDS, user must specify, multi AZ or not
+- you cant RDP or SSH into RDS instance 
+- no charge to data transfer to replicas
+- RDS reserved instances are available for multi AZ deployments 
+
+# Aurora
+
+- will run only in AWS infrastructure
+- MySQL compatible 
+- 5 times better performance then MYSql
+- storage autoscaling - 10 GB to start with
+- 2 copies of your data in each AZ, with minimum of 3 AZ. so 6 copies of your data
+- Storage is self healing. data blocks and disks are continuously scanned for errors and repaired automatically
+- designed to transparently handle the loss of upto 2 copies of data without affecting database write availability and upto 3 copies without affecting read availability
+- 2 types of replica 
+  - Aurora replicas (currently 15) - in case if primary aurora is down automatically failover to replica
+  - MySql read replicas (currently 5) - will not fail over
 
 # Elastic Cache 
+
 - Elastic Cache – cache the frequently accessed data 
 - Good if your app / db is read heavy work loads – social networking, gaming 
 - Supports Memcached, Redis (open source caching engines)
@@ -574,7 +595,9 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
 - Lamda default timeout – 3 seconds 
 - You can set memory in 64 MB increments from 128 MB to 3 GB
 - If you choose 256 MB, it allocates approximately twice as much CPU power to your lambda function as requesting 128 MB of memory and half as much CPU power as choosing 512 MB of memory 
-# API Gateway 
+
+# API Gateway
+ 
 - Fully manages service used to publish, maintain, monitor, and secure api’s at any scale \
 - Low cost and scales automatically 
 - Can throttle API gateway to prevent attacks 
@@ -981,7 +1004,43 @@ S3 storage tiers / classes
 - Scan is always eventually consistent 
 - Secondary index are optional 
 - If you do more reads/writes then provisioned capacity units, requests will be throttled and you will receive 400 error code  - ProvisionedThroughputExceededException
+- Push button scaling - can scaled your DB on the fly. no down time. 
 
+# RedShift
+
+- Dataware housing service 
+- OLAP
+- Configuration
+  - Single node - 160 GB
+  - Multi node 
+    - Leader node - manage client connections and receive queries 
+	- Compute node - store data and perform queries and computations. upto 128 compute nodes
+- Columnar data stroage 
+  - redshift organizes the data by column 
+  - row based systems for for transaction processing 
+  - column based systems for datawarehosuing and analytics
+  - 10 times faster 
+- Advanced compression 
+  - doesnt require index or materialized views 
+  - uses less space
+  - when loading the data into empty table, Redshift automatically samples your data and selects appropriate compression scheme. 
+- Massive parallel processing (MPP)
+- Easy to add nodes
+- Pricing 
+  - you will not be charged for leader node
+  - charged for computer node
+  - charged for backup 
+  - charged for data transfer (only within VPC)
+- Security 
+  - transit - SSL
+  - rest - AES 256 
+  - by default RedShift takes care of key management
+    - can manage your own keys by HSM 
+	- or AWS KMS
+- Availability
+  - currently available in 1 AZ
+  - can restore snapshots to new AZ's during outage
+  
 # KMS
 - Key management service
 - Keys are region based.  
@@ -1033,10 +1092,12 @@ S3 storage tiers / classes
   - Limited to 80 characters 
   - Alphanumeric, -, _ allowed
   - Unique within aws account 
+  
 # SNS
+
 - Simple notification service
 - Topic
-- SMS, EMAIL, SQS, email
+- SMS, EMAIL, SQS, email, http/https, email-json, application, lamabda
 - Push based system 
 - To send notifications from cloud
 - Push notifications
@@ -1101,6 +1162,11 @@ S3 storage tiers / classes
 - Max 100 SWF domains
 - Max 10000 workflow and activity types (in total)
 - Use case – Video encoding 
+- Actors 
+  - workflow starters 
+  - deciders
+  - activity workers - could be humans 
+
 # SES
 - Simple Email Service
 - Email only 
@@ -1111,8 +1177,18 @@ S3 storage tiers / classes
   - purchase confirmations, shipping notifications, order status updates 
   - Marketing communications, advertisements, newsletters, special offers 
 - Not subscription based. All you need to know is email address 
+
+# Elastic Transcoder 
+
+- Media transcoder in the cloud
+- convert media files into different formats that will play on smartphone, tablet, pC etc
+- supports all the popular output formats
+- you dont need to guess, aws will take care of the format, configurations work best on particular devices 
+- pay by mins that you transcode and resolution at which you transcode. 
+
 # Kinesis 
 - To send your streaming data
+- purchase from online store, stock prices, game data, social network data, IOT data, geo data (uber)
 - Kinesis streams – 
   - Video streams – securely stream video from connected devices to AWS for analytics and machine learning
   - Data Streams – build custom applications to process data in real time
@@ -1130,8 +1206,10 @@ S3 storage tiers / classes
   - Producers will send the data to Firehose 
   - Firehose will send to S3 or Red shift
 - Kinesis Analytics 
-  - Allows you run sql queries on the data (sent to Firehose ot Streams) and the result data can be stoted in S3, Redshift 
+  - Allows you run sql queries on the data (sent to Firehose or Streams) and the result data can be stored in S3, Redshift 
+
 # Elastic Bean Stalk 
+
 - Java, .net, php, node, python, ruby, go and docker
 - Apache tomcat, Nginx, passenger , Puma and IIS 
 - Tomcat for Java
@@ -1291,6 +1369,7 @@ S3 storage tiers / classes
 
 # VPC
 - Virtual private Cloud
+- when you create VPC, it creates, Route table, security group and nacl
 - By default 5 VPC’s can be created per region. For more need to contact amazon 
 - Public subnet 
 - Private subnet 
@@ -1423,6 +1502,8 @@ S3 storage tiers / classes
 - Global service
 - IPv4 – 32 bit 
 - IPv6 – 128 bit, 340 undecillion addresses 
+- supports MX records
+- default limit is 50 domain names. but can be increased by contacting AWS
 - Domain Registrars
   - Names are registered with InterNIC - a service of ICANN. They enforce the uniqueness.
   - Route53 isn't free, but domain registrars include things like GoDaddy.com etc.
@@ -1490,6 +1571,26 @@ S3 storage tiers / classes
   - Application auto scaling api
 - EC2 Auto Scaling can also detect when an instance is unhealthy, terminate it, and launch an instance to replace it.
 
+# Placement Group
+- Placement group nane is unique per AWS account
+- AWS supports, hemogenous instances with in placement group. Same family, storage, size
+- You cant merge placement groups
+- you cant move existing instance into placement group
+- you can create AMI from existing instance, launch new instance from AMI into placement group
+- Two types
+  - Clustered placement group
+    - grouping of instances within single AZ
+	- recommended for applications that require low network latency or high network throughput or both 
+	- Big data, you dont want to spread
+	- in exam, by default clustered 
+	- only certain instances can be launched.  you cant launch t2 micro
+	- Instance families are compute optimized, GPU, memory optimized, storage optimized
+	- cant span mutiple AZ
+  - Spread placement group
+    - grouping of instances that are each placed on distinct underlying hardware
+	- recommended for applications that have small number of critical instances that should be kept seperate from each other. 
+	- can span mutiple AZ
+
 # Shared Responsibility 
  - AWS 
    - Decommissioning Storage devices  
@@ -1500,6 +1601,30 @@ S3 storage tiers / classes
    - Patch management on EC2 instances
    - Life cycle management if IAM credentials
    - Encryption of EBS volumes 
+   
+   
+# CloudWatch
+- Basic monitoring - 5 mins - default
+- Detailed monitoring - 1 min
+- Dashboards
+- Widget
+  - Text
+  - Line 
+  - Stacked Area
+  - Number - current cpu utilization
+- Default metric for EC2 
+  - CPU related
+  - Disk related
+  - Network related
+  - Status check related
+  - No RAM related - custom metric 
+- Alarm
+  - create topic, notification list and confirm subscription 
+- Events
+  - event triggers lambda function to update DNS with public ip when EC2 becomes running state from stop
+- Logs
+  - Install agent, monitor and access 
+- Metrics
 
 
 # Acronym 
@@ -1579,3 +1704,6 @@ S3 storage tiers / classes
 - ELB 
   - No cost 
   - 200 subnets per vpc – call aws for more
+- Route53
+  - Default limit is 50 domain names. but can be increased by contacting AWS
+  - Default limit is 50 domain names. but can be increased by contacting AWS
