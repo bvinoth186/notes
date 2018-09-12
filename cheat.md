@@ -165,21 +165,24 @@
 # STS – Security Token Service
 - Grants users limited & temp access to AWS resources
 - Federation – SAML, AD, Single sign on 
-- Federation Mobile – FB, amazon, google or openId to login
+- Federation Mobile – FB, amazon, google or openId providers to login
 - Cross account access – one aws account to access another resource 
 - Federation – Combining list of users from one domain with list of users in another domain. Like from IAM to AD or FB
-- Identity Broker – service that allows you take an identity from point A and join (federate) it with point B
+- Identity Broker – service that allows you take an identity from point A and join (federate) it with point B, you have to develop, it will not come out of the box
 - Identity Store – AD, FB, Google 
 - Identity – user of service like FB
 - Identity Broker always authenticate with federation (AD, LDAP, FB, Google)  first then STS
+
 # Active Directory Federation 
 - AssumeRoleWithSAML API 
 - Always authenticated with AD first then AWS
 - SAML – Security Assertion Markup language 
+
 # Web Identity Federation 
 - Authenticate using Google, FB, LinkedIn 
 - AssumeRoleWithWebIdentity API
 - ARN – Amazon Resource Name
+
 # Cognito
 - Web identity federation service 
 - User first authenticated with web identity provider (FB). Received auth token, exchanged for temp. aws credentials allowing them to assume an IAM role
@@ -268,7 +271,8 @@
 # Instance Store
 - Called as Ephemeral storage 
 - Volume cannot be stopped. If the underlying host fails you will lose the data.  But EBS backed instance can be stopped. You will not lose the data if the instance stopped. 
-- We can reboot both.  Will not lose the data 
+- Cannot be attached or detached to other instances 
+- We can reboot both.  Will not lose the data ??
 - By default root volume will be deleted on termination.  But EBS we can have option
 - 
 # EC2 Lab
@@ -1009,6 +1013,7 @@ S3 storage tiers / classes
 # RedShift
 
 - Dataware housing service 
+- for Business intelligence 
 - OLAP
 - Configuration
   - Single node - 160 GB
@@ -1188,6 +1193,8 @@ S3 storage tiers / classes
 
 # Kinesis 
 - To send your streaming data
+- used to consume big data 
+
 - purchase from online store, stock prices, game data, social network data, IOT data, geo data (uber)
 - Kinesis streams – 
   - Video streams – securely stream video from connected devices to AWS for analytics and machine learning
@@ -1391,9 +1398,12 @@ S3 storage tiers / classes
 - http://cidr.xyz/
 - VPC peering 
   - Allows you to connect one VPC to other via direct network route using private ip address
-  - Can peer VPC’s in other aws accounts also
+  - Can peer VPC’s in other aws accounts also within single region 
+  - now VPC peering can be done in multiple region (updated)
   - Peering is star configuration, 1 central vpc peers with 4 others 
   - No transitive peering – all 4 vpc peers thorough centeral vpc.  4 vpc will not not peer directly 
+  - you cant connect if the if vpc's are peered and they are in same CIDR IP range (or)
+  - you cant create VPC peering between VPC's whcih has matching or overlapping CIDR blocks
 - AWS reserves 5 ip addresses in a subnet. First 4 and last one in each subnet CIDR block
   - For subnet with CIDR block 10.0.0.0/24 following 5 are reserved
   - 10.0.0.0 – Network Address
@@ -1593,14 +1603,19 @@ S3 storage tiers / classes
 
 # Shared Responsibility 
  - AWS 
+   - Responsible for security 'of' the cloud
    - Decommissioning Storage devices  
    -	Securing physical access to AWS resources 
    -	Virtualization infrastructure 
  - Customer 
+   - Responsible for security 'in' the cloud
    - Security group & ACL settings
    - Patch management on EC2 instances
    - Life cycle management if IAM credentials
    - Encryption of EBS volumes 
+   - OS, network, firewall configuration 
+   - Customer Data 
+   - Server side encryption
    
    
 # CloudWatch
@@ -1626,6 +1641,165 @@ S3 storage tiers / classes
   - Install agent, monitor and access 
 - Metrics
 
+# OpsWorks 
+- Orchestration service that uses chef
+- chef consists of 'receips' to maintain a consistent state 
+- cook book 
+
+# Security 
+
+- Design Principle 
+  - Apply security at all layers
+  - Enable traceability 
+  - Automate responses to security events
+  - Foucus on securing your system - Responsibility
+  - Automate security best practice
+- Definition
+  - consists of 4 areas 
+  - Data Protection
+    - Organise and classify your data (public, only employees, only MD)
+	- least privilege access system (peoples are only able to access what they need)
+	- encrypt everything possible (transit and rest)
+	- ELB, EBS, S3 and RDS
+  - Privilege management
+    - Only authorized and authenticated users are able to access your resources 
+	- Access control list 
+	- Role based access control 
+	- Password management
+	- IAM, MFA
+  - Infrastructure protection
+    - How you protect your VPC, security group, NACL, private subnet etc
+  - Detective controls 
+    - Detect or identity securtiy breach 
+	- CloudTrail, CloudWatch, AWS config
+	
+# Reliability 
+
+- Ability of a system recover from service or infrastructure outage and autoscale
+- Design Principle 
+  - Test recovery procedures 
+  - Automatically recover from failures 
+  - Scale horizontally to increase aggregate system availability
+  - Stop guessing capacity   
+- Definition
+  - consists of 3 areas
+  - Foundations - IAM, VPC
+  - Change Management - Cloud Trail 
+  - Failure Management  - CloudFormation
+  
+# Performance Efficiency 
+- Design Principle 
+  - Democratize advanced techonologies 
+  - Go global in mins
+  - Use serverless architecture 
+  - Experiment more often
+- Definition
+  - Consists of 4 areas
+  - Compute - Autoscaling 
+  - Storage - EBS, S3, Glacier
+  - Database - RDS, DynamoDB, RedShift
+  - Space - time trade off - CloudFront, Elasticache, Direct connect, RDS read replicas 
+  
+# Cost Optimization 
+- Design Principle 
+  - Transparently attribute expenditure 
+  - Use managed services to reduce cost of ownership 
+  - Trade capital expense for operatiing expense 
+  - Benefit from economies scale 
+  - Stop spending money on data centers and operations
+- Definition
+  - Consists of 4 areas
+  - Matched supply and demand  - Autoscaling 
+  - Cost effective resources - EC2 (reserved), trusted advicer
+  - Expenditure awareness - cloud watch alarms, SNS
+  - Optimizing overtime - AWS blog, trusted advicer
+  
+# Operational Excellence 
+- Design Principle 
+  - Perform operations with code
+  - Align operations processess to business objectives 
+  - Make regular, small, incremental changes 
+  - Test for responses to unexpected events 
+  - Learn from operational events and failures 
+  - Keep operations procedures current 
+- Definition
+  - Consists of 3 areas
+  - Preparation
+    - Runbook
+	- Playbook 
+	- Tagging the resources 
+	- CloudFormation, Auto Scaling, AWS config, Service catalog, SQS
+  - Operation - Code Commit, Code Deploy, Code Pipeline, AWS SDK's, Cloud Trail 
+  - Response  - CloudWatch, alarms, SNS 
+  
+# BigData
+- To consume bigdata - Kinesis 
+- For business inteligence - RedShift 
+- For BigData processing - Elastic Map Reduce 
+
+# Consolidated Billing 
+- AWS Organization 
+  - account management service enables you consolidate multiple aws accounts 
+  - Centrally manage policies across mutiple aws accounts
+  - Control access to AWS services 
+    - you can create Service Control policies (SCP). Eg. you can deny your HR group to access Kinesis or DynamoDB
+	- Even IAM in the account allows it, SCP will override it
+  - Automate AWS account creation
+  - Consolidate billing accross multiple AWS accounts
+  - Two Features
+    - Consolidated Billing 
+    - All Features 
+- Single payment method for all the AWS accounts 
+- Paying account only for billing purpose only. do not deploy servcices in paying account 
+- Linked accounts - 20 is the limit 
+- Can do billing alerts consolidated and individual 
+- consolidated billing on the linked accounts 
+- Consolidated billing allows you to get volume discounts on all your accounts. Eg.  S3 storage more you use less you pay. so when you consolidate storaged used will save your moneny. 
+- Unused reserved Ec2 instances are applied across the accounts. this will save your cost.
+- CloudTrail 
+  - per AWS account and is enabled per region 
+  - Can consolidate logs using s3 bucket
+    - Turn on cloudtrail on the paying account 
+	- create bucket policy to enable CORS
+	- Turn on cloud trail in linked accounts and use the bucket in the paying account 
+	
+# Cross Account Access 
+- Can switch users without login
+
+# Tags 
+- Key pair value 
+- Meta Data 
+- Case sensitive 
+
+# Resource Groups 
+- group your resources using tags 
+- Can contain Region, Name, Health checks etc
+- For EC2 - public and private IP addresses 
+- For ELB - port configurations 
+- for RDS - DB engine 
+- 2 types
+  - Classic resource groups
+    - Global 
+  - AWS system manager
+    - Per region based 
+  
+# Direct Connect 
+- Dedicated network connection from your premises to AWS	
+- Reduce costs when using large volumes of traffic 
+- Increase reliability 
+- Increase bandwidth
+- for immediate need go for VPN since it can done in few mins (also if you want to encrypt your traffic)
+
+# Workspaces
+
+- VDI 
+- cloud based replacement for a traditional desktop 
+- Windows 7 experiance provided by windows server 2008 R2
+- by default users can personalise their workspace (wallpaper, icons, shortcuts).  This can be locked by administrater by adding policy 
+- By default you will be given local admin access, so you can install your own applications
+- Persistant 
+- All the data in D:\ is backed up every 12 hours 
+- you dont need AWS accout to login to workspaces
 
 # Acronym 
 
