@@ -172,6 +172,13 @@
 - Identity Store – AD, FB, Google 
 - Identity – user of service like FB
 - Identity Broker always authenticate with federation (AD, LDAP, FB, Google)  first then STS
+- Temp Security Credentials 
+  - Access Key ID
+  - Secret access key 
+  - Security token
+- GetFederationToken 
+  - Returns the set of temp security credentials for federated user
+  - you must call GetFederationToken operation using the long term security credentials of IAM user. not IAM role 
 
 # Active Directory Federation 
 - AssumeRoleWithSAML API 
@@ -215,6 +222,7 @@
 - If the instance is terminated, you can find the reasons under ‘State transition reason’ label
 - By default all accounts are limited to 5 elastic ip addresses per region 
 - Xen - underlying hypervisor 
+- Auto scaling group of spot instaces in primary and Auto scaling group of OnDemand instances in secondary is cost effective 
 
 # Instance Families 
 - D2 – Density – File servers / Dataware / Hadoop
@@ -242,6 +250,7 @@
 - C – Compute
 -  P – Graphics (think pics)
 - X – Extreme memory 
+
 # EBS 
 - Elastic Block Store - allows to create to storage volumes and attach with EC2 instance
 - Virtual disk
@@ -249,7 +258,12 @@
 - Automatically replicated in AZ
 - IOPS 
 - General Purpose SSD - GP2 – upto 10000 IOPS
-- Provisional IOPS SSD (IO1) – more than 10000 IOPS – designed for I/O intensive applications, large relational or nosql DB, Can provision upto 20000 IOPS per volumn
+  - boot volumes 
+  - low latency apps
+  - dev and test environments
+- Provisional IOPS SSD (IO1) – more than 10000 IOPS – designed for I/O intensive applications, 
+  - large relational or nosql DB, Mongo, Cassandra, Mysql, oracle etc
+  - Can provision upto 20000 IOPS per volumn
 - IOPS – input output operation per second 
 - Throughput Optimized HDD (ST1) – magnetic not SSD
   - Big Data 
@@ -268,13 +282,29 @@
   - Data accessed Infrequently 
 - Cannot mount 1 EBS volume to multiple EC2 instances – instead us EFS
 - Can transfer reserved instance from one AZ to another
+- Snapshot life cycle policy - for backups
+- EBS optimized instance provides additional, dedicated capacity for EBS I/O
+- Encryption availible only in certain instance types
+- To improve performance
+  - EBS optimized instances
+  - Modern linux Kernal 
+  - RAID 0 to maximize utilization of instance resources 
+  
+
 # Instance Store
 - Called as Ephemeral storage 
 - Volume cannot be stopped. If the underlying host fails you will lose the data.  But EBS backed instance can be stopped. You will not lose the data if the instance stopped. 
 - Cannot be attached or detached to other instances 
 - We can reboot both.  Will not lose the data ??
 - By default root volume will be deleted on termination.  But EBS we can have option
-- 
+- Usecase 
+  - boot volumes
+  - transactional and no sql Db
+  - datawarehosuing
+  - ETL 
+- Cannot attach instance store volumes once the EC2 is launched
+- few EC2 types doesnt support instace store volumes 
+ 
 # EC2 Lab
 
 - AMI – Amazon Machine Instance  (when you create AMI, registerImage is the final process)
@@ -316,7 +346,8 @@
   - chkconfig httpd on -  starts automatically with boot
 - Windows
   - Putty Keygen to convert pem to ppk
-# Security Group 
+
+  # Security Group 
 - Its virtual  firewall
 - State Full
 - 1 instance can have multiple security groups
@@ -328,8 +359,8 @@
 - Can’t block specific IP address, instead use Network access control
 - All inbound traffic are blocked by default 
 - All Outbound traffic are allowed by default 
-# EBS Volumn
 
+# EBS Volumn
 - Its virtual hard disk
 - Snapshot – point in time copy of volume. 
 - Volumns exists on EBS
@@ -354,11 +385,13 @@
 - AMI can be copied to another region, using console, cli and aws EC2 api’s  
 - Snapshot of RAID array – take an application consistent snapshot.   Stop the application and flush all cashes to disk.  (Freeze the file system 0r unmount the RAID array or stop EC2 before snapshot) – stop any kind of IO 	
 - you cant delete the snapshot of EBS volume that is used as root device of a registered AMI
+
 # Encrypt EBS Volume
 
 - While creating volume, option to encrypt.  Volumes can be attached or detached to running EC2 (Volume and EC2 should be in same AZ)
 - Volume from encrypted snapshot will be automatically encrypted
 - Volume from non-encrypted snapshot will be not be encrypted
+- Can create encrypted snapshot from non-encrypted snapshot by creating encrypted copy of the non-encrypted snapshot
 - Root volume will not be encrypted by default
 - To encrypt root volume, 2 ways
 - 1. OS level like bit locker 
@@ -369,7 +402,8 @@
 - create file system before mount 
 - create file system – mkfs –t ext4 /dev/xvdf
 - to mount go to root and -  mount {/dev/xvdf}  /filesystem (create filesystem dir in root)
-- to unmount – umount –d {/dev/xvdf}  
+- to unmount – umount –d {/dev/xvdf} 
+- You cannot encrypt the existing volume  
 
 # RDS 
 
@@ -449,7 +483,7 @@
 - Cache miss or expired – returns null – so your application  needs to get the data form DB and update to elastic cache
 - Write through – adds or update to the cache whenever data is written to the database 
 - Data In the cache is never stale 
-- 
+
 
 
 
@@ -464,6 +498,33 @@
 - Supports NFSv4
 - Supports 1000 of concurrent NFS connections 
 - Data stored in multiple AZ within the region 
+- EFS can be mounted in multiple AZ
+- EFS can be used only within one VPC at a time
+- with EFS, both file system and VPC should be in the same region 
+- EFS will not be available for all VPC's within region by default. 
+- EFS does not support cross region peered VPC's
+- For EFS, can work with VPC peering within single AWS region when using C5 or M5 EC2 instances 
+- Security group to open NFS port 2049 to access EFS 
+- Encryption at rest can be enabled only at the time of EFS creation 
+- NFS not an encrypted protocol 
+- Encryption at transit canNOT be enabled only at the time of EFS creation 
+- To enable encryption at Transit, 
+  - Enable encryption during mounting on EC2 using amazon mount helper
+  - unmount unencrypted mount 
+  - remount using mount helper encryption during transit option 
+  - encryption at rest cannot be done during mounting. it can be done only during craetion. 
+- Performance Mode 
+  - General purpose - recommended for most file system, low latency 
+  - Max I/O - recommended for tens or hundreds or thousands of EC2 sharing EFS. slightly higher latency. big data 
+- Throughput mode 
+  - Provisioned - can configure specific throughput irrespective of EFS data size
+  - Bursting - throughput on EFS scales as file system grows 
+- Usecases 
+  - Bigdata and analytics
+  - media processing workflows
+  - content managment
+  - web serving 
+  - home directories 
 
 # AWS – CLI 
 - aws configure 
@@ -549,10 +610,12 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
 - If doing load test on ELB, 
   - Ensure to re-resolve DNS before every request
   - Send requests from globally distributed clients or multiple test clients 
+  
 # Route 53
 - DNS service
 - Map domain names to EC2, Load balancer and S3
 - Global 
+
 # SDK 
 - Software Development Kit
 - https://aws.amazon.com/tools/
@@ -622,7 +685,27 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
   - By default API gateway limits 10000  rps (requests per second)
   - By default Max concurrent requests is 5000 across all api’s with in aws account 
   - If you go over 10000 rps or 5000 concurrent requests – you will get 429 –Too many requests 
+- if the caller sends 10000 requests in the first milli seconds, API gateways serves 5000 of those requests and throttles the rest in the one second period. 
 - API gateway can be configured as soap webservice pass through
+- Integration sources 
+  - Lambda 
+  - Http 
+  - Mock
+  - AWS service
+  - VPC link 
+- Use VPC Link to integrate on premises backed solutions through direct connect and private VPC. i.e, Rest api's are exposed to internet and hosted in on-premises. using VPCLink the api's can be integrated with api gateway.
+- Controlling access to api in api gateway 
+  - resource policy - add policy to allow or deny access from specified IP addresses
+  - IAM roles and policies 
+  - CORS
+  - lambda autorizers
+  - cognito user pools
+  - client side SSL certs
+  - usage plans 
+- Automatically protect your backend systems from Distributed denial of service (DDoS) attacks. 
+- Access logging - logs who has accessed your API and how they accessed. 
+- Automatically integrates with CloudFront to ensure better response to the calls made to the API
+  
 
 # Step Function
 - Allows to visualize and test your serverless applications
@@ -669,8 +752,6 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
   - Meta data
   - Sub resources – bucket specific configuration (policies, access control lists), CORS, transfer acceleration 
   - Torrent
-
-
 - Built for 99.99 % availability 
 - Amazon guarantees 99.99% availability  
 - Amazon guarantees 99.999999999% durability (remember 11 x 9 s)
@@ -819,7 +900,36 @@ S3 storage tiers / classes
     - S3 uses key name to determine the which partition an object stored 
     - For heavy workload, this might cause i/o issues
     - So add random prefix to key names, to prevent multiple objects stored in the same partition 
-    -  
+- Bucket level properties 
+  - Versioning
+  - Server access logging 
+  - Object level logging 
+  - Static website hosting 
+  - Tags
+  - Transfer acceleration
+  - Events
+- Bucket level properties 
+  - Storage class
+  - Meta Data 
+- Virtual hosted S3 URL 
+  - http://bucket.s3.amazonaws.com
+  - http://bucket.s3-aws-region.amazonaws.com
+- Path style S3 URL
+  - http://s3.amazonaws.com/bucket --> for US East - N.Virginia 
+  - http://s3-aws-region.amazonaws.com/bucket --> for other regions
+  - http://s3.aws-region.amazonaws.com/bucket --> This also works
+- S3 - https://s3-eu-west-1.amazonaws.com/test
+  - https
+- Website - http://test.s3-website-eu-west-1.amazonaws.com
+  - http 
+  - can be secured through cloudfront 
+- Versioning 
+  - Pricing includes all the versions
+  - Delete api will not delete the object permanently. it will just add the delete marker. so this object eligible for year end billing 
+  - To delete permanently, you must delete object version id
+- Cross region replication requires versioning enabled on both source and destination buckets   
+
+  
 - https://aws.amazon.com/s3/faqs/
 
 
@@ -1009,6 +1119,10 @@ S3 storage tiers / classes
 - Secondary index are optional 
 - If you do more reads/writes then provisioned capacity units, requests will be throttled and you will receive 400 error code  - ProvisionedThroughputExceededException
 - Push button scaling - can scaled your DB on the fly. no down time. 
+- No need to explicitly to create Multi AZ.  Dynamo DB is highly available
+- It automatically replicate the data across mutplie AZ
+- Better to support stateless web/app apps (RDS too but DynamoDB is better option) 
+- Global Table - for good latency, if data is accessed from diff geo locations 
 
 # RedShift
 
@@ -1064,6 +1178,7 @@ S3 storage tiers / classes
 - Encrypt the data – get the envelop key by encryption cmk and encrypt the data using envelop key
 - Decrypt the data – decrypt the envelop key using CMK and decrypt the data using decrypted master key 
 - key cannot be deleted immediately.  Need to disable the key and schedule for deletion (7 to 30 days)
+
 # SQS
 - simple queue service 
 - first, oldest aws service 
@@ -1097,6 +1212,10 @@ S3 storage tiers / classes
   - Limited to 80 characters 
   - Alphanumeric, -, _ allowed
   - Unique within aws account 
+- SQS can trigger lamabda function
+- to selece message to delete, use receiptHandle of the message ( not the messageId whcih you receive when you send the message) 
+- SQS can delete message from the queue even if a visibility timeout setting causes the message to be locked by another consumer. 
+- SQS doesnt encrypt the messages by default. there is option to encrypt the messages. 
   
 # SNS
 
@@ -1374,6 +1493,65 @@ S3 storage tiers / classes
 - Build provider – no build, Jenkins, AWS code build or Solano CI
 - Deployment provider – no deployment, ECS, cloudformation, code deploy or elastic beanstalk 
 
+#VPC Lab
+
+- CreateVPC
+- CIDR - 10.0.0.0/16 - biggest range
+- it will create route table, NACL, Security group
+- no subnet, no IGW
+- Create Subnet 10.0.1.0-us-east-1a[AZ]
+- CIDR block - 10.0.1.0/24 - will give 256 IP addresses 
+- another Create Subnet 10.0.2.0-us-east-1b[AZ] - CIDR 10.0.2.0/24
+- When you create subnet, y default they are private 
+- Create IGW
+- attch to VPC
+- Route Table - Main route table wil be created with VPC
+- Routes - By default Subnet's in VPC can talk to each other.  default rule in route table - local route.
+- Subnet association - by default no subnet's will be associated 
+- Main route table will not have access to internet by default 
+- Create another  route table - for internet  access 
+- Add route, along with local route, Destination : 0.0.0.0/0 and ::/0 and Target - IGW
+- Now associate Subnet - this will be Public subnet now 
+- By default auto assign public IP is NO for subnets. Even it has public route to internet.  Enable to Yes 
+- Security groups exists only within the VPC. When you create EC2 in public subnet, you can select the security group with in the VPC 
+- For Private EC2, create a security group with source as custom, 10.0.1.0/24 also add All ICMP protocol, 0-65535 port 
+- To SSH to private EC2 from public EC2 you need to move private key pem file to your public EC2.  in real world use Bastion server. (NAT instance) 
+- Nat instance - EC2 - Community AMI's 
+- Choose public subnet 
+- Security Group, SSH and HTTP, HTTPS 
+- disable source / destination check 
+- No need to login to NAT instance 
+- add the route in route table which is assigned to private subnet which is default subnet here
+- Destination : 0.0.0.0/0 and Terget is NAT instance
+- if NAT instance is down, your private EC2 will not have internet access
+- NAT Gateway
+- choose public subnet 
+- create Elastic IP address 
+- Go to route table - default route table 
+- add rule -  Destination : 0.0.0.0/0 and Terget is NAT gatway 
+- NAT Gateways dont sit behind the security and its Highly availiable 
+- NACL 
+- open ephemeral port, Custom TCP rule,  1024 - 65535 - important to access from externally 
+- you can block specfic IP 
+- what is my IP
+- add a deny rule 10.34.45.65/32  as source 
+- Rules are validated in numerical order
+- VPC endpoint
+- With Nat GateWay, if you do AWS S3 ls from private EC2, it will list your buckets.  it has access to internet through NAT Getway 
+- remove Nat GateWay route from private (default) route table 
+- now AWS S3 ls will not work 
+- Create NAT endpoint to make it work 
+- Role for EC2 with S3 full access 
+- assign this role to private Ec2 
+- Create VPC endpoint
+- Gateway 
+- Interface 
+- S3 Gateway
+- select VPC 
+- choose private subnet 
+- 
+
+
 # VPC
 - Virtual private Cloud
 - when you create VPC, it creates, Route table, security group and nacl
@@ -1426,7 +1604,6 @@ S3 storage tiers / classes
   - use script to manage failovers
   - attached with security group 
   - must be in public subnet
-
 - NAT Gateway – Ipv4
   - In VPC, create NAT GateWay and attach public subnet
   - Highly available
@@ -1436,7 +1613,6 @@ S3 storage tiers / classes
   - Scale automatically 
   - More secure 
   - use ports from 1024 to 65535
-  - 
 - Egress only internet Gateways – ipv6
 - NACL 
   - Subnet can be associated with one NACL always. But NACL can have multiple subnets 
@@ -1467,13 +1643,49 @@ S3 storage tiers / classes
     - Traffic to and from 169.254.169.256 meta data
     - DHCP traffic
 - VPC endpoint – to access AWS resources via virtual private gateway (IGW not required)
+  - If you want to access S3 from private EC2, you can access through NAT GateWay which is in public subnet. NAT Gateway communitcate with S3 over internet
+  - VPC endpoint helps you communicate with S3 internally through internal Gateway. No internet
   - Interface
   - Gateway
 - If you want to multiple apps (different ip’s) on a single EC2
   - Launch a vpc instance with 2 network groups 
   - Assign elastic IP 
   - Assign separate security groups
+- NATGatway cannot send traffic over VPC endpoints, VPN connections, AWS direct connect or VPC peering. 
+- Internet Gatways are two way traffic. NAT Gatway is not
+- For any route table local route cannot be edited or deleted 
+- if both NAT Gateway and VPC endpoint is associated with same route table, VPC endpoint always takes the precedence. 
+- VPC endpoints doesnt support cross region S3 requests 
+- if route table has both NAT gateway and VPC endpoint route, if you want to access S3 from private Ec2, NAT gateway always takes the precedence. it will not communicate via internet which NAT Geteway.  But if the S3 in the different region then communication will be over NAT Gateway. since VPC endpoints doesnt support cross region S3 requests
+- in VPC endpoint, we can add a policy to restrict access to certain S3 bucket and certain actions. by default policy allows all actions. 
+- In NACL if SSH allowed in inbound and SSH denied in outbound and ephemeral allowed in outbound - SSH will work 
+- when you SSH to EC2, inbound port is 22 and outbound port in ephemeral
+- Nat Gatway should be associated with public subnet which has IGW 
+- Nat Gatway cannot be created without elastic IP 
+- NACL - should allow outbound traffic to all ports or ephemeral ports or specific protocol to allow traffic 
+- VPC gateway endpoints not supported outside VPC
+- By default security groups allows all outbound traffic. but you can change the ruke to allow traffic on specific protocols 
+- In VPC peering, you cant use NAT GateWay created in one VPC in another VPC. using NAT Gateway in another VPC becomes transitive routing and its not allowed in AWS
+- with custom VPC, dy default DNS hostnames are disabled. This can be enabled from VPC actions
+- once the VPC and subnets are created, CIDR range cannot be edited 
+- if all the IP address in CIDR range is use, need to use more 
+  - Create another VPC and peer with old VPC - complex approach 
+  - Add secondary CIDR range for VPC and create subnet with the new range 
+- Custom route table can be changed to as main route table
+- VPC peering beteen VPC A and VPC B, VPC A should have route table route to VPC B as destination and VPC B should have route table route to VPC A as destination
+- For VPC peering - route will contain target as pcx-xxxxxx
+- For direct connect and VPN - route will contain target as pcx-xxxxxx as vgw-xxxxxxx
+- For secondary CIDR range - route will contain target as ipv4 address (20.0.0.0/32)
+- x.x.x.x/16 - 65, 536 IP addresses 
+- x.x.x.x/24 - 256 IP addresses 
+- x.x.x.x/32 - 1 IP address
+- To connect on primeses to AWS VPC via AWS VPN, you need
+  - Hardware compatible VPN device 
+  - Virtual private Gateway 
+  - Direct connect is not for VPN
+  
 # CloudFormation
+
 -  Template – template 
    - Description Declaration
    - Format Version Declaration 
@@ -1789,6 +2001,8 @@ S3 storage tiers / classes
 - Increase reliability 
 - Increase bandwidth
 - for immediate need go for VPN since it can done in few mins (also if you want to encrypt your traffic)
+- VPN goes over internet where as Direct Connect is Intranet
+- Direct Connect is not a site-to-site VPN
 
 # Workspaces
 
@@ -1800,6 +2014,74 @@ S3 storage tiers / classes
 - Persistant 
 - All the data in D:\ is backed up every 12 hours 
 - you dont need AWS accout to login to workspaces
+
+# ECS
+- Amazon EC2 Container Service 
+- Container management service that makes it easy to run, stop and manage docker containers on a cluster of EC2 instances. 
+- Docker Components
+  - Docker Image - Containers are created from a read only template called Image which has instructions to create container 
+  - Docker Container 
+  - Layers / Union file system 
+  - DockerFile 
+  - Docker Daemon / Engine 
+  - Docker Client
+  - Docker Registries -  Docker Hub or ECR
+- Container and Images 
+- Task definition 
+  - to run docker containers in ECS
+  - test files in json format 
+  - can have 
+    - docker image name, 
+	- cpu, memory to use 
+	- networking mode to use
+	- ports 
+	- IAM role
+	- data volumes
+	- environment variables
+	- init task 
+- ECS Clusters 
+  - logical grouping of container instances
+  - with first ECS service, default cluster will be created. 
+  - Can create multiple clusters 
+  - Can contain multiple different container instance types
+  - region specific 
+  - Container instances can be part of 1 container at a time 
+  - can use IAM policies to restrict/ allows users to aceess specific clusters 
+- ECS Scheduling 
+  - Service Scheduler 
+  - Custom Scheduler - you can create your own scheduler or use third party like blox 
+- ECS Container Agent 
+  - This agent allows container instances to connect your cluster. 
+  - supported only on EC2 instances that supports ECS specification 
+  - Linux based
+  - works with Amazon linux, Ubuntu, Red Hat, CentOs etc 
+  - Will not work with Windows 
+- ECS Security 
+  - IAM roles- to restrict/allow aceess 
+  - Security group - at the instance level. not at the tasks or container level 
+- Customers will have full control over ECS. with root access can install third party apps   
+- Container instance need external network access to communicate with ECS service endpoint. so if your container instances doest have public IP, they you muse use NAT Gatway for external network access (internet) 
+- For ECS agents to communicate with ECS cluster
+  - IAM role used to run ECS instance should have ecs:poll action in its policy 
+  - security groups should allow traffic to ECS service endpoint
+- ECS container has no password to use for SSH access, use key pair to login  to your instance securely. you will specify name of key pair when you launch your container service, then provide the private when you login using SSH. 
+- ECS launch types
+  - Fargate launch type 
+  - EC2 launch type 
+- Service definition 
+  - Defines which task definition to use with your service
+  - How many instantiations of that task to run
+  - which load balancers associated with the tasks
+  - cluster on which run your service 
+  - IAM role that allows ECS to call your load balancer 
+- To set ECS container agent configuration during ECS instance launch - Set configuration in user data parameter  of ECS instance
+
+	
+  
+# ECR
+- Amazon EC2 Container Registry 
+- like DockerHub
+- Docker image repository
 
 # Acronym 
 
@@ -1825,6 +2107,7 @@ S3 storage tiers / classes
 - EC2
   - 5 elastic ip address
   - uptime SLA for EC2 and EBS - 99.95
+  - 20 EC2 instances per region (depends on the family).  New accounts may start with lower limit.  Can be increased by contacting AWS
 - S3 
   - 100 buckets per account – can increase by contacting AWS
   - No limit 
@@ -1880,4 +2163,13 @@ S3 storage tiers / classes
   - 200 subnets per vpc – call aws for more
 - Route53
   - Default limit is 50 domain names. but can be increased by contacting AWS
-  - Default limit is 50 domain names. but can be increased by contacting AWS
+  
+# Tips
+- Stateless Services - RDS, DynamoDB, Elasticache
+- Stateful services - ELB 
+- High Availability services - DynamoDB, S3, SQS (data automatically replicated in multiple AZ)
+- RDS - customer has the setup high availability - Multi AZ and EC2 by auto scalling 
+  
+  
+VPC - 2, 5, 6, 10, 11
+S3 - 17
