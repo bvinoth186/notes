@@ -593,8 +593,7 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
 - It will cost if its running
 - Classic load balancer – TCP/IP layer or Http/Https, layer 7 or 4, legacy, not recommended. Important for exam
 - Application Load balancer – application layer,  operates at layer 7, best suited for http/https, Can look at till application level to decide routing 
-- Network Load balancer – level 4, most expensive, TCP, extreme performance, can handle millions of requests per second 
-- 
+- Network Load balancer – level 4, most expensive, TCP, extreme performance, can handle millions of requests per second, supports only TCP. doesnt support http/https 
 - Healthy threshold – no of success healthy checks before declare the instance as in service
 - UnHealthy threshold – no of failure healthy checks before declare the instance as out of service
 - Timeout
@@ -610,11 +609,19 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
 - If doing load test on ELB, 
   - Ensure to re-resolve DNS before every request
   - Send requests from globally distributed clients or multiple test clients 
+- To split the traffic accross the AZ - Enable Cross Zone load balancing (for classic) 
+- Cross Zone load balancing 
+  - Enabled in Application and Network load balancer by default 
+  - Not Enabled in classic load balancer by default
+- To monitor application load balancers 
+  - Cloudwatch metrics 
+  - Access logs
+  - request tracing 
+  - CloudTrail logs 
+- Target Type 
+  - instance Id 
+  - Ip address 
   
-# Route 53
-- DNS service
-- Map domain names to EC2, Load balancer and S3
-- Global 
 
 # SDK 
 - Software Development Kit
@@ -1720,6 +1727,7 @@ S3 storage tiers / classes
 - Provides python helper scripts – to install software, start service in EC2. You can call the helper script directly from your template. This will be executed in Ec2 as part of stack creation process 
 - Can be used to bootstrap Chef and Puppet
 - Data can be saved before deleting the stack by defining delete policy 
+
 # Route 53
 - Global service
 - IPv4 – 32 bit 
@@ -1745,7 +1753,6 @@ S3 storage tiers / classes
   - used by Top Level Domains to direct traffic to the Content DNS servers which contains the authoritative DNS records.
 - A Records
   - Address record - used to translate from a domain name to the IP address. A records are always IPv4. IPv6 is AAA.
-
 - CName – Canonical Name – used to resolve one domain name to another. You can use mobile.aacloud.com to m.aacloud.com  so users can use both and its points to same dns 
 - Alias records 
   - Alias is free
@@ -1776,8 +1783,39 @@ S3 storage tiers / classes
     - Let you to send traffic based on the geolocation of the user 
     - Eg: EU customers will be sent to London and US customers will be sent to Mumbai 
     - You need to select location.  Continent or Country or state or default (everywhere else) 
+  - GeoProximity 
+    - route traffic based on the location of your resouce and can shift traffic from resources in one location to resources in anothetr 
+  - MultiValue answer 
+    - when you want Route53 to respond to DNS queries with upto eight healty records selected in random 
 - Supports SSL termination – all regions 
 - New instances can be added on the fly. No need to stop ELB
+- Global 
+- 3 main functions 
+  - Register domain names
+  - route internet traffic to the resources for your domain 
+  - check health of your resources 	(can send notifications if the resource is unavailiable) 
+- To access S3 static website through Route 53 -> A IPv4 address with Alias = Yes
+- To route traffic to ELB through Route 53 -> A IPv4 address with Alias = Yes
+- To route traffic to RDS through Route 53 -> CNAME - Canonical with Alias = Yes
+- Can route traffic to 
+  - CloudFront 
+  - Ec2
+  - Elastic BeanStalk 
+  - ELB
+  - RDS
+  - S3 
+  - Amazon work mail 
+- If Route53 couldnt reach your resouce and the browser says "Server Not Found" 
+  - you didnt create a record for the doamin or sub domain name 
+  - you created the record but specified the wrong value  (like wrong IP) 
+  - resurce that you are routing is not avaliable 
+- Health checks
+  - monitor endpoint 
+  - monitor Cloudwatch alarm 
+  - monitor other health cheks
+  
+  
+
 
 # AutoScaling 
 - Free of cost 
@@ -1792,6 +1830,35 @@ S3 storage tiers / classes
   - Ec2 auto scaling 
   - Application auto scaling api
 - EC2 Auto Scaling can also detect when an instance is unhealthy, terminate it, and launch an instance to replace it.
+- Components required to setup effectively 
+  - Launch configuration
+  - ELB
+  - Auto Scaling 
+- Launch configuration cannot be edited once its created
+- if you want to update launch configuration, you can use existing launch configuration as base, create new one, and update the new launch configuration in a auto scaling group. 
+- Scaling default metict types
+  - Average CPU Utilization
+  - Network In
+  - Network Out 
+  - Application ELB request count per target
+- Scalling based on Memory (RAM) - custom metric 
+- Health check grace period - even if the EC2 is unhealthy, auto scaling will not act until the health check grace period expires 
+- Termination Policy 
+  - Default - useful if you have more then one scaling policy for the group 
+  - Oldest Instance - useful if you are upgrading the instances in the auto scaling group. This will be helpful to get rid of old instance types
+  - Newest instance - useful if you want to test your new launch configuration 
+  - Oldest launch configuration - useful if you have updated the launch configuration 
+  - ClosestToNextInstanceHour - terminates the instances that are closest to next billing hour. helps to manage EC2 usage costs
+- Scaling policy 
+  - Simple scaling 
+  - Step Scaling 
+  - Target tracking scaling 
+- Default Termination poilcy 
+  - If multiple AZ, choose AZ which has more instances
+  - select the instance which has oldest launch configuration
+  - if more then 1 instace with oldest launch configuration, then select the instance which is close to next billing hour 
+  - if more then one then select random 
+
 
 # Placement Group
 - Placement group nane is unique per AWS account
