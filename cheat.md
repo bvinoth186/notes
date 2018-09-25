@@ -7,7 +7,7 @@
 - EC2 – vm
 - EC2 container service
 - Elastic BeanStalk
-- Lamda
+- Lambda
 - Lightsail – Virtual private service, fixed IP address 
 - Batch –  Batch computing in cloud 
 # Storage *
@@ -270,6 +270,7 @@
   - Frequently accessed workloads
   - Data warehouse 
   - Cant boot volume 
+  - Minimum volumn is 500 GB
 - Cold HDD (SC1)
   - Lowest cost 
   - Less Frequently accessed workloads
@@ -319,6 +320,7 @@
 - Monitoring – cloud watch 
 - Tenancy – dedicated 
 - Advanced Details – user input, Boot instructions (install PHP SDK, apache)
+- Boot instructions (install PHP SDK, apache) - User Data section 
 - Storage – Root, Boot volume
 - By default Root volume can’t be encrypted.  Either bit locker, or encrypt when creating AMI or API.  
 - By Default Root EBS volume will be deleted on termination.  Option can be changed
@@ -426,7 +428,9 @@
 - During backup window, there will be some latency 
 - Snapshot – Manual, user initiated.  They are stored even after RDS is deleted.  (in Automatic, backups will be deleted in RDS is deleted)
 - When you restore it will be new RDS instance with new RDS endpoint. (both auto and snapshot)
-- Encryption – all RDS supports encryption
+- Encryption – all RDS supports encryption ??
+- Encryption can be done at the time RDS creation. also ensure underlying instance type supports DB encryption 
+- Encryption at rest is not availible for DB instances running on SQL server express editionF
 - Encryption is done using KMS – AWS Key Management Service 
 - Once RDS is encrypted, data from snapshot or back up also will be encrypted. 
 - We can’t encrypt existing RDS instance. we need take snapshot, copy, encrypt and restore
@@ -450,6 +454,7 @@
 - you cant RDP or SSH into RDS instance 
 - no charge to data transfer to replicas
 - RDS reserved instances are available for multi AZ deployments 
+- Multi AZ provides high availability across AZ. Not across the region 
 
 # Aurora
 
@@ -463,6 +468,8 @@
 - 2 types of replica 
   - Aurora replicas (currently 15) - in case if primary aurora is down automatically failover to replica
   - MySql read replicas (currently 5) - will not fail over
+- automatically stores the data in DB cluster across mutiple AZ in a single region.  so for Aurora, multi AZ is not required 
+- For aurora, For DR, - create read replica in another region 
 
 # Elastic Cache 
 
@@ -620,7 +627,8 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
   - CloudTrail logs 
 - Target Type 
   - instance Id 
-  - Ip address 
+  - Ip address
+- ELB can distribute the traffic only in one region. not across the region   
   
 
 # SDK 
@@ -666,9 +674,64 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
 - Alias – can create alias and map the version behind the screen 
 - Can split traffic using alias to different version.  Alias can 50 % to v1 and 50% traffic to v2
 - Cannot spilt traffic with $latest
-- Lamda default timeout – 3 seconds 
+- Lambda default timeout – 3 seconds 
+- Max execution duration per request - 300 seconds (5 mins)
 - You can set memory in 64 MB increments from 128 MB to 3 GB
+- Minimum 128 MB and Max is 3008 MB (64 MB increments)
+- ephemeral disk capacity (/tmp space ) = 512 MB
 - If you choose 256 MB, it allocates approximately twice as much CPU power to your lambda function as requesting 128 MB of memory and half as much CPU power as choosing 512 MB of memory 
+- Lambda function can reach across the region as lomg as it as internet access
+- Lambda function is set to run in private VPC, then to access S3, it need NAT Gateway or S3 VPC endpoint.  it requires either internet or internal access. 
+- Lambda can run function securely with in VPC by default. But to enable your lamabda to access the resources within your VPC, you must provide additional VPC specific configuration (subnet ID's, security groups). if you didnt do this, lambda cannot connect to the resources in your vpc. this means lamabda running in no vpc mode. 
+- Lambda Triggers 
+  - S3
+  - DynamoDB
+  - Kinesis
+  - SNS, SES, SQS 
+  - Cognito
+  - CloudFormation
+  - Cloudwatch logs and Events 
+  - CodeCommit
+  - AWS Config 
+  - Lex
+  - IOT button 
+  - CloudFront 
+  - API GateWay
+- Lambda supports to forward non-processed payloads (timeout or memory out) to Dead Letter Queue using SQS, SNS for notification. 
+- Automatically retries failed executions for asynchronous invocations. 
+- SQS default and maximum batch size = 10
+- lamabda supports only standard queue. FIFO queue is not supported. 
+- Cloudfront events that can trigger lamabda
+  - Viewer request - request from end user 
+  - Viewer response 
+  - Origin request - request from edge to origin (EC2 or S3) when edge doesnt have the data in cache 
+  - Origin response
+- Version 
+  - when you update the code, it updates the version as latest 
+  - no need to define the code, which version needs to be used. it uses latest by default. however you can mention  the version if you want 
+  - if new version is updated, requests might be served by old or new version for few seconds. 
+- Poll based event sources for lamabda to trigger 
+  - SQS
+  - Kinesis
+  - DynamoDB
+- Lambda function policy cant be edited from console. yo should use CLI or SDK only 
+- Function policy to grant cross account permissions. Not the execution policy. 
+- Lambda in VPC, VPC should have sufficient ENI capacity to support scaling 
+- ENI Capacity = peak concurrent exeutions * (Memory in GB / 3GB) 
+  - if the peak concurrent request is 100, memory is 1 GB then = 100* (1 GB/ 3 GB) = 33 ~ 30
+  - /24 will have 256 IP and 251 will be available
+  - /25 will have 128 IP and 123 will be available
+  - /26 will have 64 IP and 59 will be available
+  - /27 will have 32 IP and 27 will be available
+  - so /26 will be the minimum CIDR block, that lamabda function requires to work without any issues
+- Lambda function uses environement varible to store the configuration. lambda encrypts them using KMS by default and those values are decrypted and made availiable for lamabda code durimg the execution 
+- for any sensitive data like DB credetials, data from environment variables is decrypted during execution. so its not secure
+- aws recommends to encrypt the data before deploying by your own KMS key. Lambda provides encryption helper and decryption helper to make it easier. 
+- Version of the lamabda function
+  - getFunctionVersion() from context object 
+  - AWS_LAMBDA_FUNCTION_VERSION - environement variable 
+  
+
 
 # API Gateway
  
@@ -700,7 +763,7 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
   - Mock
   - AWS service
   - VPC link 
-- Use VPC Link to integrate on premises backed solutions through direct connect and private VPC. i.e, Rest api's are exposed to internet and hosted in on-premises. using VPCLink the api's can be integrated with api gateway.
+- Use VPC Link to integrate on premises backed solutions through direct connect and private VPC. i.e, Rest api's are exposed to internet and hosted in on-premises. using VPCLink the api's can be integrated with api gateway. (VPCLink not used to connect internet)
 - Controlling access to api in api gateway 
   - resource policy - add policy to allow or deny access from specified IP addresses
   - IAM roles and policies 
@@ -799,6 +862,10 @@ S3 storage tiers / classes
   - Infrequently accessed 
   - No real time access 
   - it takes 3 to 5 hours to restore data from glacier 
+  - 3 types of retrievals 
+    - Expedited retrievals (1 -5 mins)
+	- standard ( 3 - 5 hours)
+	- Bulk (5 - 12 hours) - cheapest option 
 - charged for 
   - Storage per GB
   - No of request (get, put, copy , delete etc
@@ -865,7 +932,8 @@ S3 storage tiers / classes
   - 2. S3 .023 
   - 3. S3-IA .0125 
   - 4. S3OneZone IA .01.
-# CoundFront
+
+# CloudFront
 -  CDN 
 - Can be used to deliver static, dynamic, streaming and interactive content 
 - Geographically disbursed data centers
@@ -935,6 +1003,9 @@ S3 storage tiers / classes
   - Delete api will not delete the object permanently. it will just add the delete marker. so this object eligible for year end billing 
   - To delete permanently, you must delete object version id
 - Cross region replication requires versioning enabled on both source and destination buckets   
+- if you run PCI or HIPAA-compliant workloads, aws recommends to log your cloudfront usage data for last 355 days by 
+  - Enabling cloudfront access logs
+  - Capture requests that are sent to the cloudfront API 
 
   
 - https://aws.amazon.com/s3/faqs/
@@ -1166,7 +1237,9 @@ S3 storage tiers / classes
 - Availability
   - currently available in 1 AZ
   - can restore snapshots to new AZ's during outage
-  
+- For DR - configure cross region snapshots 
+- When you create Redshift cluster its locked down by default. no one can access it. Add inbound rules in security group to provide access. 
+
 # KMS
 - Key management service
 - Keys are region based.  
@@ -1400,6 +1473,8 @@ S3 storage tiers / classes
     - Need to provide connection string 
 - Ec2, RDS, ELB, S3, SNS and Auto scaling group can be deployed in beanstalk (SQS – cant) 
 - AWS toolkit for eclipse – to update running app in beanstalk 
+- can be used to create web server environement and worker environement
+- supports the deployment of web applications from docker containers 
 
 # Code Commit
 
@@ -1613,7 +1688,7 @@ S3 storage tiers / classes
   - must be in public subnet
 - NAT Gateway – Ipv4
   - In VPC, create NAT GateWay and attach public subnet
-  - Highly available
+  - Highly available (to make it highly avaliable, create another NAT GATWAY in another AZ) 
   - Create in each AZ 
   - AWS managed  
   - Security group not required 
@@ -1690,6 +1765,32 @@ S3 storage tiers / classes
   - Hardware compatible VPN device 
   - Virtual private Gateway 
   - Direct connect is not for VPN
+- Enhanced VPC Routing 
+  - No additional cost 
+  - Redshift require Enhanced VPC Routing to access S3 (both S3 and Redshift is in same region) 
+  - NatInstance cannot be reached by Redshift without Enhanced VPC Routing 
+  - If enhanced VPC routing enabled, RedShift used aws internal route through VPC
+  - if its not enabled, redshift routes traffic through internet
+  
+
+  
+# CIDR
+- x.x.x.x/y  -  2^(32-y) - 2  
+- /16	232-16 - 2	65,534
+- /17	232-17 - 2	32,766
+- /18	232-18 - 2	16,382
+- /19	232-19 - 2	8,190
+- /20	232-20 - 2	4,094
+- /21	232-21 - 2	2,046
+- /22	232-22 - 2	1,022
+- /23	232-23 - 2	510
+- /24	232-24 - 2	254
+- /25	232-25 - 2	126
+- /26	232-26 - 2	62
+- /27	232-27 - 2	30
+- /28	232-28 - 2	14
+- /29	232-29 - 2	6
+- /30	232-30 - 2	2
   
 # CloudFormation
 
@@ -1796,7 +1897,8 @@ S3 storage tiers / classes
   - check health of your resources 	(can send notifications if the resource is unavailiable) 
 - To access S3 static website through Route 53 -> A IPv4 address with Alias = Yes
 - To route traffic to ELB through Route 53 -> A IPv4 address with Alias = Yes
-- To route traffic to RDS through Route 53 -> CNAME - Canonical with Alias = Yes
+- To route traffic to RDS through Route 53 -> CNAME - Canonical with Alias = No
+- To route traffic to Cloudfront through Route 53 -> create an alias record point to cloudfront distribution 
 - Can route traffic to 
   - CloudFront 
   - Ec2
@@ -1858,7 +1960,8 @@ S3 storage tiers / classes
   - select the instance which has oldest launch configuration
   - if more then 1 instace with oldest launch configuration, then select the instance which is close to next billing hour 
   - if more then one then select random 
-
+- Cooldown period 
+- Autoscaling used to scale both proxy servers and backend instances 
 
 # Placement Group
 - Placement group nane is unique per AWS account
@@ -2133,7 +2236,7 @@ S3 storage tiers / classes
   - security groups should allow traffic to ECS service endpoint
 - ECS container has no password to use for SSH access, use key pair to login  to your instance securely. you will specify name of key pair when you launch your container service, then provide the private when you login using SSH. 
 - ECS launch types
-  - Fargate launch type 
+  - Fargate launch type - you dont have to provision and manage the backend infrastructure. Just register the task definition, Farget launches the container for you
   - EC2 launch type 
 - Service definition 
   - Defines which task definition to use with your service
@@ -2142,6 +2245,7 @@ S3 storage tiers / classes
   - cluster on which run your service 
   - IAM role that allows ECS to call your load balancer 
 - To set ECS container agent configuration during ECS instance launch - Set configuration in user data parameter  of ECS instance
+- if a shared service is deployed in multiple containers and customer from container 1 should not have access to data from another customer  - IAM roles for tasks
 
 	
   
@@ -2230,12 +2334,28 @@ S3 storage tiers / classes
   - 200 subnets per vpc – call aws for more
 - Route53
   - Default limit is 50 domain names. but can be increased by contacting AWS
+- Lambda
+  - Lamda default timeout – 3 seconds 
+  - Max execution duration per request - 300 seconds (5 mins)
+  - You can set memory in 64 MB increments from 128 MB to 3 GB
+  - Minimum 128 MB and Max is 3008 MB (64 MB increments)
+  - ephemeral disk capacity (/tmp space ) = 512 MB  
   
 # Tips
-- Stateless Services - RDS, DynamoDB, Elasticache
+- Stateless Services - RDS, DynamoDB, Elasticache, Lambda 
 - Stateful services - ELB 
 - High Availability services - DynamoDB, S3, SQS (data automatically replicated in multiple AZ)
 - RDS - customer has the setup high availability - Multi AZ and EC2 by auto scalling 
+- for storing seesion data - Elasticache, DynamoDB
+- NGINX can be hosted in - EC2 
+- Schema-less DB - DynamoDB
+- Durable and no downtime DB - Aurora
+- To monitor API activity - CloudTrail 
+- Enable CloudTrail for all regions. if new region is added in future, cloudtrail will create same trail in the new region. 
+- For DR - use route53 to divert the traffic to static website 
+- VM Import / Export - to import instances from on prim to aws (windows, Linux VM's uses VMware ESX or workstations, microsoft Hyper-V and Citrix xen formats)
+
+
   
   
 VPC - 2, 5, 6, 10, 11
