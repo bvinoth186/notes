@@ -444,6 +444,7 @@
 - Read Replica – must have auto backup turned on, can have upto 5 read replicas, can have read replica’s of read replica (latency),  each replica will have own endpoint, , can be promoted has own DB but this will break replication, can have read replica in second region. 
 - Can set read replica’s  as multi AZ for mysql and mariaDB. PostgreSql is not supported yet. 
 - Read replica can be encrypted 
+- Read replica - might return stale data due the replication lag. cannot accept write queries 
 - RDS cannot be paused or stopped. Take the snapshot for future use and terminate 
 - Supports 
   - Auto backup 
@@ -455,6 +456,12 @@
 - no charge to data transfer to replicas
 - RDS reserved instances are available for multi AZ deployments 
 - Multi AZ provides high availability across AZ. Not across the region 
+- To improve performance 
+  - Read Replica 
+  - Elasticache
+  - Shards 
+- Multi AZ - synchronous replication
+- Read Replica - axsynchronous replication
 
 # Aurora
 
@@ -1201,6 +1208,7 @@ S3 storage tiers / classes
 - It automatically replicate the data across mutplie AZ
 - Better to support stateless web/app apps (RDS too but DynamoDB is better option) 
 - Global Table - for good latency, if data is accessed from diff geo locations 
+- DynamoDB Autoscaling - dynamically adjusts the provisioned throughput capacity on your behalf. increases read and write capacity units incase of sudden traffic without throttling and also reduces when the load is less
 
 # RedShift
 
@@ -1258,6 +1266,7 @@ S3 storage tiers / classes
 - Encrypt the data – get the envelop key by encryption cmk and encrypt the data using envelop key
 - Decrypt the data – decrypt the envelop key using CMK and decrypt the data using decrypted master key 
 - key cannot be deleted immediately.  Need to disable the key and schedule for deletion (7 to 30 days)
+- HMS - Customer can have the complete control of keys and lifecycle
 
 # SQS
 - simple queue service 
@@ -1871,7 +1880,7 @@ S3 storage tiers / classes
     - let you to split the traffic, 
     - 95% traffic to region 1 and 5 % traffic to region 2 or 2 different ELB’s 
     - Need to provide weightage  1- 255
-    - 
+    - blue-green deployments
   - Latency – 
     - let you send traffic to region which has less latency (region near to user) t. 
     - Eg 1 elb in india and one in London. If users access from india, latency routing take him to india elb since London elb will have more latency
@@ -2173,6 +2182,7 @@ S3 storage tiers / classes
 - for immediate need go for VPN since it can done in few mins (also if you want to encrypt your traffic)
 - VPN goes over internet where as Direct Connect is Intranet
 - Direct Connect is not a site-to-site VPN
+- doesn’t encrypt traffic between vpn and on prime
 
 # Workspaces
 
@@ -2354,9 +2364,19 @@ S3 storage tiers / classes
 - Enable CloudTrail for all regions. if new region is added in future, cloudtrail will create same trail in the new region. 
 - For DR - use route53 to divert the traffic to static website 
 - VM Import / Export - to import instances from on prim to aws (windows, Linux VM's uses VMware ESX or workstations, microsoft Hyper-V and Citrix xen formats)
-
-
-  
+- CloudTrail automatcally encrypt the logs by default ussing amazon S3 server side encryption (SSE). you cqn choose to encrypt using KMS
+- CloudSearch - 
+- EMR with spot instance nodes - cost effective
+- AWS WAF - Web Application Firewall -protect your app from web vulnerability (XSS)
+- AWS Config 
+- Inspector 
+- Data Pipeline - can move the data from dynamoDB to S3
+- Fault tolerance - Auto Scalling, Multi AZ
+- High Availability - Auto Scalling, Multi AZ
+- OpsWorks - stack
   
 VPC - 2, 5, 6, 10, 11
 S3 - 17
+1 - 6 11 20 28 34 38 44 49 54 55 57 59 60 61 62 
+2 - 1 4 13 23 26 35 36 39 43 45 46 47 48 51 53 57 63 64
+3 - 2 4 6 11 12 15 25 26 31 36 51 57 
