@@ -1,6 +1,6 @@
 # AWS Global Infrastructure *
 - Region – Geographical location
-- Availability Zone – Data center, 2 or more ny region
+- Availability Zone – Data center, 2 or more in region
 - Edge Location – Cashing,  Cloud Front, CDN- Content Delivery Network
 
 # Compute *
@@ -587,6 +587,7 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
 - services/
 - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html
 - https://github.com/acloudguru/metadata
+
 # Cloud Watch
 - Monitoring, Cloud watch – basic monitoring, CPU. Disk,Nw
 - Standard monitoring – 5 mins 
@@ -597,7 +598,28 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
 - Alarms 
 - Events 
 - Logs
-- 
+- Basic monitoring - 5 mins - default
+- Detailed monitoring - 1 min
+- Dashboards
+- Widget
+  - Text
+  - Line 
+  - Stacked Area
+  - Number - current cpu utilization
+- Default metric for EC2 
+  - CPU related
+  - Disk related
+  - Network related
+  - Status check related
+  - No RAM related - custom metric 
+- Alarm
+  - create topic, notification list and confirm subscription 
+- Events
+  - event triggers lambda function to update DNS with public ip when EC2 becomes running state from stop
+- Logs
+  - Install agent, monitor and access 
+- Metrics
+
 
 
 # Elastic Load Balancer - ELB
@@ -1584,7 +1606,7 @@ S3 storage tiers / classes
 - Build provider – no build, Jenkins, AWS code build or Solano CI
 - Deployment provider – no deployment, ECS, cloudformation, code deploy or elastic beanstalk 
 
-#VPC Lab
+# VPC Lab
 
 - CreateVPC
 - CIDR - 10.0.0.0/16 - biggest range
@@ -1747,7 +1769,7 @@ S3 storage tiers / classes
 - For any route table local route cannot be edited or deleted 
 - if both NAT Gateway and VPC endpoint is associated with same route table, VPC endpoint always takes the precedence. 
 - VPC endpoints doesnt support cross region S3 requests 
-- if route table has both NAT gateway and VPC endpoint route, if you want to access S3 from private Ec2, NAT gateway always takes the precedence. it will not communicate via internet which NAT Geteway.  But if the S3 in the different region then communication will be over NAT Gateway. since VPC endpoints doesnt support cross region S3 requests
+- if route table has both NAT gateway and VPC endpoint route, if you want to access S3 from private Ec2, VPC endpoint always takes the precedence. it will not communicate via internet which NAT Geteway.  But if the S3 in the different region then communication will be over NAT Gateway. since VPC endpoints doesnt support cross region S3 requests
 - in VPC endpoint, we can add a policy to restrict access to certain S3 bucket and certain actions. by default policy allows all actions. 
 - In NACL if SSH allowed in inbound and SSH denied in outbound and ephemeral allowed in outbound - SSH will work 
 - when you SSH to EC2, inbound port is 22 and outbound port in ephemeral
@@ -2009,28 +2031,6 @@ S3 storage tiers / classes
    - Server side encryption
    
    
-# CloudWatch
-- Basic monitoring - 5 mins - default
-- Detailed monitoring - 1 min
-- Dashboards
-- Widget
-  - Text
-  - Line 
-  - Stacked Area
-  - Number - current cpu utilization
-- Default metric for EC2 
-  - CPU related
-  - Disk related
-  - Network related
-  - Status check related
-  - No RAM related - custom metric 
-- Alarm
-  - create topic, notification list and confirm subscription 
-- Events
-  - event triggers lambda function to update DNS with public ip when EC2 becomes running state from stop
-- Logs
-  - Install agent, monitor and access 
-- Metrics
 
 # OpsWorks 
 - Orchestration service that uses chef
@@ -2374,6 +2374,12 @@ S3 storage tiers / classes
 - Fault tolerance - Auto Scalling, Multi AZ
 - High Availability - Auto Scalling, Multi AZ
 - OpsWorks - stack
+- High Availability - Create NAT Gatway in multiple AZ
+- NATGatway cannot send traffic over VPC endpoints, VPN connections, AWS direct connect or VPC peering.
+- VPC endpoints doesnt support cross region S3 requests
+- A Records - Address record - used to translate from a domain name to the IP address. A records are always IPv4. IPv6 is AAA.
+- CName – Canonical Name – used to resolve one domain name to another. You can use mobile.aacloud.com to m.aacloud.com so users can use both and its points to same dns
+- Alias - same as CName. Cant use CNAME for naked domains 
   
 VPC - 2, 5, 6, 10, 11
 S3 - 17
