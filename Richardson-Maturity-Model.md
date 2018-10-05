@@ -12,6 +12,11 @@
 - Expose Resources with proper URI’s (using nouns). 
 - http://server/accounts, http://server/accounts/10. 
 - HTTP Methods are not used.
+- POST - Create a new resource
+- GET - Read a resource
+- PUT - Update an existing resource (complete replacement)
+- PATCH - Partial update
+- DELETE - Delete a resource
 
 
 # Level 2 
@@ -27,3 +32,11 @@
 - HATEOAS (Hypermedia as the engine of application state). 
 - You will tell not only about the information being requested but also about the next possible actions that the service consumer can do. 
 - When requesting information about a facebook user, a REST service can return user details along with information about how to get his recent posts, how to get his recent comments and how to retrieve his friend’s list.
+
+
+'''xml
+<dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-hateoas</artifactId>
+    </dependency>
+'''
