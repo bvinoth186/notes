@@ -33,10 +33,44 @@
 - You will tell not only about the information being requested but also about the next possible actions that the service consumer can do. 
 - When requesting information about a facebook user, a REST service can return user details along with information about how to get his recent posts, how to get his recent comments and how to retrieve his friend’s list.
 
+# Configuration
 
 ```xml
-<dependency>
+   <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-hateoas</artifactId>
     </dependency>
 ```
+
+```java
+@GetMapping("/students/{id}")
+public Resource<Student> retrieveStudent(@PathVariable long id) {
+  Optional<Student> student = studentRepository.findById(id);
+
+  if (!student.isPresent())
+    throw new StudentNotFoundException("id-" + id);
+
+  Resource<Student> resource = new Resource<Student>(student.get());
+
+  ControllerLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveAllStudents());
+
+  resource.add(linkTo.withRel("all-students"));
+
+  return resource;
+}
+```
+
+```json
+{
+  "id": 10001,
+  "name": "Ranga",
+  "passportNumber": "E1234567",
+  "_links": {
+    "all-students": {
+      "href": "http://localhost:8080/students"
+    }
+  }
+```
+
+
+
