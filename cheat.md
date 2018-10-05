@@ -2373,7 +2373,7 @@ S3 storage tiers / classes
 - Data Pipeline - can move the data from dynamoDB to S3
 - Fault tolerance - Auto Scalling, Multi AZ -  
 - High Availability - Auto Scalling, Multi AZ
-- OpsWorks - stack
+- OpsWorks - stack based 
 - High Availability - Create NAT Gatway in multiple AZ, load balancer in multi AZ
 - NATGatway cannot send traffic over VPC endpoints, VPN connections, AWS direct connect or VPC peering.
 - VPC endpoints doesnt support cross region S3 requests
@@ -2382,24 +2382,6 @@ S3 storage tiers / classes
 - Alias - same as CName. Cant use CNAME for naked domains 
 - EBS replicated in multiple AZ by default 
 - VPC Peering can be done across the region
+- CloudTrail - API activity, Monitor Route53
+- CloudWatch - Monitor, Alarm, Send Notifications, can detect errors from logs for lambda 
   
-S3 - 17
-1 - 6 11 20 28 34 38 44 49 54 55 57 59 60 61 62 
-2 - 1 4 13 23 26 35 36 39 43 45 46 47 48 51 53 57 63 64
-3 - 2 4 6 11 12 15 25 26 31 36 51 57 
-4 - 5 11 21 24 53 54 55 59 60 61
-5 - 2 16 18 23 27 30 35 36 37 39 43 48 50 57 58 62 64 
-6 - 1 2 5 7 8 9 11 12 13 14 23 29 30 31 33 35 38 43 46 47 48 52 55 58 61
-7 - 1 2 8 12 17 21 25 29 44 45 52 56 62
-
-VPC - 1 2 5 6 7 9 10 11 12 13 14 15 16 17 18 22 23
-S3  - 5 6 10 11 12 13 14 15 17 
-EFS - 1 5 6 7 8 10
-API - 3 5 7 10 
-ECS - 1 4 7 8 9 
-Lambda - 3 5 6 8 17 18 19 22 23 25
-EBS - 1
-SQS - 2 5 6 7 9
-Autoscaling - 1 6 8 9 
-R53 - 6 10	
-Add - 10 13 
