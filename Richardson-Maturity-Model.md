@@ -60,6 +60,8 @@ public Resource<Student> retrieveStudent(@PathVariable long id) {
 }
 ```
 
+# JSON response 
+
 ```json
 {
   "id": 10001,
