@@ -8,7 +8,7 @@ ibmcloud ks cluster-config mycluster
 ## List Nodes
 kubectl get nodes
 
-# List Deployments
+## List Deployments
 kubectl get deployments
 
 ## Create POD
