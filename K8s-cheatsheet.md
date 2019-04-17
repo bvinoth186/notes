@@ -1,92 +1,92 @@
 # **_Kubernetes Cheat Sheet_**
-# What isKubernetes?
+## What isKubernetes?
 - Kubernetes is a platform for managing containerized workloads. 
 - Kubernetes orchestrates computing, networking and storage to provide a seamless portability across infrastructure providers.
 
 # **_Cluster Introspection_**	
 	
-# List all services
+## List all services
  	kubectl get services                
-# List all pods
+## List all pods
 	kubectl get pods                    
-# Watch nodes continuously
+## Watch nodes continuously
 	kubectl get nodes -w                
-# Get version information
+## Get version information
 	kubectl version                     
-# Get cluster information
+## Get cluster information
 	kubectl cluster-info                
-# Get the configuration
+## Get the configuration
 	kubectl config view                 
-# Output information about a node
+## Output information about a node
 	kubectl describe node <node>        
 	
 # **_Pod and Container Introspection_**	
 	
-# List the current pods
+## List the current pods
 	kubectl get pods                         
-# Describe pod <name>
+## Describe pod <name>
 	kubectl describe pod <name>              
-# List the replication controllers
+## List the replication controllers
 	kubectl get rc                           
-# List the replication controllers in <namespace>
+## List the replication controllers in <namespace>
 	kubectl get rc --namespace="<namespace>" 
-# Describe replication controller <name>
+## Describe replication controller <name>
 	kubectl describe rc <name>               
-# List the services
+## List the services
 	kubectl get svc                          
-# Describe service <name>
+## Describe service <name>
 	kubectl describe svc <name>              
 	
 # **_Interacting with Pods_**	
 	
-# Launch a pod called <name> using image <image-name>
+## Launch a pod called <name> using image <image-name>
  	kubectl run <name> --image=<image-name>                             
-# Create a service described in <manifest.yaml>
+## Create a service described in <manifest.yaml>
  	kubectl create -f <manifest.yaml>                                   
-# Scale replication controller <name> to <count> instances
+## Scale replication controller <name> to <count> instances
  	kubectl scale --replicas=<count> rc <name>                          
 	                                                                    
 	
-# Map port <external> to port <internal> on replication controller <name>	                                                                    
+## Map port <external> to port <internal> on replication controller <name>	                                                                    
  	kubectl expose rc <name> --port=<external> --target-port=<internal> 
 
 # **_Stopping Kubernetes_**	
 	
-# Delete pod <name>
+## Delete pod <name>
 	kubectl delete pod <name>                                         
-# Delete replication controller <name>
+## Delete replication controller <name>
 	kubectl delete rc <name>                                          
-# Delete service <name>
+## Delete service <name>
 	kubectl delete svc <name>                                         
-# Stop all pods on <n>
+## Stop all pods on <n>
 	kubectl drain <n> --delete-local-data --force --ignore-daemonsets 
-# Remove <node> from the cluster
+## Remove <node> from the cluster
 	kubectl delete node <name>                                        
 	
 # **_Debugging_**	
 	
-# execute <command> on <service> selecting container <$container>
+## execute <command> on <service> selecting container <$container>
 	kubectl exec <service> <command> [-c <$container>] 
-# Get logs from service <name> selecting container <$container>	
+## Get logs from service <name> selecting container <$container>	
 	kubectl logs -f <name> [-c <$container>]           
-# Watch the Kublet logs
+## Watch the Kublet logs
 	watch -n 2 cat /var/log/kublet.log                 
-# Show metrics for nodes
+## Show metrics for nodes
 	kubectl top node                                   
-# Show metrics for pods
+## Show metrics for pods
 	kubectl top pod                                    
 	
 # **_Administration_**	
 	
-# Initialize your master node
+## Initialize your master node
 	kubeadm init                                              
-# Join a node to your Kubernetes cluster
+## Join a node to your Kubernetes cluster
 	kubeadm join --token <token> <master-ip>:<master-port>    
-# Create namespace <name>
+## Create namespace <name>
 	kubectl create namespace <namespace>                      
-# Allow Kubernetes master nodes to run pods
+## Allow Kubernetes master nodes to run pods
 	kubectl taint nodes --all node-role.kubernetes.io/master- 
-# Reset current state
+## Reset current state
 	kubeadm reset                                             
-# List all secrets
+## List all secrets
 	kubectl get secrets                                       
