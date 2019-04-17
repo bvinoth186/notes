@@ -1,9 +1,9 @@
-#** Kubernetes Cheat Sheet **
+# **_Kubernetes Cheat Sheet_**
 # What isKubernetes?
 - Kubernetes is a platform for managing containerized workloads. 
 - Kubernetes orchestrates computing, networking and storage to provide a seamless portability across infrastructure providers.
 
-#** Cluster Introspection **	
+# **_Cluster Introspection_**	
 	
 # List all services
  	kubectl get services                
@@ -20,7 +20,7 @@
 # Output information about a node
 	kubectl describe node <node>        
 	
-#** Pod and Container Introspection **	
+# **_Pod and Container Introspection_**	
 	
 # List the current pods
 	kubectl get pods                         
@@ -37,7 +37,7 @@
 # Describe service <name>
 	kubectl describe svc <name>              
 	
-#** Interacting with Pods	**
+# **_Interacting with Pods_**	
 	
 # Launch a pod called <name> using image <image-name>
  	kubectl run <name> --image=<image-name>                             
@@ -50,7 +50,7 @@
 # Map port <external> to port <internal> on replication controller <name>	                                                                    
  	kubectl expose rc <name> --port=<external> --target-port=<internal> 
 
-#** Stopping Kubernetes	**
+# **_Stopping Kubernetes_**	
 	
 # Delete pod <name>
 	kubectl delete pod <name>                                         
@@ -63,7 +63,7 @@
 # Remove <node> from the cluster
 	kubectl delete node <name>                                        
 	
-#** Debugging	**
+# **_Debugging_**	
 	
 # execute <command> on <service> selecting container <$container>
 	kubectl exec <service> <command> [-c <$container>] 
@@ -76,7 +76,7 @@
 # Show metrics for pods
 	kubectl top pod                                    
 	
-#** Administration	**
+# **_Administration_**	
 	
 # Initialize your master node
 	kubeadm init                                              
