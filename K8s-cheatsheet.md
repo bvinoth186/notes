@@ -3,7 +3,7 @@
 - Kubernetes is a platform for managing containerized workloads. 
 - Kubernetes orchestrates computing, networking and storage to provide a seamless portability across infrastructure providers.
 
-# **_Cluster Introspection_**	
+# **_Cluster Info_**	
 	
 ## List all services
  	kubectl get services                
@@ -20,7 +20,7 @@
 ## Output information about a node
 	kubectl describe node <node>        
 	
-# **_Pod and Container Introspection_**	
+# **_Pod and Container Info**	
 	
 ## List the current pods
 	kubectl get pods                         
@@ -45,8 +45,6 @@
  	kubectl create -f <manifest.yaml>                                   
 ## Scale replication controller <name> to <count> instances
  	kubectl scale --replicas=<count> rc <name>                          
-	                                                                    
-	
 ## Map port <external> to port <internal> on replication controller <name>	                                                                    
  	kubectl expose rc <name> --port=<external> --target-port=<internal> 
 
