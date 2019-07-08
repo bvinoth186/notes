@@ -2,4 +2,5 @@
 
 ## Cloud concepts 
 
- - High Availiaility
+- High Availiaility
+  - Load balancers
