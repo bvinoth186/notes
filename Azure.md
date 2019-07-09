@@ -31,6 +31,7 @@
   - Avoids over provisioning and under provisioning 
   - Autoscaling in Azure 
     - Add or remove VM's based on set of rules
+	
 
 - Agility
   - Value = Agility + Utilization 
@@ -63,6 +64,62 @@
 	- printer cartridges, paper, electricity 
 	- Web site hosting, web domain registrations, maintancer agreement, yearly service 
 	- Pay as you go items 
+	
+- IAAS 
+  - Provides infrastructue required on demand 
+  - IAAS scenaios 
+    - Test and Development 
+    - Website hosting 
+	- Storage, backup and recovery 
+	- Web apps 
+	- High performance computing (eg : weather predictions, financial modeling)
+	- Big data analysis 
+  - Advantages 
+	- Eliminates CapEx and reduces ongoing cost 
+	- improves business continuity and DR 
+	- Innovate rapidly 
+	- Focus on core business
+	- increase stability 
+	- No need to troubleshoot equipment problems. cloud provides takes the responsibility of infra resources 
+	- Get new apps to user faster 
+  - When to use IAAS 
+    - Startup or small company 
+	- Large orgnanization looking to only purchase what is needed
+	- rapidly growing companies 
+	- When you not sure of the demand
+
+- PAAS 	
+  - Complete develpoment and deployment environment in cloud 
+  - purchase resources when you need 
+  - Includes IAAS (Services, Storage & networking)
+  - also includes middleware, develpoment tools and business intelligence 
+  - Desinged to support complete cycle of web apps
+  - Avoid expenses of buying / Managing software licenses 
+  - you manage the application and services 
+  - PAAS scenaios 
+    - Development framework 
+	- Analytics 
+	- Business Intelligence 
+	- Security 
+	- Middleware 
+  - Advantages 
+    - Cut coding time (workflow directroy service)
+	- provides inbuilt tools
+	- Develop for multiple platforms (mobile)
+	- Pay as you go 
+	- efficianly manage application lifecycle 
+	- Geographically distributed 
+  - When to use PASS
+    - Multiple developers working on same project 
+	- own customized applications 
+	- if you repidly developing and deploying application
+  - Examples 
+	- AWS ELastic Bean Stalk 
+	- Google app Engine 
+	- windows Azure 
+	 
+  
+	
 	
   
 	
