@@ -51,6 +51,9 @@
     - Replicates workloads to a secondary location
 	- it outage in primary site, fails over to secondary. once the outage is over fall back to primary. 
 	
+- Economies of Scale
+  - Economies of scale is the ability to do things more efficiently or at a lower-cost per unit when operating at a larger scale	
+	
 - CapEX vs OpEx
   - Capital Expenditures 
     - Money company spends on fixed assets
@@ -89,6 +92,11 @@
 	- rapidly growing companies 
 	- When you not sure of the demand
 	- Google Compute Engine 
+  - Responsibilities 
+    - User
+	  - Purchase, installation, configuration, and management of their own software operating systems, middleware, and applications.
+	- Cloud Provider
+	  - Responsible for ensuring that the underlying cloud infrastructure (such as virtual machines, storage, and networking) is available for the user.
 
 - PAAS 	
   - Complete development and deployment environment in cloud 
@@ -119,6 +127,11 @@
 	- AWS ELastic Bean Stalk 
 	- Google app Engine 
 	- windows Azure 
+  - Responsibilities 
+    - User
+	  - Responsible for the development of their own applications.
+	- Cloud Provider
+	  - Responsible for operating system management, and network and service configuration.
 
 - SAAS 
   - Connects to cloud based apps over Internet
@@ -148,6 +161,12 @@
 	- Drop box 
 	- Concur 
 	- GotoMeeting
+  - Responsibilities 
+    - User
+	  - Users just use the application software; they are not responsible for any maintenance or management of that software.
+	- Cloud Provider
+	  - The cloud provider is responsible for the provision, management, and maintenance of the application software.
+	
 
 - Public Cloud	
   - Public Internet 
@@ -181,6 +200,66 @@
   - cost effective 
   - Ease
 	
+## Core Azure Services
+
+- Geography 
+  - Americas, Europe, Asia Pacific, Middle East and Africa
+  - 2 or more regions 
+
+- Regions
+  - 42 regions around the world.  12 are in plan 
+  - e.g. North Europe, West Europe, Germany North, Germany West Central
+  - independent power, cooling, and networking
+
+- Paired Regions 
+  - Each region is paired with another region within the same geography (such as US, Europe, or Asia) at least 300 miles away
+  - allows for the replication of resources
+  - For platform updates (Planned maintenance) only one paired region will be updated at a time
+  - to avoid outage 
+
+- Availability Zones 
+  - for HA 
+  - e.g. Zone 1, Zone 2, Zone 3 
+  - physical locations within azure region 
+  - minimum 3 separate zones in all enabled regions 
+  - 99.99 % VM uptime SLA
+  - Combination of fault domain and update domain (all VM's in AZ will not be updated at the same time)
+  
+- Availability Sets
+  - Availability Sets comprise of update and fault domains 
+  - Update Domain 
+    - When a maintenance event occurs, the update is sequenced through update domains
+  - Fault Domain
+    - Fault domains provide for the physical separation of a workload across different hardware in the data center. 
+
+- Hierarchy
+  - Geography > Region > Availability Zone > Availability Set > Fault Domain/Update Domain 
+  
+- Resource Groups  
+  - Group the related resources by project or feature (container)
+  - all resources should share the same life cycle 
+  - one resource can be in one resource group 
+  - Can move, add, remove at any time
+  - can group from different regions 
+  - scope access control (permissions, billings)
+  - resources one resource group can interact another resources in another resource group. 
+  - location required when creating resource group (this saved in metadata)
+  
+- Azure Resource Manager
+  - deploy, update, delete, monitor all the resources as a group
+  - security, auditing, tagging 
+  - Resource 
+  - Resource Group
+  - Resource Provider (Microsoft Storage)
+  - Resource Manager Template 
+    - Json configuration 
+  - Declarative syntax 
+  - Can define the dependencies between resources 
+  - access control 
+  
+- Azure Virtual Machines   
+  
+  
 	 
   
 	
