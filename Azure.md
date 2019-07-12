@@ -256,8 +256,77 @@
   - Declarative syntax 
   - Can define the dependencies between resources 
   - access control 
+
+## Compute 
   
 - Azure Virtual Machines   
+  - like EC2
+  - still you need to maintain the VM (patching etc)
+  - VM naming
+  - location 
+  - Size of the VM - process, cpu
+  - Number of VM's needed
+  - OS
+  - configuration after it starts
+  - related resources (virtual network etc)
+  - name can be up to 15 chars 
+  - computer name (as part of OS) and vm name is same if you use Azure vm 
+  - if you use your own image, name can be different. best practice to keep the same name 
+  - VM Scale Sets 
+	  - create and manage group of identical, load balanced VM'same
+	  - Number of VM instances can automatically increase or decrease
+	  - provide HA 
+	  - offers auto scaling and load balance
+
+- Azure App Service 
+  - build and host web apps, mobile restful api's 
+  - auto scaling and HA
+  - supports both windows and Linux
+  - enables automated deployments (from Github etc)
+  - Java,.Net, ruby, python etc 
+  - SAAS in mins
+
+- Azure Functions
+  - Server-less compute service 
+  - Java,.Net, ruby, python, PHP etc 
+  - Pay per use 
+  - bring your own dependencies
+  - security 
+  - open source 
+  - working with IOT
+  - Can be integrated with CosmoDB, Event Hubs, Service Bus, Storage etc
+  
+## Networking
+
+- Azure Virtual Networks 
+  - Enables resources to securely communicate with each others
+  - Internet or on perm networks 
+  - scoped to single region 
+  - can interact to different regions using V-Net peering   
+  - isolation 
+  - by default outbound to Internet 
+  - filter network traffic using security group or network appliance 
+  - route network traffic (route tables)
+  - connect other virtual networks (can be in same or other regions) using V-Net peering  
+  
+- Azure Load balancer
+  - Scaling and HA 
+  - supports inbound and outbound connections
+  - low latency and high throughput
+  - two SKU's 
+    - Basic 
+    - Standard 
+  - Port forwarding traffic to specific port
+  - Application agnostic 
+  - Automatic reconfiguration 
+  - health probes (health check)
+  - Public load balancer - Maps the public ip address and port number of incoming traffic to the private IP and port of the VM and vice versa 
+  - Internal Load balancer - directs the traffic only to resources that are inside virtual network or that uses vpn to access azure infra
+  
+	
+  
+  
+  
   
   
 	 
