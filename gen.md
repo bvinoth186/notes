@@ -204,7 +204,7 @@
 
 ## BASE
 - No Sql 
-- B
+- BA
   - Basically available 
 - S
   - Soft state
@@ -229,11 +229,11 @@
 ## ACID
 - DBMS 
 - A
- - Atomicity
- - Transactions with bunch statements, either all success or complete rollback.
- - No partial commit 
+  - Atomicity
+  - Transactions with bunch statements, either all success or complete rollback.
+  - No partial commit 
 - C
- - Consistency
+  - Consistency
 - I
   - Isolation
   - Multiple threads accessing the same data it should be isolated.
@@ -344,6 +344,7 @@
 - Boundary context between sub domains 
 -  Strategic design 
     - Everything you talk in context 
+	- Domain and Subdomains
     - bounded context 
     - Context map 
     - ubiquitous language 
@@ -362,13 +363,17 @@
    - each sub domain would have its own bounded context 
    - Each bounded context has its own domain model, ubiquitous language, api, Db, documentation 
 - Tactical design
-- Talks about the implementation 
-- Components inside the bounded context 
-- Tends to change
-- Entities, Services, Factories, Repositories, VO
-- Value Objects - String is value object.  It’s helps handle character array, Immutable, Thread safe 
-- Aggregates - one to many relation between entities 
-
+  - Talks about the implementation 
+  - Components inside the bounded context 
+  - Tends to change
+  - Entities, Services, Factories, Repositories, VO
+  - Value Objects 
+    - String is value object. 
+	- It’s helps handle character array, 
+	- Immutable, 
+	- Thread safe 
+  - Aggregates 
+    - one to many relation between entities 
 - Event Storm 
    - like Brainstorming
    - Event Storm sessions 
@@ -409,7 +414,7 @@
    - Filter Pattern
      - filter through set of objects with different criteria
 	 - Hibernate criteria 
-   - composite
+   - Composite
      - when we want to treat the group of objects in a similar manner 
 	 - Employee  class has variables of name, age, role and coworkers list. 
 	 - Coworker is the type of employee class 
@@ -431,7 +436,7 @@
      - interprets the inputs and gives the result.  
 	 - Java compiler, google translate is the example.  
 	 - If I pass string to api, it interprets the string by splitting the string into more then one string if it had delimiter comma, and returns string array 
-   - template
+   - Template
      - Abstract class pre defined the ways to run its methods.  
 	 - Sub classes should follow the way defined in the abstract class 
 	 - employee abstract class has abstract method work.  Subclass developer implements work() and it’s about writing code.  Manager subclass implements work() it’s about managing developers.  Here work is the template all the employees are following. Abstract method of abstractSet, AbstractList.  
