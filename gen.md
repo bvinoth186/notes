@@ -196,22 +196,22 @@
   - Liskov Substitution principle
   - if q(x) is provable of objects of x of type T, then q(y) should be provable of objects of y of type S, where S is subtype of T
 - I
- - Interface Segregation principle
- - client should never forced to implement an interface that it doesn't use 
+  - Interface Segregation principle
+  - client should never forced to implement an interface that it doesn't use 
 - D
- - Dependency Inversion principle
- - Entities must depends on the abstractions and not on concretions
+  - Dependency Inversion principle
+  - Entities must depends on the abstractions and not on concretions
 
 ## BASE
 - No Sql 
 - B
- - Basically available 
+  - Basically available 
 - S
- - Soft state
- - state of the system will be changing even if no inputs 
+  - Soft state
+  - state of the system will be changing even if no inputs 
 - E
- - Eventual consistency
- - Data will be consistent over a period of time
+  - Eventual consistency
+  - Data will be consistent over a period of time
 
 ## CAP theorem or Brewer theorem 
 - Distributed data store can’t guarantee the 3 characteristics.
@@ -235,9 +235,9 @@
 - C
  - Consistency
 - I
- - Isolation
- - Multiple threads accessing the same data it should be isolated.
- - Lock the table for concurrent update 
+  - Isolation
+  - Multiple threads accessing the same data it should be isolated.
+  - Lock the table for concurrent update 
 - D
   - Durability
   - Once the data committed it should be available even if the power failure 
@@ -283,18 +283,30 @@
 
 ## Cloud Foundry 
 - its PAAS
-- Build Pack - framework of runtime, it automates the detection of application framework 
-- BOSH - creates and deployed VM and deploys Cloud foundry on top 
-- Blobstore - repo of large binary files (github cant store them). it has application code packages, buildpacks and droplets
-- Diego -self healing container management system
+- Build Pack
+  - framework of runtime, it automates the detection of application framework 
+- BOSH
+  - creates and deployed VM and deploys Cloud foundry on top 
+- Blobstore
+  - repo of large binary files (github cant store them). it has application code packages, buildpacks and droplets
+- Diego
+  - Self healing container management system
 
 ## UML
 - Unified Modeling Language 
 - Graphical , Visual representation of Artifact 
-- Structural - static part of the model - class, interface, component, node - class diagram, component diagram, deployment diagram
-- Behavioral - dynamic part of model - message , state, dependency, association - use case diagram, sequence diagram, state diagram, activity diagram 
-- Architectural  - candidates architecture 
-- views - use case view, design view, deployment view 
+- Structural
+  - Static part of the model
+  - class, interface, component, node
+  - class diagram, component diagram, deployment diagram
+- Behavioral
+  - Dynamic part of model
+  - message , state, dependency, association
+  - use case diagram, sequence diagram, state diagram, activity diagram 
+- Architectural
+  - candidates architecture 
+- views
+  - use case view, design view, deployment view 
 - Use case diagram 
 - class diagram 
 - object diagram 
@@ -302,14 +314,23 @@
 - sequence diagram 
 - activity diagram 
 - Deployment diagram 
-- Components - Actor, Object
-- Deployment Diagram - Nodes, Dependencies, Components, Links 
-- state diagram - initial state, transition, final state 
-- Dependency - dotted arrow from dependent side to independent side.  Inheritance
-- Association - dotted 2 side pointing arrow 
-- Message - pointing arrow 
-- class notation - square box with 4 parts - 1. Name 2. Instance variables 3.  Methods 4.  Additional responsibilities (optional)
-- Object notation - same as class.  But name is underlined 
+- Components
+  - Actor, Object
+- Deployment Diagram
+  - Nodes, Dependencies, Components, Links 
+- state diagram
+  - initial state, transition, final state 
+- Dependency
+  - dotted arrow from dependent side to independent side.  Inheritance
+- Association
+  - dotted 2 side pointing arrow 
+- Message
+  - pointing arrow 
+- class notation
+  - square box with 4 parts
+  - 1. Name 2. Instance variables 3.  Methods 4.  Additional responsibilities (optional)
+- Object notation
+  - same as class.  But name is underlined 
 
 
 ## Domain Driven Design 
@@ -363,69 +384,162 @@
 - Creational Patterns
    - Singleton
    - Factory / Template 
-   - Abstract Factory - Factory of Factories 
-   - Builder pattern - instantiate the classes which has larger or complex fields step by step.   Instantiating with argument constructor with many fields is complex.  Instead include static builder class and build. (Private constructer) 
-   - Prototype pattern - to minimize the cost of object creation - copying the object once it’s created.  And reuse the copy of the request for future requests - clone 
+   - Abstract Factory
+     - Factory of Factories 
+   - Builder pattern
+     - instantiate the classes which has larger or complex fields step by step.
+	 - Instantiating with argument constructor with many fields is complex.
+     - Instead include static builder class and build. (Private constructer) 
+   - Prototype pattern
+     - to minimize the cost of object creation
+	 - copying the object once it’s created.
+	 - And reuse the copy of the request for future requests
+	 - clone 
 - Structural Patterns 
-   - Adapter - adapts one interface to another.  Acts as bridge between two unrelated interfaces. Example , 1 interface Builder has a method build(type, location), 2nd interface Advanced Builder has 2 methods, buildFlat(location) and buildFarmHouse(location).  Now adapter can be used to use interface 2 in interface 1 - Arrays.asList() coverts arrays into List and marshal and unmarshalling
-   - Bridge - segregates abstract classes from its implementation and act as bridge between them - 1 interface Shape 1 interface colour.   Combining this 2, RedCircle, RedSqure, BlueCircle 
-   - Filter Pattern - filter through set of objects with different criteria - Hibernate criteria 
-   - composite - when we want to treat the group of objects in a similar manner - Employee  class has variables of name, age, role and coworkers list.  Coworker is the type of employee class 
-   - Decorator -Dynamically adding responsibilities to a class in a run time 
-   - Facade - provides the top level interface to clients to access the system.  They don’t have to know the internal logic. 
-   - Flyweight - reduces strain on JVM and it’s memory.  If application needs to create same instances multiple times, use pool of instances and reuse it.  Connection Pool.  String in java are examples 
-   - Proxy - when we want limit the capabilities and functionalities of class, use another class as proxy and restrict it 
+   - Adapter
+     - adapts one interface to another.
+	 - Acts as bridge between two unrelated interfaces.
+	 - Example , 1 interface Builder has a method build(type, location), 2nd interface Advanced Builder has 2 methods, buildFlat(location) and buildFarmHouse(location).  Now adapter can be used to use interface 2 in interface 1
+	 - Arrays.asList() coverts arrays into List 
+	 - marshal and unmarshalling
+   - Bridge
+     - segregates abstract classes from its implementation and act as bridge between them 
+	 - 1 interface Shape 1 interface colour.   Combining this 2, 
+	 - RedCircle, RedSqure, BlueCircle 
+   - Filter Pattern
+     - filter through set of objects with different criteria
+	 - Hibernate criteria 
+   - composite
+     - when we want to treat the group of objects in a similar manner 
+	 - Employee  class has variables of name, age, role and coworkers list. 
+	 - Coworker is the type of employee class 
+   - Decorator 
+     - Dynamically adding responsibilities to a class in a run time 
+	 - I/O classes 
+	 - InputStream, FileInputStream, BufferedInputStream and ObjectInputStream
+   - Facade 
+     - Provides the top level interface to clients to access the system.  They don’t have to know the internal logic. 
+   - Flyweight
+     - Reduces strain on JVM and it’s memory. 
+	 - If application needs to create same instances multiple times, use pool of instances and reuse it.  
+	 - Connection Pool. 
+	 - String in java are examples 
+   - Proxy  
+     - when we want limit the capabilities and functionalities of class, use another class as proxy and restrict it 
 - Behavioral Patterns 
-   - interpret - interprets the inputs and gives the result.  Java compiler, google translate is the example.  If I pass string to api, it interprets the string by splitting the string into more then one string if it had delimiter comma, and returns string array 
-   - template - abstract class pre defined the ways to run its methods.  Sub classes should follow the way defined in the abstract class - employee abstract class has abstract method work.  Subclass developer implements work() and it’s about writing code.  Manager subclass implements work() it’s about managing developers.  Here work is the template all the employees are following. Abstract method of abstractSet, AbstractList.  
-   - Chain of responsibility - method 1 calls method 2, 2 calls 3, and 3 calls 4- if any exceptions occurs in m4 it would be transferred to 3, 2 and 1 if no try catch or approval process 
-   - Command - 2 phase commit, runnable 
-   - Iterator - collections 
-   - Mediator - mediator between 2 different objects which communicate any way. Messaging system 
-   - memento - concerned with pervious state of the object. When we want to store the state of an object so that we can restore at any time, Event sourcing 
-   - observer - to monitor the state of the object.  One to many relationship, changing state of one class may impact others classes.  So system should monitor state of the object 
-   - Strategy - Algorithm or class behavior is dynamic.  It can changed in runtime.  Comparator.compare, Collections.sort. 
-   - visitor - move the business logic from each individual element of a group to different class. 
+   - Interpret
+     - interprets the inputs and gives the result.  
+	 - Java compiler, google translate is the example.  
+	 - If I pass string to api, it interprets the string by splitting the string into more then one string if it had delimiter comma, and returns string array 
+   - template
+     - Abstract class pre defined the ways to run its methods.  
+	 - Sub classes should follow the way defined in the abstract class 
+	 - employee abstract class has abstract method work.  Subclass developer implements work() and it’s about writing code.  Manager subclass implements work() it’s about managing developers.  Here work is the template all the employees are following. Abstract method of abstractSet, AbstractList.  
+   - Chain of responsibility
+     - method 1 calls method 2, 2 calls 3, and 3 calls 4- if any exceptions occurs in m4 it would be transferred to 3, 2 and 1 if no try catch 
+	 -  approval process 
+   - Command 
+     - 2 phase commit 
+	 - runnable 
+   - Iterator
+     - collections 
+   - Mediator
+     - Mediator between 2 different objects which communicate any way. 
+	 - Messaging system 
+   - Memento
+     - concerned with pervious state of the object. 
+	 - When we want to store the state of an object so that we can restore at any time, 
+	 - Event sourcing 
+   - Observer 
+     - to monitor the state of the object.
+     - One to many relationship, changing state of one class may impact others classes.  
+	 - So system should monitor state of the object 
+   - Strategy 
+     - Algorithm or class behavior is dynamic.  
+	 - It can changed in runtime.  
+	 - Comparator.compare,
+	 - Collections.sort. 
+   - Visitor 
+     - move the business logic from each individual element of a group to different class. 
 
 ## J2EE Patterns
 - MVC Pattern 
-- Business Delegate - decouples business layer from presentation later.  Delegates the requests to different business based in the request type.  Requests comes business delegate.  Delegate checks the type of the requests, if it’s type customer sends to customer service, if it’s type payments sends to payments service 
+- Business Delegate 
+  - Decouples business layer from presentation later. 
+  - Delegates the requests to different business based in the request type.  Requests comes business delegate.  
+  - Delegate checks the type of the requests, if it’s type customer sends to customer service, if it’s type payments sends to payments service 
 - DAO 
 - Front Controller 
 
 
 ## Hibernate 
 - ORM 
-- Configuration, Session Factory, Session, Transaction, Query, Criteria 
-- First level cache, session cache, mandatory, objects are stored here before persist 
-- cache query, second level cache, associated with session factory, optional, queries that frequently holding same set of parameters 
-- Transient state - state which is not persisted 
-- Lazy loading - child objects are not loaded when the parent is loaded 
-- Advantages of using hibernate template - don’t have to close the sessions.  Frameworks takes care if it.  Exception handling easier 
-- Save vs persist - save returns serializable object , persist is void 
-- load vs get - load throws exception if the records not found. Get returns null 
-- Update vs Merge - update can be used only with in the session.  If session is closed update would throw the error.  If we don’t know the state of the session use merge.  Merge can be used at anytime. 
-- Transient - object  is created with no primary and not associated wit the session 
-- Persistent - saved the object to DB or object is retrieved from DB 
-- Detached - object is created but session is closed before persisting 
-- detached objects comes to persistent state if lock() or update () is called 
-- By default class is mutable.  To make immutable, Mark a class as mutable = false 
-- Dirty checking is automate.  If the any change in object only then it hits the Db 
+- Configuration 
+- Session Factory 
+- Session 
+- Transaction 
+- Query 
+- Criteria 
+- First level cache
+  - session cache 
+  - Mandatory
+  - objects are stored here before persist 
+- Second level cache, 
+  - cache query, 
+  - associated with session factory, 
+  - optional, 
+  - queries that frequently holding same set of parameters 
+- Transient state
+  - state which is not persisted 
+- Lazy loading 
+  - child objects are not loaded when the parent is loaded 
+- Advantages of using hibernate template
+  - don’t have to close the sessions.  
+  - Frameworks takes care if it.  
+  - Exception handling easier 
+- Save vs persist 
+  - save returns serializable object 
+  - persist is void 
+- load vs get 
+  - load throws exception if the records not found. 
+  - Get returns null 
+- Update vs Merge 
+  - update can be used only with in the session.  
+  - If session is closed update would throw the error.  
+  - If we don’t know the state of the session use merge. 
+  -  Merge can be used at anytime. 
+- Transient 
+  - object  is created with no primary and not associated wit the session 
+- Persistent 
+  - saved the object to DB or object is retrieved from DB 
+- Detached 
+  - object is created but session is closed before persisting 
+  - detached objects comes to persistent state if lock() or update () is called 
+- By default class is mutable.  
+  - To make immutable, Mark a class as mutable = false 
+- Dirty checking is automate.  
+  - If the any change in object only then it hits the Db 
 
 
 ## Java8 
-- Lambda expressions - gives ability to pass a functionality as a method argument - helps to reduce code clutter and better readability 
-- pipelines and streams  - iteration, filter, Match 
+- Lambda expressions 
+  - gives ability to pass a functionality as a method argument 
+  - helps to reduce code clutter and better readability 
+- pipelines and streams  
+  - iteration, filter, Match 
 - date and time api 
 - default methods 
 - Static methods in interface 
 - concurrent api 
-- Parallel - iterating over collection can be parallel 
+- Parallel 
+  - iterating over collection can be parallel 
 - perm gen space removed 
 - For each method 
-- Type annotations - @NotNull @ReadOnly 
+- Type annotations 
+  - @NotNull @ReadOnly 
 - Optional 
-- method reference - alternate for lambda for better readability, 2 colon , ::
+- Method reference 
+  - alternate for lambda for better readability, 2 colon , ::
   
 ## Solution Arch
 
