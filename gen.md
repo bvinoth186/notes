@@ -29,30 +29,6 @@
   - CICD 
   - Easy debugging and maintenance
   
-  
-##Solution Arch
-
-- Check first the app is already there 
-- Who are the stockholders 
-- Collect the attributes and requirement from business 
-- High level flow diagram, actor, system 
-- Use case diagrams
-- Convert technical requirement 
-- Low level design, define interface 
-- Design 
-  - What’s requirement 
-  - What’s volume 
-  - What’s the availability 
-  - What’s the scalability 
-  - What’s the load expected 
-  - Choose technology, like spring boot 
-  - Check all the available options 
-  - Check approved options 
-  - Check available skill set 
-  - Check for best practice 
-  - Which cloud 
-  - Check the compatibility and evaluate 
-
 ## 15 factor app
 
 - One code base, one application
@@ -451,6 +427,28 @@
 - Optional 
 - method reference - alternate for lambda for better readability, 2 colon , ::
   
+## Solution Arch
+
+- Check first the app is already there 
+- Who are the stockholders 
+- Collect the attributes and requirement from business 
+- High level flow diagram, actor, system 
+- Use case diagrams
+- Convert technical requirement 
+- Low level design, define interface 
+- Design 
+  - What’s requirement 
+  - What’s volume 
+  - What’s the availability 
+  - What’s the scalability 
+  - What’s the load expected 
+  - Choose technology, like spring boot 
+  - Check all the available options 
+  - Check approved options 
+  - Check available skill set 
+  - Check for best practice 
+  - Which cloud 
+  - Check the compatibility and evaluate 
    
   
   
