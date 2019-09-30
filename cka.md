@@ -17,14 +17,14 @@
 
 ## Cluster Architecture 
 
-- K8s Architecture
-  - Master 
-    - Manage 
-	- Plan
-	- Schedule 
-	- Monitor nodes 
-  - Worker Nodes
-    - Host application as Containers 
+# K8s Architecture
+- Master 
+  - Manage 
+  - Plan
+  - Schedule 
+  - Monitor nodes 
+- Worker Nodes
+  - Host application as Containers 
 	
 - Master Side 	
   - ETCD Cluster 
@@ -40,11 +40,12 @@
   - Container Runtime Engine 
     - Docker 
 	- Rocket (rkt)
-	- Container-D
+	- Containerd
   - Kubelet
     - Agents runs on the node 
   - Kube-Proxy 
     - Communication between nodes 
   
+## ETCD 
   
 	
