@@ -17,7 +17,7 @@
 
 ## Cluster Architecture 
 
-# K8s Architecture
+### K8s Architecture
 - Master 
   - Manage 
   - Plan
@@ -46,6 +46,6 @@
   - Kube-Proxy 
     - Communication between nodes 
   
-## ETCD 
+### ETCD 
   
 	
