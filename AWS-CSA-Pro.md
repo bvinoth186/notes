@@ -78,7 +78,7 @@
 	- same underlying AWS technologies 
 	- Same tools and API's 
   - Counter statement is also valid  (AWS and AZURE)
-    - Not to lock with same vender 
+    - Not to lock with same vendor 
 	
 - RTO 
   - Recovery Time Objective
@@ -128,6 +128,7 @@
     - Cached Volumes
 	  - Cached mode 
 	  - Only your most frequently accessed data is stored in on prime and Your entire data set is stored in S3 (as EBS snapshot).
+	- EBS snapshots can be restored as either EBS volume and attached to EC2 or ICASI transfer via another storage gateway 
   - Tape Gateway 
     - iSCSI 
     - VTL
@@ -153,6 +154,93 @@
   - Ec2 instance which was imported using VM import tool can be exported as Virtual Machine image for external use 
   - but AWS own EC2 instances cant be exported as VM image 
   - no charge for VM import / Export tool beyond and standard usage of Ec2 and S3
+  
+- Route 53
+  - HA, Cost effective 
+  - Health check 
+  - ability to fail over multiple endpoints
+  
+- Elastic IP address 
+  - static ip's  
+  - public ip address are dynamic. (restarts of instance would give you different ip)
+  - Elastic IP address, mask instance or AZ failure by programmatically remapping your public IP addresses to instances in your account in a region
+  
+- Elastic Load Balancer 
+  - Region based
+  - can distribute the traffic within AZ or across AZ. (for across Region - Route 53)
+  
+-----------------------  
+- DR Approaches 
+  - Backup and Restore (Slow, Cheap)
+  - Pilot lite
+  - Warm Standby 
+  - Multi site (Fast, Pricey)
+  
+- Backup and Restore
+  - S3
+    - Over Internet
+	- Direct Connect 
+	- AWS Import / Export 
+	- Snapshots of EBS
+	- RDS DB (EBS Snapshots)
+	- Redshift (snapshots)
+  - Glacier
+  - Storage Gateway 
+
+- Pilot Lite 
+  - Minimal version of core components always running in DR and continuously up-to date. 
+  - for Data - Data mirroring from primary to pilot lite 
+  - During DR situation, rapidly provision the full scale production environment around the critical core. 
+  - For Restore 
+    - Pre configured AMI's 
+	- Elastic IP address 
+	- ELB
+	- EBS snapshots using backup and restore method
+	- Resize the Database to handle traffic and data (with RDS you can increase on the fly but decreasing not possible)
+  - quicker recovery then Backup and Restore 
+  - Costlier then backup and restore 
+  - Regularly test and keep the data up-to date
+  - automate the provisioning of AWS services 
+  
+- Warm Standby 
+  - Extends the pilot version
+  - Scaled down version of full functional primary environment always running 
+  - Data replication up-to date 
+  - can run with minimum fleet of EC2 with smallest sizes possible since there is no traffic 
+  - Can be used for non prod work like pre prod, testing, internal use until DR 
+  - Create and maintain AMI's 
+  - Patch and update software and keep in sync with primary 
+  - Recovery 
+    - Rescale 
+	- load balancer split the traffic to the new instances 
+	- Route 53 to route the traffic
+	- can resize to larger EC2 instances 
+	- scale up RDS DB
+
+- Multi Site
+  - Active Active
+  - Route 53 weight age policy 
+
+- Replication 
+  - distance - larger distance would have high latency 
+  - bandwidth 
+  - data rate required by application (should be less then the bandwidth)
+  - replication technology (should be in parallel)
+  - Synchronous replication
+    - data is automically updated in multiple locations
+	- depends on network performance and availability
+  - Asynchronous replication
+    - eventual consistency
+
+- Self Healing 
+  - SQS to decouple
+  - Cloud watch and Auto scaling terminates unhealthy instances
+  - Auto scaling replaces terminated instances 
+  - S3 / Glacier performs systematic integrity checks (automatic self healing)
+  
+
+
+  
   
 
 
