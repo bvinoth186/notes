@@ -237,6 +237,69 @@
   - Cloud watch and Auto scaling terminates unhealthy instances
   - Auto scaling replaces terminated instances 
   - S3 / Glacier performs systematic integrity checks (automatic self healing)
+ 
+# Organizational complexity and Cost control  
+
+- AWS Billing and Cost Management
+  - service used to pay bill, monitor usage and budget usage costs 
+  - payer account 
+  - consolidated billing 
+  - aggregated usage across the accounts(cost saving)
+  - month begin usage reset to zero (aws charges monthly)
+  - aws support is per individual account 
+  - aws limits are per individual account (not master account or consolidated)
+  - one detailed bill for multiple accounts
+  - consolidated billing is free
+  
+- AWS Cost Explorer 
+  - free service 
+  - cost data as graph 
+  - filter by AZ, region, tag, aws resource etc
+  - filter by account (consolidated billing)
+  - forecast based on historical data 
+
+- AWS Budgets 
+  - to plan service usage, costs, instance reservations
+  - predict the usage 
+  - how much of the budget used 
+  - SNS notification 
+    - usage goes over budget amount 
+	- estimated cost exceeds budget 
+  - info updated 3 times a day 
+  - Types
+    - Cost Budget - plan how much desired to spend on service
+	- Usage budget - 
+	- RI Utilization budget
+	- RI coverage budget 
+	
+- AWS Organizations (Consolidated billing)
+  - master account or payer account -- responsible for paying 
+  - one or more member account 
+  - by default member cant add /  edit / read other account budgets
+  - but can be enabled via IAM policy 
+  - AWS recommendation not to run any services in master account.  S3 alone created to store the bills
+  - volume discounts (charged by aggregated usage)
+  - tagging the resources across multiple accounts are complex 
+  - usage of Reserved instance can be shared across accounts. sharing must be turned on both sides
+  - This can be turned off also 
+  
+- Cost Monitoring 
+  - Cloud watch can monitor and send notifications
+  - Billing alerts with threshold 
+  - upto 20000 budgets can be created by individual account or master account 
+  - first 2 budgets are free
+  - notification 
+    - SNS topic
+	- email 
+	- or both
+
+- Tags 
+
+- Cost Allocation Tags
+  - To track AWS costs details
+  - must be activated to appear in cost explorer 
+  - only master account or individual account would have the access 
+  
   
 
 
