@@ -272,7 +272,7 @@
 	- RI Utilization budget
 	- RI coverage budget 
 	
-- AWS Organizations (Consolidated billing)
+- Consolidated billing
   - master account or payer account -- responsible for paying 
   - one or more member account 
   - by default member cant add /  edit / read other account budgets
@@ -299,6 +299,155 @@
   - To track AWS costs details
   - must be activated to appear in cost explorer 
   - only master account or individual account would have the access 
+  
+- Resource Groups 
+  - group of AWS resources sharing one or more tags 
+  
+- EC2 Purchasing options
+  - OnDemand
+  - Reserved
+  - Scheduled - Specified schedule for one year term 
+  - Spot
+  - Dedicated Host 
+  - Dedicated Instances
+  - Capacity reservations 
+  - Do not commit RI purchase before sufficiently bench marking your application in production 
+  - RI utilization report to ensure we are making most of our reserved capacity 
+  - Spot instances can be launched independently with auto scaling or EMR (task nodes)
+  - Redshift doesn't use  SPOT
+
+- AWS Organization 
+  - Consolidating multiple accounts into single org
+  - Free service 
+  - Global like IAM 
+  - Can be reached through endpoint in US East region 
+  
+  
+- AWS Organization Components
+  - Root account 
+    - Parent container for all accounts and OU's in the org 
+	- policy applied at root level flows through all accounts and OU's
+	- Root created automatically when we create AWS organization 
+	- Only one root in an 
+	- Can have one or more individual accounts 
+	- Can have one or more OU's 
+  - OU (organizational unit)
+    - Container of other OU's and account 
+	- OU can have only one parent
+	- An account can be member of only one OU 
+	- policy applied at OU level flows through other accounts and OU's under this OU
+    - Can have one or more individual accounts 
+	- Can have one or more OU's 
+	- Can nest OUs within other OU's at the up to the depth of 5
+  - Individual Account 
+    - Master Account 
+	  - Payer account 
+	  - Responsible for payment 
+	  - Account that exists before creating AWS organization (Account that creates AWS Organization)
+	  - From the master account 
+	    - Add / Remove / Manage accounts in / from the organization
+		- Can manage invitations to join to AWS Organization
+		- Can apply Organizational policies (NOT IAM) at Root, OU and accounts level
+	- All other accounts called member account 
+	- An account can be member of only one account 
+	
+- AWS Organization Features 
+  - if the account is created it will be automatically part of AWS organization
+  - Can invite any other accounts to join in AWS Organization
+  - Ability to apply policies selectively or all accounts in organization 
+  - Accounts can be grouped into in OU (Finance OU)
+  - Each OU can have separate policy 
+  - Organization permissions can overrule / override account permissions 
+  - Master account administrator have higher authority over the administrators of individual account 
+  - Master account administrator can restrict which aws service or api actions that user in individual account can access to.  (which is authorized by individual account administrator)
+  - User or IAM role can access only what is allowed by both AWS organization and Individual account policies 
+  - if any service is denied by any one, this cannot be accessed 
+  
+- AWS Organization Data replication
+  - Highly available service 
+  - AWS Organization data is replicated to multiple data centers within the region 
+  - Eventual consistency 
+  - if any configuration or policies changes, might not available immediately if the configuration is retrieved from other data center. bit it will consistent eventually 
+
+- AWS Organization Feature sets
+  - operates on two modes 
+  - 1. Consolidated Billing
+    - default 
+	- only consolidated feature is enabled 
+	- it cant access other advanced features.
+  - 2. All Features 
+    - Full advanced features 
+	- Can be enabled at the time or creation or can be enabled later time 
+	- To enable All features from Consolidated billing mode, invite should be sent from master to all the member accounts.  member account have to approve the changes first 
+  - in All features mode, Master account can 
+    - has full control over what member accounts can do 
+	- Can apply Service Control Policies (SCP's) to restrict all IAM users ((including root) and IAM roles in the account can do or access 
+	- Can prevent member accounts from leaving the organization
+	
+- Service Control Policy (SCP)
+  - SCP defines the services and actions the IAM users and IAM roles can do in the accounts to which SCP is applied to 
+  - SCP doesn't grant permissions, they are only filtering permissions
+  - it defines maximum permissions that affected accounts can have 
+  - SCP can be applied to (like policy) 
+    - Root level 
+	- OU level 
+	- Account level 
+  - SCP has not effect on the master account 
+  
+- White-listing 
+  - policy specifies list of actions or access  that are allowed 
+  - all others actions are denied 
+  - By default, Root, AU and accounts have default policy applied by AWS Organization - called FullAWSAccess
+  - in other words, By default, everything allowed by IAM is whitelisted 
+  - to change you need replace the default policy 
+  - if the policy applied at root level, it will flow through all OUs and accounts under it and so on 
+  - you cannot add what is denied by non default policy at root 
+  
+- Black-Listing 
+  - Default for AWS organization
+  - policy specifies list of actions or access  that are denied 
+  - all others actions are allowed
+  - To establish this 
+    - Leave FullAWSAccess policy at the root level 
+	- and attach more policies that define what is denied 
+  - Like IAM, an explicit deny overrides any allow 
+  
+- AWS Organization integration with other services 
+  - CloudTrail 
+    - For central logging for all accounts logs in Organization
+  - CloudWatch Events
+  - AWS Config 
+  - Artifact 
+  - AWS Firewall Manager 
+    - Centrally manage all firewall configurations
+  - AWS Directory Service 
+  - AWS Licensing Manager 
+  - AWS RAM  
+    - For sharing resources across the accounts (Sharing subnet, Transit gateway)  
+  - AWS Service Catalog 
+  - AWS Single SignOn
+
+- AWS IAM Service Linked Role 
+  - For integration with AWS services in Organization
+  - AWS Organization created service linked role for AWS service in each member account of the AWS Organization, when that AWS service is authorized to access AWS Organization
+  
+- AWS Organization Best practices 
+  - use AWS Cloud Trail to monitor the log activities in a Master account 
+  - Do not add resources in master account (except S3 and Cloud-trail for storing bill and logs) 
+  - Use the least privileged principle 
+  - Assign SCP's at OU level instead of account level (easy scaling) 
+  - Test you SCP's before rolling out 
+  - avoid assigning the SCP's at root level unless necessary 
+  - ue either white-listing or blacklisting but not both 
+  - Establish clear strategy on when to create account 
+  
+  
+	
+	
+- Practice	
+  - ORACLE RAC (Real Application Clusters)  not supported in AWS 
+
+	  
   
   
 
