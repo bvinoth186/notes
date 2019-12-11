@@ -441,12 +441,138 @@
   - ue either white-listing or blacklisting but not both 
   - Establish clear strategy on when to create account 
   
+# Deployment and Operations management
+
+ - Cloudformation
+   - Infra as as Code
+   - Code that provision and configures the resources 
+   - Result is called Stack 
+   - Json or YAML 
+   - Control and track changes 
+   - create code or use existing template 
+   - store locally or in S3
+   - Cloudformation engine to create stack based on your template 
+   - Calls Api calls to provision the resources
+   - Can perform actions only that you have permissions to do
+   - Cloudformation created S3 bucket in each region for you to upload the template file 
+   - bucket is accessible to anyone who is with S3 permissions
+   - if the bucket created by Cloudformation already presents, the template added to that bucket 
+   - Can use your own bucket. Specify the bucket url in a stack 
+   - Cloudformation would notify once the stack is created from the bucket
+   - if Cloudformation fails, it rollbacks all the changes by deleting the resources 
+   - To update stack resources, can modify the template 
+   - no need to recreate the new template 
+   - To update a stack 
+     - Create a change set by submitting the modified template with different configurations or input values if any 
+	 - Cloudformation compares the modified template with old template and generate the change set
+     - can review the changes and confirm 
+	 - Can execute the changes to update the stack
+	 - Updates can cause interruptions
+   - Cloudformation Designer 
+     - Graphic tool for creating, viewing, modifying the template
+     - diagram your template resource 
+     - drag and drop 
+     - integrated with Json/Yaml editor
+   - Template components 
+     - Format Version
+	 - Description 
+	 - Meta Data
+	   - Additional information of the template 
+	 - Parameters 
+	   - Values to pass to your template at runtime 
+	   - can refer parameters from resources and output section 
+     - Mappings
+       - mapping of keys and associated values 
+       - like lookup table 
+     - Conditions
+       - based on the condition create resource, or create dev or prod infra
+     - Transform 
+       - For serverless applications
+       - specifies version of the AWS Serverless Application Model to use (SAM)
+	 - Resources 
+	   - MANDATORY component
+	   - specifies the stack resource 
+	   - like EC2 and its configuration 
+	 - Outputs 
+	   - describes the values that are returned whenever you view your stack properties 
+   - Intrinsic Functions 
+     - built in functions to manage your stacks 
+	 - Can be used in
+	   - Resources 
+	   - Outputs 
+	   - Meta data
+	   - to conditionally crete stack resources
+	 - GetAtt
+	 - FindInMap 
+	 - Ref
+	 - GetAZs
+	 - ImportValue 
+   - Resource Attributes 
+     - Creation policy 
+	   - When you want to delay your resource creation until another resource is created 
+	   - invoked only when Cloudformation creates the associated resources 
+	   - currently supported resources are 
+	     - AWS::AutoScaling::AutoScalingGroup
+		 - AWS::EC2::Instance 
+		 - AWS::Cloudformation::WaitCondition
+	 - Deletion Policy 
+	   - When you want to retain or create snapshots before stack is being deleted 
+	   - If no deletion policy is associated, Cloudformation deletes the resource by default 
+	   - Attributes
+	     - Delete 
+		   - By Default deletes the resources 
+		   - AWS::RDS::DBCluster resources, default policy is snapshot 
+		   - for S3 buckets, you should delete all the objects in the bucket before deleting the bucket 
+		 - Retain
+		   - to retain
+		   - Can be used for any resource 
+		 - Snapshot
+		   - EBS
+		   - Elasticache 
+		   - RDS 
+		   - Redshift 
+	   - Can use both Retain and Snapshot (costly)
+		 
+	 - Depends On
+	   - Specifies the resource creation is depends on another resource 
+	 - Meta Data 
+	   - If you want to add more meta data to your resources 
+	 - Update Policy 
+	   - defines how the resource update should be carried out 
+   - Nested Stacks 
+     - Stacks that creates others stacks 
+     - To reuse common template patterns 
+     - To create nested stacks, use AWS::CloudFormation::Stack to call/reference other templates
+   - Cross Stack References 
+     - to export shared resources 
+	 - when you want organize your AWS resources based on life cycle and ownership 
+	 - instead of including all your resources in a singe stack 
+	 - Can create AWS resources in a separate stacks 
+	 - Can refer the required resource outputs from other stacks 
+	 - using Fn::ImportValue function
+	 - For example, you have network stack with VPC, security group, subnet and web application stack 
+   - Cloudformation Security Best Practices
+     - Only allow specific templates and stack policies, so you can control the source of stack templates and stack policy documents
+	 - Stack Policy - JSON documents describes what you can do during the update operation
+	 - Restrict what resource types can an IAM principle can create 
+   - CloudFormation with CloudTrail and SNS 
+     - Cloudformation integrates with Cloud Trail
+	 - if Logging is enabled, Cloud Trail logs all the AWS services API calls that were done by CloudFormation
+	 
+	 
+	 
   
 	
 	
 - Practice	
   - ORACLE RAC (Real Application Clusters)  not supported in AWS 
-
+  - AD connector (for ad to connect on perm)
+  - AWS Shield standards - to protect layer 3 and layer 4 attacks like SYN floods and UDP reflection attacks   
+  - AWS Shield advanced - includes notification 
+  - Route 53 and ELB integration should use alias record.  Not non alias record.  
+  - Storage Gateway can store upto 512 TB 
+  - Can attach multiple ENI (elastic network interface) so can assign multiple ip /EIP's
+  - only one virtual private gateway (VGW) can be associated with VPC
 	  
   
   
