@@ -532,7 +532,6 @@
 		   - RDS 
 		   - Redshift 
 	   - Can use both Retain and Snapshot (costly)
-		 
 	 - Depends On
 	   - Specifies the resource creation is depends on another resource 
 	 - Meta Data 
@@ -559,6 +558,264 @@
      - Cloudformation integrates with Cloud Trail
 	 - if Logging is enabled, Cloud Trail logs all the AWS services API calls that were done by CloudFormation
 	 
+- OpsWorks 
+  - Provides simple and flexible way to create and manage stacks and applications 
+  - Distributes the applications to application servers 
+  - monitor the stacks, performance, mange security and permissions 
+  - Stack is the core AWS OpsWorks component 
+  - For example, web application require, application servers, db servers, load balancers etc. this group of instances is called Stack 
+  - OpsWorks allows SSH and RDP access to Stack instances
+  - Resources can be managed  only in the region in which they are created 
+  - Resources that are created in one regional endpoint are not available nor can they be cloned to another regional endpoint 
+  - Chef 
+    - chef provides automated configuration that enables consistent configurations at scale 
+    - Cookbook 
+      - package file that contains configuration information, including instructions called recipes 
+    - Recipes 
+      - set of one or more instructions
+	  - written in ruby syntax language 
+	  - specifies the resources to use and order in which those resources are applied 
+	  - Opsworks runs the recipes automatically at the appropriate time 
+	  - can also be run manually at anytime 
+    - Resource 
+      - in Chef terms, A resource, as used in chef, is statement of configuration policy 
+	  - Thus is different in AWS OpsWorks terms
+- OpsWorks TBD
+
+- Elastic BeanStalk
+  - Quickly deploy and manage applications into AWS cloud
+  - IAAS
+  - need not know or worry about AWS services and infrastructure 
+  - Automatically controls capacity provisioning, load balancing, scaling and application health monitoring
+  - less control 
+  - for more control go for OpsWorks 
+  - for more and more control go for CloudFormation
+  - Java, .NET, PHP, Node.js, Ruby, Python, GO
+  - Web Containers (Tomcat, Passenger, Puma), Docker containers
+  - Difference from OpsWorks 
+    - OpsWorks is to manage your infrastructure
+	- EBS can automate, monitor and do the healthcheck 
+	- EBS can rotate your application logs and publishes to S3
+  - EBS Data Persistence 
+    - EBS runs on EC2 instances that have no persistent local storage 
+	- if you terminate the EBS you will lose all the data. when you start the EBS again EC2 will start with the default data 
+	- its your responsibility to backup the data - S3, DyanamoDB, RDS (Not EBS (elastic block storage))
+	- EBS doesn't restrict your choice of data persistence and DB service options 
+	- don't include RDS within EBS. though its allowed not recommended. RDS can be outside EBS and can be accessed via CNAME (DNS)
+  - EBS Rebuild 
+    - EBS became unusable if you modify or terminate one of the underlying aws resource which is in EBS (due to dependency)   
+	- if that happens you can rebuild the EBS environment to restore to working state 
+	- rebuild would terminate all the resources, replace with new resources with same configuration 
+	- you can also rebuild the terminated environment within 6 weeks (42 days). EBS attempt to create new environment with same id, name if it available
+  - EBS components
+    - Application 
+	  - container for the environment 
+	  - includes source code, configurations, logs and other artifacts that you create while creating EBS 
+	- Application Version 
+	- Environment
+	  - Version that is deployed in AWS
+	- Environment Tier 
+	  - Web server environment 
+	    - Apache or Tomcat
+	  - Worker environment
+	    - pulls the tasks from AWS SQS
+	- Environment configuration 
+	  - Configuration of associated resource 
+	  - when update the configuration, EBS automatically apply the changes or terminate the resources and replace with new configuration 
+	- Configuration Template 
+  - EBS Custom AMI's 
+    - supports custom platforms and custom AMI's 
+	- lets say application uses different programming language and web server which not comes in pre build AMI's you can use custom AMI's 
+	- to create custom platform 
+	  - build AMI from one of the supported operating system (Ubuntu, RHEL, or Amazon Linux)
+	  - create your own EBS platform using packer (open source)
+	- build custom AMI (golden image) if you image require lot of softwares and pre configurations and use the golden image to build EBS
+  - EBS Docker container 
+    - EBS supports the deployment of web applications from docker containers 
+	- if Docker container runs EBS crashes, EBS restarts automatically 
+	- Single container configuration 
+	  - when you only need to run one container per instance 
+	- Multi container configuration 
+	  - deployment of multiple docker containers to an Amazon ECS cluster in EBS
+	  - when you need to run multiple containers in each instance 
+	- Pre Configured Docker platform configurations
+	  - Java with Glassfish 
+  - EBS and S3
+    - EBS creates S3 bucket named elasticbeanstalk-region-account-id for each region 
+	- EBS use this bucket to store objects required for your application 
+	- EBS doesn't turn on the default encryption. so by default the objects are not encrypted 
+	- you can configure EBS to retrieve log files and publish to S3 (different bucket), enable log rotation and publish logs to S3 automatically after they rotated (difference from OpsWorks)
+  - EBS and EFS 
+    - shared drive 
+  - EBS and RDS 
+    - including RDS within EBS is not recommended. Ok only for Dev and test environment.  you lose the data if the EBS is terminated 
+	- decouple RDS from your EBS 
+	- use separate security group out side of EBS to avoid dependency. (don't use security group in EC2 (in EBS)  or RDS) - best practices
+  - EBS and DynamoDB 
+  - EBS and CloudWatch
+    - automatically uses cloud watch to monitor your environment and application  
+	- Can configure EBS to automatically stream logs to cloudwatch (difference from OpsWorks)
+	- logs can be exported to S3.  you should create bucket and configure 
+  - EBS and CloudTrail 
+    - CloudTrail captures all api calls for Events 
+	
+- CloudWatch 
+  - monitoring 
+  - collect and track metrics
+  - is a metrics repository
+  - can do in console, cli, api and SDK 
+  - VPC resources can connect to cloudwatch by creating cloudwatch VPC interface endpoint 
+  - CW Namespaces 
+    - container for CW repository
+	- metrics in different namespaces are isolated to each other (not aggregated into same statistics)
+	- naming convention AWS/service 
+	- eg for EC2 it uses AWS/EC2 namespace
+    - can specify namespace name when you create a metric 
+    - there is no default namespaces	
+  - CW Metrics 
+    - time ordered set of data points 
+	- CPU usage of EC2 instance is one metric 
+	- AWS services send metrics to CW
+	- metrics exists only in region in which they are created 
+  - CW Timestamps 
+    - metrics data must be marked with a timestamp 
+	- timestamp can be upto 2 weeks in the past and upto two hours in the future 
+  - Metric retention 
+    - metrics cannot be deleted but it automatically expires after 15 months 
+	- data points with the period less than 60 seconds are available for 3 hours
+	  - these data points are called high resolution custom metrics
+	- 60 seconds - 15 days 
+	- 300 seconds (5 min) - 63 days 
+	- 3600 seconds (1 hour) - 15 months (455 days) 
+	- expire in rolling basis 
+	- shorter period data points are aggregated to next tier when they expire 
+  - CW Alarm 
+    - alarm can be created either to watch single CW metric or result of a math expression based on CW metrics 
+	- can be based on CW logs metric filters also 
+	- can be added to CW dashboard (they become RED once the threshold is reached or alarm state ) 
+	- Limited to actions like
+	  - EC2
+	  - SNS
+	  - AutoScaling
+	- for others use CW events
+	- 
+	- States 
+	  - Ok
+	  - ALARM 
+	  - Insufficient Data
+	- 3 settings required for alarm 
+	  - Period in seconds 
+	  - Evaluation period 
+	  - Data points to Alarm 
+	- Actions
+	  - Action when in Alarm state 
+	  - EC2 action 
+	    - Recover 
+		- Start 
+		- Reboot 
+		- Terminate 
+	  - CW doesn't test or validate the action results. Eg, it cant detect EC2, autoscaling, SNS errors 
+    - CW Logs 
+	  - to monitor, store, access logs from many AWS / non AWS sources 
+	  - no code change required 
+	  - view the logs 
+	  - sort or search logs for error codes or patterns 
+	  - filter
+	  - archive securely 
+	  - CW logs can monitor logs in EC2 instance in real time
+	  - CloudTrail events can be logged to CW logs and can do Alarm
+	  - CW logs can be stored in S3 
+	    - can export logs from multiple log groups 
+		- takes 12 hours to export log data
+		- for real time analysis 
+		  - use CW logsInsights 
+		  - using subscriptions
+		    - based on subscription filter 
+		    - log group can be configured to stream the data to AW Elastic Search service in near real time  (costly)
+			- Kinesis stream 
+			- Kinesis Data Firehose
+			- Lambda
+	  - Log Data sources 
+	    - EC2, ECS (requires cloudwatch agent)
+		- CloudTrail, Route53 DNS queries 
+		- Aurora, MySql, mariaDB
+		- Lambda 
+		- Logs from on perm services (requires cloud watch agent) 
+		- VPC flow logs etc 
+	  - Log Events 
+	    - log 
+		- two parts 
+		  - timestamp
+		  - raw log data 
+	  - Log Streams
+	    - sequence of log events which shares the same source
+		- AWS deletes log streams which is being empty for 2 years.  or you can delete it manually 
+	  - Log Groups 
+	    - Group of log streams that shares same retention, monitoring, access control 
+		- each log stream belong to one log group 
+	  - Log retention 
+	    - by default indefinite or never expire (costs charge)
+        - retention can be adjusted at log group level (1 day to 10 years)
+        - expired log events deleted automatically 
+      - Metric Filters
+        - can you filters to configure custom metrics 
+        - assigned to log groups 
+        - filter the word "success" in log events. for every match CW logs reports the data to the specified metric
+        - CW logs sends metrics to CW for every 1 min
+	  - Encryption in  Transit 
+	    - uses end to end encryption in data transit 
+		- manages server side encryption keys 
+	  - Encryption at Rest 
+	    - manages server side encryption keys
+		- you can encrypt using AWS KMS customer master key (CMK)
+		- encryption is enabled at log group level 
+		- can be done either at the time log group creation or after it exists
+    - CW Logs Insights
+	  - can create custom / powerful queries and visualize the data in dashboards 
+	  - enables interactive search and analysis of the log data in CW logs 
+	  - includes purpose-built query language with simple and powerful commands 
+	  - automatically discovers fields in logs
+	  - single request can query upto 20 log groups
+	  - can search older data after Nov 5th 2018
+	- CW Agent 
+	  - agent to collect logs and stream
+	  - EC2 or on perm server 
+	  - Old Agent 
+	  - New Unified CW agent 
+	    - supports both linux and windows servers 
+		- additional metrics 
+	- Cross account logs data sharing 
+	  - Kinesis Stream
+	- Central logging in multi account environment 
+	- CW Events
+	  - Scheduled (creating EBS snapshot periodically) 
+	  - application level events
+	  - cron 
+	  - State change (EC2 terminated) 
+	  - Target is AWS resource (all most all the the services) (EC2, lambda etc)
+	  - JSON message 
+	  - Sharing CW events across accounts
+        - Event can be sent from one account to another account 
+        - both accounts should be in same region 
+        - receiving account will NOT be charged. sending account will be charged for CW events
+    - CW Synthetics 
+      - enables canaries creation 
+      - monitor endpoints and API's in your environment from the outside in 
+      - can check the availability of endpoints, load time, latency etc 
+      - can create CW alarms based on created canaries 
+	- CW ServiceLens
+	  - To monitor the health of the application
+	  - Enhances the observability of applications by integrating traces, metrics, logs and alarms into one place 
+	  - ServiceLens integrates CW with X-ray
+	  
+		
+	   
+		
+
+	
+	  
+	
+	  
 	 
 	 
   
@@ -569,10 +826,13 @@
   - AD connector (for ad to connect on perm)
   - AWS Shield standards - to protect layer 3 and layer 4 attacks like SYN floods and UDP reflection attacks   
   - AWS Shield advanced - includes notification 
-  - Route 53 and ELB integration should use alias record.  Not non alias record.  
+  - Route 53 and ELB integration should use alias record.  Not non alias record, A record or CNAME  
   - Storage Gateway can store upto 512 TB 
   - Can attach multiple ENI (elastic network interface) so can assign multiple ip /EIP's
   - only one virtual private gateway (VGW) can be associated with VPC
+  - A record - to IP 
+  - CNAME - to another name. but one name can be associated 
+  - Alias - to another name. but multiple name can be associated 
 	  
   
   
