@@ -807,7 +807,59 @@
 	  - To monitor the health of the application
 	  - Enhances the observability of applications by integrating traces, metrics, logs and alarms into one place 
 	  - ServiceLens integrates CW with X-ray
+
+- AWS Config
+  - it provides detailed view of the configuration of AWS resources in an AWS account 
+    - Resources relation with each other 
+    - Configuration and configuration history 
+  - private connection between VPC and AWS config will be established. so the communication over the AWS infrastructure, not over the Internet. 	
+  - Benefits 
+    - get the snapshot of current configuration 
+	- get historical configurations
+	- notification when the resource created, edited and deleted 
+	- view relationship between resources 
+  - Configuration Item 
+    - point in time view of AWS resource 
+	- includes metadata, attributes, relationship, configuration, and events
+	- AWS config creates the configuration item whenever it detects a change in resource type 
+  - Configuration History 
+    - collection of Configuration Item for a given time 
+	- helps to find when the resource created, edited etc
+	- configuration history file stored in S3 automatically 
+	- retention period minimum of 30 days to 7 years 
+  - Configuration Recorder 
+  - Configuration Snapshot 
+  - Configuration Stream
+  - Resource Relationship
+  - Delivering configuration items 
+    - S3 bucket 
+	  - AWS config tracks the changes in the configuration of your AWS resources and regularly sends the configuration file to S3 bucket which you specify 
+	  - sends for every six hours for the six hours periodically
+	  - if no change it will not be sent
+	- SNS Topic 
+      - AWS Config uses SNS topic you specify to send the notifications
+      - for better results use SQS as the notification endpoint for the SNS topic 
+    - Evaluating resources with Rules 
+      - it has managed rules
+      - custom rules can be created
+      - for compliance 
+      - if any resource violate the rules, AWS config mark the resource as non compliant 
+	  - can run periodically or when there change in configuration 
+	  - each rule is associated with lambda 
+	- SNS Notifications
+	- Multi Account Multi region Data Aggregation 
+	  - aggregates configuration and compliances from multiple accounts and regions to single account 
+	  - Source Account 
+	    - Account from which config data will be collected 
+		- can be a individual account or organization 
+	  - Source Region 
+	    - region from which configuration and compliance data need to be aggregated
+      - Aggregator 
+        - resource type in AWS Config
+        - collects configuration and compliance data from multiple source accounts and regions
+        -  		
 	  
+	
 		
 	   
 		
