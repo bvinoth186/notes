@@ -432,9 +432,515 @@
     - operator In represents OR conditions.   
 	- operator NotIn represents XOR conditions.   
 	- operator Exists check whether the label presents with node  (value is not required)
-	- 
+
+- Multi Container Pods 
+  - in pod definition, spec section, container is array. 
+  - means pod can have more then 1 containers 
+  - multi container pods shares the same 
+    - lifecycle (scale up and down together)
+	- network (can be accessed through localhost)
+	- storage (volume sharing is not required)
+  - patterns 
+    - Sidecar 
+	  - login service along with application 
+    - Ambassador 
+	  - you have 3 DB dev, stage and prod.  application always contacts ambassdor container as localhost, in which it has logic to divert to respective environment 
+    - Adaptor 
+	  - different applications produces logs in different format.  Adaptor container processes the logs to standard format and sends to centralized logging server 
+	  
+## Observability 
+	  
+- POD Status
+  - Pending 
+  - ContainerCreating 
+  - Running 
   
+- POD Conditions 
+  - array of true or false 
+  - PodScheduled 
+  - Initialized 
+  - ContainersReady 
+  - Ready 
+    - once the condition is set to ready, service will send the traffic to the pod 
+	- By default pod is set to be ready once the container started 
+	- it didnt check the status of underlying app 
+
+	  
+- Liveness probe
+  - To know when to restart a container. 
+  - For example, liveness probes could catch a deadlock, where an application is running, but unable to make progress. 
+  - Restarting a container in such a state can help to make the application more available despite bugs.	
+  - in spec section 
+    - livenessProbe: 
+      -	initialDelaySeconds: 5 # should wait 5 second before performing the first probe
+      - periodSeconds: 5 # specifies that the kubelet should perform a liveness probe every 5 seconds
+	  - failureThreshold: 1
+	  - successThreshold: 
+	    - Minimum consecutive successes for the probe to be considered successful after having failed. 
+		- Defaults to 1. 
+		- Must be 1 for liveness. 
+		- Minimum value is 1.
+      - failureThreshold: 
+	    - When a Pod starts and the probe fails, Kubernetes will try failureThreshold times before giving up. 
+		- Giving up in case of liveness probe means restarting the container. 
+		- In case of readiness probe the Pod will be marked Unready. 
+		- Defaults to 3. 
+		- Minimum value is 1.
+  - probes are 
+    - exec 
+	  - executes the command
+	  - If the command succeeds, it returns 0, and the kubelet considers the container to be alive and healthy. 
+	  - If the command returns a non-zero value, the kubelet kills the container and restarts it.
+	- httpGet
+	  - path: /healthz
+        port: 8080
+        httpHeaders:
+        - name: Custom-Header
+          value: Awesome
+	  - Any code greater than or equal to 200 and less than 400 indicates success. Any other code indicates failure.
+	- tcpSocket
+	  - port: 8080
+
+- Readiness Probe 
+  - To know when a container is ready to start accepting traffic
+  - A Pod is considered ready when all of its containers are ready.
+  - By default pod is set to be ready once the container started 
+  - Readiness probes runs on the container during its whole lifecycle.
+  - same as liveness probe 
+  - in spec section add 
+    - readinessProbe: 
   
+- Container Logging 
+  - To view the container logs 
+    - kubectl logs -f <pod-name>
+  - In case if its multi container pod 
+    - kubectl logs -f <pod-name> <container-name>
+  
+- Monitoring K8s
+  - Prometheus 
+  - Elastic Stack
+  - DataDog
+  - Dynatrace
+  - Metrics Server
+    - Heapster is deprecated 
+	- can have 1 metrics server per k8s cluster 
+	- In Memory monitoring solution 
+	- doesn't store the results in disk 
+	- so you cant see historical analytics 
+	- Kubelet agent also contains cAdvisor component 
+	- container advisor 
+	  - responsible for collecting the metrics and sends to metrics server using kube api's 
+	- For minikube 
+	  - minikube addons enable metrics-server 
+	- for others 
+      - clone from github and install 
+	- kubectl top nodes 
+	- kubectl top pod
+  
+## POD Design 
+
+- Labels and Selectors 
+  - Labels are key/value pairs that are attached to objects, such as pods.
+  - in Pods, under metadata section
+  - metadata:
+      - name: label-demo
+      - labels:
+          - environment: production
+          - app: nginx
+  - labels do not provide uniqueness. In general, we expect many objects to carry the same label(s).
+  - Via a label selector, the client/user can identify a set of objects. 
+  - The label selector is the core grouping primitive in Kubernetes.
+  - equality based selector
+    - kubectl get pods -l environment=production,tier=frontend
+  - set based selector
+    - kubectl get pods -l 'environment in (production),tier in (frontend)'
+  - In service or Replication Controller 
+    - equality based selectors are supported
+    - The set of pods that a service targets is defined with a label selector. 
+	- selector:
+      - component: redis
+  - In Job, Deployment, ReplicaSet, DaemonSet
+    - support set-based selectors as well.
+	- selector:
+		- matchLabels:
+			- component: redis
+		- matchExpressions:
+			- - {key: tier, operator: In, values: [cache]}
+			- - {key: environment, operator: NotIn, values: [dev]}
+
+- Updates and Rollbacks in Deployment
+  - Deployment automatically creates replicaset with replicas defined 
+  - Deployment triggers the rollout which is revision 1
+  - when deployment is updates new rollout will be triggered and revision will be 2
+  - to track the changes of the previous deployments, stores the configuration for rollback
+  - after the upgrade 
+	- kubectl get replicasets
+	- shows both old and new replicaset 
+  - to view the rollout of the deployment
+    - kubectl rollout status <deployment-name>
+  - To view the history 
+    - kubectl rollout history <deployment-name>
+  - To check the revisions details individually 
+    - kubectl rollout history deployment <deployment-name> --revision=<revision-no>
+  - By default change cause in the history will be none. 
+  - To start recording the change cause in deployments
+    - --record flag 
+	- kubectl apply -f  <deployment.yml> --record
+  - 2 types of Deployment Strategy 
+    - Details can be seen with describe deployment command 
+    - 1. Recreate 
+	  - destroys all the pods at once and create new set of pods 
+	  - outage
+	  - not default 
+	  - .spec.strategy.type==Recreate
+	- 2. RollingUpdate 
+	  - creates another replica set 
+	  - destroys 1 pod in old replica set and create 1 pod in new 
+	  - no outage
+	  - .spec.strategy.type==RollingUpdate
+	  - default deployment strategy 
+  - To update the deployment
+    - kubectl apply -f <deployment.yml>
+  - To update the image alone 
+    - kubectl set image <deployment-name> nginx=nginx:1.9.1
+  - For Rollback 
+    - kubectl rollout undo <deployment-name>
+	- reverts to previous configuration of the deployment
+	- can see the difference by listing replicasets 
+
+- Jobs 
+  - For batch processing 
+  - A Job creates one or more Pods and ensures that a specified number of them successfully terminate. 
+  - As pods successfully complete, the Job tracks the successful completions. 
+  - When a specified number of successful completions is reached, the task (ie, Job) is complete. 
+  - Deleting a Job will clean up the Pods it created.
+  - definition
+    - apiVersion: batch/v1
+    - kind: Job
+	- in spec: 
+	  - add template 
+	  - restartPolicy: Never
+  - Lets say Pod is created with image which adds two numbers prints the output end 
+  - When the pod is created it does the addition task and ends the process 
+  - by default Pod tries to recreate the container again and it goes till it meets the restart thershold 
+  - by default k8s wants to keep your pod running for ever. so it restarts to make it live (Job usecase)
+  - To avoid this add restartPolicy: Never in spec of pod.yaml
+  - default policy is Always 
+  - To View the Jobs 
+    - kubectl get jobs 
+  - Job creates Pods
+  - To view the output of the job, check the logs of the pod created 
+    - kubectl logs <pod-name>
+  - to delete job 
+    - kubectl delete job <job-name>
+	- deleting the job also deletes the pods created 
+  - To run multiple instance of pods to run in job
+    - add completions in spec section 
+	  - completions: 3
+	  - it creates 3 pods sequentially by default 
+      - 1 after another 
+      - second pod is created only after first pod is finished 
+	  - in case if one of the pod is failed, k8s continue creates pod till it reach the completions count 
+  - To create the pods in parallel 
+    - in spec section add parallelism
+	  - completions: 3
+	  - parallelism: 3
+  - backoffLimit
+    - There are situations where you want to fail a Job after some amount of retries due to a logical error in configuration
+	- in spec section of job 
+	  - backoffLimit: 15  # retries creating pod 15 times till it success
+	  - default is 6 
+	  - if the backoffLimit is not mentioned, Job retries 6 times. it creates the pod till success status 
+	  
+- Cron Jobs:
+  - A Cron Job creates Jobs on a time-based schedule.
+  - One CronJob object is like one line of a crontab (cron table) file. 
+  - It runs a job periodically on a given schedule, written in Cron format.
+  - Job runs instantly 
+  - Instead we can create Cron Job and schedule the job periodically 
+  - definition 
+    - apiVersion: batch/v1beta1
+    - kind: CronJob
+    - metadata:
+        - name: hello
+    - spec:
+      - schedule: "*/1 * * * *"
+      - jobTemplate:
+	    - spec section of Job 
+  - it has 3 spec sections 
+    - 1 is for cronjob 
+	- 2 is for Job 
+	- 3 is for Pod
+  - To View the cron jobs 
+    - kubectl get cronjob
+	
+# Services and Networking
+  
+- Service 
+  - An abstract way to expose an application running on a set of Pods as a network service.
+  - Types
+    - 1. Nodeport
+	- 2. ClusterIp
+	- 3. LoadBalancer
+  - NodePort
+    - Exposes the Service on each Node’s IP at a static port (the NodePort).
+	- A ClusterIP Service, to which the NodePort Service routes, is automatically created. 
+	- You’ll be able to contact the NodePort Service, from outside the cluster, by requesting <NodeIP>:<NodePort>.
+	- 3 ports 
+	  - Target port, port of the pod 
+	  - port, port of the service 
+	  - NodePort 
+	    - 30000 to 32769 range
+    - in spec section
+	  - type: NodePort 
+	  - ports:
+	  - selector:
+	- ports is array, can add more then one set of ports mapping
+	- port is mandatory 
+	- if target port is not given, port will be taken as target port 
+	- if nodeport is not given, available port from the range will be taken
+	- if selector matches more then one pod, service distribute the traffic to all the pods
+	  - no additional configuration required 
+	  - uses random algorithm 
+	  - SessionAffinity is Yes
+	  - in case Pod is spread across multiple Pods, 
+	    - k8s spans the service across the nodes automatically
+		- service can be accesses via any NodeIp and nodeport 
+		- Nodeport remains same 
+  - ClusterIp  
+    - This is the default ServiceType.
+	- Exposes the Service on a cluster-internal IP. 
+	- Choosing this value makes the Service only reachable from within the cluster. 
+	- creates virtual IP inside cluster to enable the communication within the cluster
+	- service can be accessed either by cluster ip or service name 
+  - LoadBalancer
+    - Exposes the Service externally using a cloud provider’s load balancer. 
+	- NodePort and ClusterIP Services, to which the external load balancer routes, are automatically created.
+	- sends request to cloud platform to provision network load balancer 
+	
+- Ingress
+  - An API object that manages external access to the services in a cluster, 
+  - provides 
+    - load balancing, 
+	- SSL termination 
+	- name-based virtual hosting
+	- url based routing 
+  - Ingress --> Service --> Deployment --> Pod
+  - Ingress exposes HTTP and HTTPS routes from outside the cluster to services within the cluster. 
+  - Traffic routing is controlled by rules defined on the Ingress resource.
+  - built in layer 7 load balancer (like)
+  - uses a service of type Service.Type=NodePort or Service.Type=LoadBalancer to expose
+  - Ingress Controller 
+    - responsible for fulfilling the Ingress, 
+	- k8s doesn't come with ingress controller by default 
+    - solutions
+	  - GCE (Googlr layer 7 load balancer)
+	  - Nginx
+	  - Contour
+	  - HAProxy 
+	  - Traefik
+	  - Istio
+	- GCE and Nginx are currently supported by k8s project
+	- controller is deployed as just anohter k8s deployment 
+	- Nginx Controller 
+	  - Deployment yaml 
+	  - ConfigMap
+	  - Service
+	  - ServiceAccount 
+  - Ingress Resources  
+    - Set of rules and configurations applied on the ingress controller 
+    - You must have an ingress controller to satisfy an Ingress. 
+	- Only creating an Ingress resource has no effect.
+	- yaml
+	  - apiVersion: extensions/v1beta1
+	  - kind: Ingress 
+	  - spec
+	    - backend:
+		    - serviceName:
+			- servicePort 
+	- To view
+	  - k get ingress 
+	- Rules 
+	  - host
+	    - optional 
+		- if no host is specified, so the rule applies to all inbound HTTP traffic through the IP address specified. 
+		- If a host is provided, the rules apply to that host.
+	  - path
+	    -  list of paths (for example, /testpath), 
+		- each of which has an associated backend defined with a serviceName and servicePort. 
+		- Both the host and path must match the content of an incoming request before the load balancer directs traffic to the referenced Service.
+    - default back-end 
+	  - if the rules doesn't satisfy default will be routed
+	  - must create the default service to show 404 error page (eg)
+  - Rewrite annotations
+    - https://kubernetes.github.io/ingress-nginx/examples/rewrite/  
+
+- Network Policies 
+  - Ingress - incoming traffic 
+  - Egress - outgoing traffic
+  - A network policy is a specification of how groups of pods are allowed to communicate with each other and other network endpoints.
+  - NetworkPolicy resources use labels to select pods and define rules which specify what traffic is allowed to the selected pods.
+  - by default k8s follow all-allow rule 
+  - all the pods in cluster is connected 
+  - By default, pods are non-isolated; they accept traffic from any source.
+  - network policy is used to isolate the pod 
+  - Yaml
+    - apiVersion: networking.k8s.io/v1
+    - kind: NetworkPolicy
+	- in spec:
+	  - podSelector: 
+	    - Each NetworkPolicy includes a podSelector which selects the grouping of pods to which the policy applies.
+		- An empty podSelector selects all pods in the namespace.
+      - policyTypes: 
+	    - Each NetworkPolicy includes a policyTypes
+     	  - Ingress
+		  - Egress
+		  - or both. 
+		- The policyTypes field indicates whether or not the given policy applies to ingress traffic to selected pod, egress traffic from selected pods, or both. - If no policyTypes are specified on a NetworkPolicy then by default Ingress will always be set and Egress will be set if the NetworkPolicy has any egress rules.
+	  - ingress: from (or) egress: to
+	    - podSelector
+		  - This selects particular Pods in the same namespace as the NetworkPolicy which should be allowed as ingress sources or egress destinations.
+		- namespaceSelector: 
+		  - This selects particular namespaces for which all Pods should be allowed as ingress sources or egress destinations.
+  - solutions supports networking policies 
+    - Kube-router
+	- Calico
+	- Romana
+	- weave-net
+  - solutions supports networking policies 
+    - Flannel 
+
+## State Persistence 
+
+- Volumes
+  - On-disk files in a Container are ephemeral
+  - when container crashes or stopped data will be lost 
+  - Volumes 
+    - to store and manage the data
+	- To share files between the containers 
+  - in POD definitions, spec sections
+    - 1. create volumes 
+	  - volumes:
+	    - name: test-volume
+	    - hostpath: 
+	      - path: /data 
+		  - type: directory 
+    - 2. mount the volume in container section 
+	  - volumeMounts:
+        - mountPath: /test-pd
+        - name: test-volume
+  - for multi pods, k8s supports many storage solution 
+    - NFS 
+	- AWS EBS etc 
+		
+- Persistent Volume
+  - PV
+  - Piece of storage in the cluster that has been provisioned by an administrator
+  - Volumes are configured within the pod
+  - for large environment, centralized volume solution is persistent volume
+  - administrator provisions large pool of storage is persistent volume
+  - users can select the storage from the pool is PersistentVolumeClaim
+  - yaml 
+    - apiVersion: v1
+	- kind: PersistentVolume
+	- spec 
+	  - accessMode:
+	    - ReadOnlyMany 
+		- ReadWriteOnce
+		- ReadWriteMany
+	  - capacity:
+	    - storage: 1Gi
+	  - hostPath:
+	    - path: /tmp 
+	  - for aws, replace the hostPath options with 
+        - awsElasticBlockStore
+          - volumeID:
+          - fstType: ext4		  
+  
+- PersistentVolumeClaim
+  - PVC
+  - (PVC) is a request for storage by a user
+  - to make the storage available to node 
+  - Admin creates set of PV
+  - user creates set of PVC
+  - once the PVC created k8s binds the PVC with respective PV based on size and accessMode
+  - PV to PVC is one to one
+  - in case if multiple matches use label and selectors to bind to PV
+  - PVC couldn't find PV, it will be in pending state 
+  - if small PVC binded to large PV (if no oher better option), since its one to one relation, no other PVC can utilise the remaining capacity of PV
+  - Yaml
+    - apiVersion: v1
+	- kind: PersistentVolumeClaim
+	- spec 
+	  - accessMode:
+	   - ReadWriteMany
+	  - capacity:
+	    - storage: 500Mi
+  - to view 
+    - k get pvc
+  - to delete pvc
+    - k delete pvc <pvc-name>
+	- what happens the underlying pv when pvc is deleted 
+	  - persistentVolumeClaimPolicy 
+	    - Retain 
+		  - by default
+		  - PV will remains untill administrator delete it manually 
+		  - its not available for re use for any other claims 
+		- Delete 
+		  - when PVC is deleted PV also deleted automatically
+		  - freeing up the memory 
+		- Recycle 
+		  - Data will be scrubbed and make it available for other PVC;same
+		  - deprecated
+		  - use dynamic provisioning
+  - Cliams as Volumes
+    - once the PVC is created use it in volumes section of the pod
+    - mounting remains same 
+    - volumes:
+      - name: mypd
+      - persistentVolumeClaim:
+          - claimName: myclaim	
+		  
+- Storage Classes
+  - Dynamically provisioning the storage
+  - admin no need to create PV and provision the storage manually (static provisioning) 
+  - in PVC use the storage class name, 
+  - cloud provider dynamically provision the storage as per PVC 
+  - K8s automatically created PV and bind behind the screen 
+
+- StatefulSet  
+  - StatefulSet is the workload API object used to manage stateful applications.
+  - Same as Deployment
+  - kind: StatefulSet
+  - Stable, unique network identifiers.
+  - Stable, persistent storage.
+  - Ordered, graceful deployment and scaling.
+  - Ordered, automated rolling updates.
+  - StatefulSet maintains a sticky identity for each of their Pods. 
+  - These pods are created from the same spec, but are not interchangeable: 
+  - each has a persistent identifier that it maintains across any rescheduling.
+  - if the replica is set to 3, 3 pods are crated sequentially one after another 
+  - pod name is suffixed in order from 0 to 1 
+  - pod-0, pod-1 and pod-2 
+    - in case of scale up, pod 3 wil be created 
+	- in case of scale down pod 2 will be termineted 
+	- in case pod-o is crashed, StatefullSet provisions another new pod with the same name pod-0 
+	- sticky session
+  - MySql DB replication use case 
+  - Parallel pod management 
+    - Parallel tells the StatefulSet controller to launch or terminate all Pods in parallel
+	- by default its sequential
+  
+		
+   
+- Vim Setup
+  - vi ~/.vimrc
+  - set ts=2 sts=2 sw=2 et number
+  - Save and exit and then reload the file: . /~.vimrc
+	  
+	  
+	  
+    
   
   
   
@@ -449,11 +955,19 @@
   - kubectl scale --replicas=5 replicaset new-replica-set
   - kubectl get all
   - kubectl get pods --all-namespaces
-  - kubectl run redis --image=redis123 --generator=run-pod/v1 -l app=run
+  - kubectl run redis --image=redis123 --generator=run-pod/v1 -l app=run  or k run mosquito --image=nginx --restart=Never
   - kubectl get pod my-pod -o yaml --export       # Get a pod's YAML without cluster specific information
   - kubectl delete pods <pod> --grace-period=0 --force
   - echo -n 'mysql' | base64
   - echo -n 'bahbfdh=' | base64 --decode 
+  - kubectl exec ubuntu-sleeper whoami  # To check the user 
+  - kubectl exec -it app cat /log/app.log
+  - kubectl get nodes node01 --show-labels
+  - kubectl get pods -l environment=production,tier=frontend
+  - kubectl get pods -l 'environment in (production),tier in (frontend)'
+  - kubectl expose deployment -n ingress-space ingress-controller --type=NodePort --port=80 --name=ingress --dry-run -o yaml >ingress.yaml
+  
+
   
 
 
