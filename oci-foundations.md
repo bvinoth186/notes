@@ -73,7 +73,7 @@
   - resources from multiple regions can be in same compartment 
   - its global 
   - Can be Nested - upto Six levels 
-  - can give access to goroup of users to compartments
+  - can give access to group of users to compartments
   - bulling 
   
 ## IAM 
@@ -158,14 +158,14 @@
   - Highly durable 
     - Block Volumes stores replica of data in 3 different FD's 
   - automated backups to obj storage 
-  - can copy backtop to another region 
+  - can copy backups to another region 
   - encryption 
   - Volumes can be 50 GB to 32 TB in size 
   - 32 volumes can be attached to instance 
   - Tiers 
     - Basic
 	  - big data 
-	  - dataware housing 
+	  - data-ware housing 
 	  - 2 IOPS/GB
 	  - 240 KB/s /GB throughput
 	- Balanced 
@@ -193,7 +193,7 @@
   - file structure 
   - NFS and SMB 
   - access over networks
-  - supports all major OS and hypervisors 
+  - supports all major OS and hypervisor 
   - NAS and SAN 
   - FSS - File storage service 
   - shared file system storage 
@@ -245,7 +245,7 @@
 	- FastConnect (private, dedicated)
   - Service gateway 
     - access OCI resource with in OCI network
-	- without using internet or NAT gateway
+	- without using Internet or NAT gateway
 	
 - Security 
   - SG
@@ -273,7 +273,7 @@
   - VM with DB 
   - fast provisioning 
   - Storage scaling with no impact
-  - will not be billied in stop state 
+  - will not be billed in stop state 
   - customer managed 
   - updates - customer initiated
   - scaling - storage - yes 
@@ -318,7 +318,7 @@
   - two types
     - shared 
 	  - you provision and manage only the autonomous DB 
-	  - oracle manages the infra and deplpoyment 
+	  - oracle manages the infra and deployment 
 	  - supports both ATP and ADW
 	  - updates - automatic
 	  - scaling - storage - yes 
@@ -421,7 +421,7 @@
     - OS management service 
 	  - install security updates 
 	  - patches 
-	  - wihtout any downtime 
+	  - without any downtime 
 	  - security / compliance reporting 
 	  - configured by default for oracle linux instances 
   - Infrastructure protection 
@@ -455,7 +455,7 @@
     - GDPR -EU 
 	- BSI C5 - Germany 
 	- TISAX - Germany 
-	- PIPEDA - Cananda 
+	- PIPEDA - Canada 
 	- My Number - Japan 
 	
 ## Pricing Billing 
@@ -479,7 +479,7 @@
   - resource type
   - data transfer 
     - Ingress is free 
-	- Egress is chargeble 
+	- Egress is not free
   - All oci regions are same pricing (unlike AWS)
 	
 - Block Volume pricing 
@@ -489,7 +489,7 @@
 - Data Transfer Cost 
   - no charge with in AD 
   - no charge with in Region 
-  - for diff region or internet 
+  - for diff region or Internet 
     - ingress is free 
 	- egress is not free 
   - no charge for DRG to on prem 
@@ -521,7 +521,6 @@
   - monitoring 
   - notifications
   
-## OCI Support Model 
 
   
 	
