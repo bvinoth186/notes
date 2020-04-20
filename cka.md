@@ -930,6 +930,23 @@
   - Parallel pod management 
     - Parallel tells the StatefulSet controller to launch or terminate all Pods in parallel
 	- by default its sequential
+	
+- Generators 
+  - Pod 
+    - run-pod/v1
+	- restart=Never
+  - Replication Controller 
+    - run/v1
+  - Deployment 
+    - deployment/v1beta1
+	- Default one 
+  - Job 
+    - job/v1
+	- restart=OnFailure
+  - CronJob 
+    - cronjob/v1beta1
+	- restart=OnFailure --schedule=<some cron expression>
+	
   
 		
    
@@ -937,6 +954,10 @@
   - vi ~/.vimrc
   - set ts=2 sts=2 sw=2 et number
   - Save and exit and then reload the file: . /~.vimrc
+  
+- Vim Tips 
+  - 'dG' - Deletes contents from cursor to end of file. This is very useful when editing YAML files.
+  - 'ZZ' - Save and exit quickly.
 	  
 	  
 	  
@@ -962,11 +983,21 @@
   - echo -n 'bahbfdh=' | base64 --decode 
   - kubectl exec ubuntu-sleeper whoami  # To check the user 
   - kubectl exec -it app cat /log/app.log
+  - kubectl exec -it <pod-name> -c <container-nmae> <command> # for multi containers 
   - kubectl get nodes node01 --show-labels
   - kubectl get pods -l environment=production,tier=frontend
   - kubectl get pods -l 'environment in (production),tier in (frontend)'
   - kubectl expose deployment -n ingress-space ingress-controller --type=NodePort --port=80 --name=ingress --dry-run -o yaml >ingress.yaml
+  - k run b3 --image=busybox --restart=Never --rm  -it env   # executes env command and deletes the pod 
+  - kubectl run busybox --image=busybox --labels=c=d --restart=Never --rm -it -- wget -O- http://10.109.97.129:80 # executes wget command and deletes the pod 
+  - k exec nginx -- /bin/sh
+  - k run b --image=busybox --restart=Never --dry-run -o yaml -- /bin/sh -c 'i=0; while true; do echo "$i: $(date)"; i=$((i+1)); sleep 1; done' >b.yml #Shell arguments 
+  - kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10 # AutoScale
+  - kubectl get hpa # Horizantal Pod AutoScaler
   
+- Clear
+  - https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+    - array
 
   
 
