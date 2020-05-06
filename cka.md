@@ -991,16 +991,42 @@
   - k run b3 --image=busybox --restart=Never --rm  -it env   # executes env command and deletes the pod 
   - kubectl run busybox --image=busybox --labels=c=d --restart=Never --rm -it -- wget -O- http://10.109.97.129:80 # executes wget command and deletes the pod 
   - k exec nginx -- /bin/sh
-  - k run b --image=busybox --restart=Never --dry-run -o yaml -- /bin/sh -c 'i=0; while true; do echo "$i: $(date)"; i=$((i+1)); sleep 1; done' >b.yml #Shell arguments 
+  - 	 >b.yml #Shell arguments 
   - kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10 # AutoScale
   - kubectl get hpa # Horizantal Pod AutoScaler
   
-- Clear
-  - https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
-    - array
+## Some 
+
+- kubectl run busybox --image=busybox --command --restart=Never -it -- env # -it will help in seeing the output
+- kubectl run busybox --image=busybox --rm -it --restart=Never -- wget -O- 10.1.1.131:80
+- k exec p1 -it /bin/sh
+- kubectl run busybox --image=busybox -it --restart=Never -- /bin/sh -c 'echo hello world'
+- kubectl cp busybox:/etc/passwd ./passwd # kubectl cp command
+- :set paste
+- For Windows: Ctrl+Insert to copy and Shift+Insert to paste
+- man lf_exam
+- Nodes making up each cluster can be reached via ssh, using a command such as the following: ssh <nodename>
+- sudo -i
+- You can also use sudo to execute commands with elevated privileges at any time
+- You must return to the base node (hostname node-1)after completing each task.
+- Nested−ssh is not supported.
+- kubectl get po nginx -o jsonpath='{.spec.containers[].image}{"\n"}'
+
+
 
   
-
+## Tips 
+ 
+ 
+- alias k=kubectl
+- alias kd="kubectl describe"
+- alias ke="kubectl explain --recursive"
+- alias del="kubectl delete --grace-period=0 --force"
+- export d="--dry-run -o yaml"
+- vi ~/.vimrc
+- set ts=2 sts=2 sw=2
+- source ~/.vimrc
+- complete -F __start_kubectl k
 
   
 	
