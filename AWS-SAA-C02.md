@@ -1264,4 +1264,1310 @@
      - Preconfigured Docker
    - If not supported, you can write your custom platform (advanced)   
 
+# S3 Storage and Data Management
+  
+## Section introduction
+   - Amazon S3 is one of the main building blocks of AWS
+   - It’s advertised as ”infinitely scaling” storage
+   - It’s widely popular and deserves its own section
+   - Many websites use Amazon S3 as a backbone
+   - Many AWS services uses Amazon S3 as an integration as well
+  
+## Amazon S3 Overview - Buckets
+   - Amazon S3 allows people to store objects (files) in “buckets” (directories)
+   - Buckets must have a globally unique name
+   - Buckets are defined at the region level
+   - Naming convention
+     - No uppercase
+     - No underscore
+     - 3-63 characters long
+     - Not an IP
+     - Must start with lowercase letter or number
+
+  
+## Amazon S3 Overview - Objects
+   - Objects (files) have a Key    
+   - The key is the FULL path:    
+     - s3://my-bucket/my_file.txt    
+     - s3://my-bucket/my_folder1/another_folder/my_file.txt    
+   - The key is composed of prefix + object name    
+   - s3://my-bucket/my_folder1/another_folder/my_file.txt    
+   - There’s no concept of “directories” within buckets (although the UI will trick you to think otherwise)
+   - Just keys with very long names that contain slashes (“/”)
+   - Object values are the content of the body:
+     - Max Object Size is 5TB (5000GB)
+     - If uploading more than 5GB, must use “multi-part upload”
+   - Metadata (list of text key / value pairs – system or user metadata)
+   - Tags (Unicode key / value pair – up to 10) – useful for security / lifecycle
+   - Version ID (if versioning is enabled)
+
+  
+## Amazon S3 -Versioning
+   - You can version your files in Amazon S3
+   - It is enabled at the bucket level
+   - Same key overwrite will increment the “version”: 1, 2, 3….
+   - It is best practice to version your buckets
+     - Protect against unintended deletes (ability to restore a version)
+     - Easy roll back to previous version
+   - Notes:
+     - Any file that is not versioned prior to enabling versioning will have version “null”
+     - Suspending versioning does not delete the previous versions
+
+  
+## S3 Encryption for Objects
+   - There are 4 methods of encrypting objects in S3
+     - SSE-S3: encrypts S3 objects using keys handled & managed by AWS
+     - SSE-KMS: leverage AWS Key Management Service to manage encryption keys
+     - SSE-C: when you want to manage your own encryption keys
+     - Client Side Encryption
+   - It’s important to understand which ones are adapted to which situation for the exam
+
+  
+## SSE-S3
+   - SSE-S3: encryption using keys handled & managed by Amazon S3
+   - Object is encrypted server side
+   - AES-256 encryption type
+   - Must set header: “x-amz-server-side-encryption": "AES256"
+
+## SSE-KMS
+   - SSE-KMS: encryption using keys handled & managed by KMS
+   - KMS Advantages: user control + audit trail
+   - Object is encrypted server side
+   - Must set header: “x-amz-server-side-encryption": ”aws:kms"
+
+## SSE-C
+   - SSE-C: server-side encryption using data keys fully managed by the customer outside of AWS
+   - Amazon S3 does not store the encryption key you provide
+   - HTTPS must be used
+   - Encryption key must provided in HTTP headers, for every HTTP request made
+
+## Client Side Encryption    
+   - Client library such as the Amazon S3 Encryption Client    
+   - Clients must encrypt data themselves before sending to S3    
+   - Clients must decrypt data themselves when retrieving from S3    
+   - Customer fully manages the keys and encryption cycle
+  
+## Encryption in transit (SSL/TLS)
+   - Amazon S3 exposes:
+     - HTTP endpoint: non encrypted
+     - HTTPS endpoint: encryption in flight
+   - You’re free to use the endpoint you want, but HTTPS is recommended
+   - Most clients would use the HTTPS endpoint by default
+   - HTTPS is mandatory for SSE-C
+   - Encryption in flight is also called SSL / TLS 
+
+  
+## S3 Security
+   - User based
+     - IAM policies 
+	 - which API calls should be allowed for a specific user from IAM console
+   - Resource Based
+     - Bucket Policies 
+	 - bucket wide rules from the S3 console 
+	 - allows cross account
+     - Object Access Control List (ACL) – finer grain
+     - Bucket Access Control List (ACL) – less common
+   - Note: 
+     - an IAM principal can access an S3 object if
+     - the user IAM permissions allow it OR the resource policy ALLOWS it
+     - AND there’s no explicit DENY
+
+  
+## S3 Bucket Policies    
+   - JSON based policies    
+     - Resources: buckets and objects    
+	 - Actions: Set of API to Allow or Deny    
+	 - Effect: Allow / Deny    
+	 - Principal: The account or user to apply the policy to
+   - Use S3 bucket for policy to:    
+     - Grant public access to the bucket    
+	 - Force objects to be encrypted at upload    
+	 - Grant access to another account (Cross Account)
+
+  
+## Bucket settings for Block Public Access
+   - Block public access to buckets and objects granted through
+     - new access control lists (ACLs)
+     - any access control lists (ACLs)
+     - new public bucket or access point policies
+   - Block public and cross-account access to buckets and objects through any public bucket or access point policies
+   - These settings were created to prevent company data leaks
+   - If you know your bucket should never be public, leave these on
+   - Can be set at the account level
+
+  
+## S3 Security - Other
+   - Networking:
+     - Supports VPC Endpoints (for instances in VPC without www internet)
+   - Logging and Audit:
+     - S3 Access Logs can be stored in other S3 bucket
+     - API calls can be logged in AWS CloudTrail
+   - User Security:
+     - MFA Delete: MFA (multi factor authentication) can be required in versioned buckets to delete objects
+     - Pre-Signed URLs: URLs that are valid only for a limited time 
+	 - (ex: premium video service for logged in users)
+
+  
+## S3 Websites
+   - S3 can host static websites and have them accessible on the www
+   - The website URL will be:
+   - <bucket-name>.s3-website-<AWS-region>.amazonaws.com
+   - OR
+   - <bucket-name>.s3-website.<AWS-region>.amazonaws.com
+   - If you get a 403 (Forbidden) error, make sure the bucket policy allows public reads!
+
+  
+## CORS - Explained
+   - An origin is a scheme (protocol), host (domain) and port
+   - E.g.: https://www.example.com (implied port is 443 for HTTPS, 80 for HTTP)
+   - CORS means Cross-Origin Resource Sharing
+   - Web Browser based mechanism to allow requests to other origins while visiting the main origin
+   - Same origin: http://example.com/app1 & http://example.com/app2
+   - Different origins: http://www.example.com & http://other.example.com
+   - The requests won’t be fulfilled unless the other origin allows for the requests, using CORS Headers (ex: Access-Control-Allow-Origin)
+
+
+  
+## S3 CORS
+   - If a client does a cross-origin request on our S3 bucket, we need to enable the correct CORS headers
+   - You can allow for a specific origin or for * (all origins)
+  
+## Amazon S3 - Consistency Model
+   - Read after write consistency for PUTS of new objects
+     - As soon as a new object is written, we can retrieve it
+     - ex: (PUT 200 => GET 200)
+     - This is true, except if we did a GET before to see if the object existed
+     - ex: (GET 404 => PUT 200 => GET 404) – eventually consistent
+   - Eventual Consistency for DELETES and PUTS of existing objects
+     - If we read an object after updating, we might get the older version
+     - ex: (PUT 200 => PUT 200 => GET 200 (might be older version))
+     - If we delete an object, we might still be able to retrieve it for a short time
+     - ex: (DELETE 200 => GET 200)
+   - Note: there’s no way to request “strong consistency”
 	 
+ 
+# Developing on AWS
+
+## How to Develop
+   - Developing and performing AWS tasks against AWS can be done in several ways
+   - Using the AWS CLI on our local computer
+   - Using the AWS CLI on our EC2 machines
+   - Using the AWS SDK on our local computer
+   - Using the AWS SDK on our EC2 machines
+   - Using the AWS Instance Metadata Service for EC2
+   - In this section, we’ll learn:
+ 
+## AWS EC2 Instance Metadata
+   - AWS EC2 Instance Metadata is powerful but one of the least known features to developers
+   - It allows AWS EC2 instances to ”learn about themselves” without using an IAM Role for that purpose.
+   - The URL is http://169.254.169.254/latest/meta-data
+   - You can retrieve the IAM Role name from the metadata, but you CANNOT retrieve the IAM Policy.
+   - Metadata = Info about the EC2 instance
+   - Userdata = launch script of the EC2 instance
+  
+## AWS SDK Overview
+   - What if you want to perform actions on AWS directly from your applications code ? (without using the CLI).
+   - You can use an SDK (software development kit) !
+   - Official SDKs are…
+     - Java
+     - .NET
+     - Node.js
+     - PHP
+     - Python (named boto3 / botocore)
+     - Go
+     - Ruby
+     - C++
+   - We have to use the AWS SDK when coding against AWS Services such as DynamoDB
+   - Fun fact… the AWS CLI uses the Python SDK (boto3)
+   - Good to know: if you don’t specify or configure a default region, 
+   - then us-east-1 will be chosen by default
+
+  
+## AWS SDK Credentials Security
+   - It’s recommend to use the default credential provider chain
+     - The default credential provider chain works seamlessly with:
+     - AWS credentials at ~/.aws/credentials (only on our computers or on premise)
+     - Instance Profile Credentials using IAM Roles (for EC2 machines, etc…)
+     - Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+   - Overall, NEVER EVER STORE AWS CREDENTIALS IN YOUR CODE.
+   - Best practice is for credentials to be inherited from mechanisms above, 
+   - and 100% IAM Roles if working from within AWS Services
+
+  
+## Exponential Backoff
+   - Any API that fails because of too many calls needs to be retried with Exponential Backoff
+   - These apply to rate limited API
+   - Retry mechanism included in SDK API calls
+
+   
+# Advanced S3, Glacier, Athena
+
+  
+## S3 MFA-Delete
+   - MFA (multi factor authentication) forces user to generate a code on a device 
+   - (usually a mobile phone or hardware) before doing important operations on S3
+   - To use MFA-Delete, enable Versioning on the S3 bucket
+   - You will need MFA to
+     - permanently delete an object version
+     - suspend versioning on the bucket
+   - You won’t need MFA for
+     - enabling versioning
+     - listing deleted versions
+   - Only the bucket owner (root account) can enable/disable MFA-Delete
+   - MFA-Delete currently can only be enabled using the CLI
+
+  
+## S3 Default Encryption vs Bucket Policies
+   - The old way to enable default encryption was to use a bucket policy and refuse any HTTP command without the proper headers:
+   - The new way is to use the “default encryption” option in S3
+   - Note: Bucket Policies are evaluated before “default encryption”
+
+  
+## S3 Access Logs
+   - For audit purpose, you may want to log all access to S3 buckets
+   - Any request made to S3, from any account, authorized or denied, will be logged into another S3 bucket
+   - That data can be analyzed using data analysis tools…
+   - Or Amazon Athena 
+  
+## S3 Access Logs: Warning
+   - Do not set your logging bucket to be the monitored bucket
+   - It will create a logging loop, and your bucket will grow in size exponentially
+  
+## S3 Replication (CRR & SRR)
+   - Must enable versioning in source and destination
+   - Cross Region Replication (CRR)
+   - Same Region Replication (SRR)
+   - Buckets can be in different accounts
+   - Copying is asynchronous
+   - Must give proper IAM permissions to S3
+   - CRR - Use cases: compliance, lower latency access, replication across accounts
+   - SRR – Use cases: log aggregation, live replication between production and test accounts
+
+  
+## S3 Replication – Notes
+   - After activating, only new objects are replicated (not retroactive)
+   - For DELETE operations:
+   - If you delete without a version ID, it adds a delete marker, not replicated
+   - If you delete with a version ID, it deletes in the source, not replicated
+   - There is no “chaining” of replication
+   - If bucket 1 has replication into bucket 2, which has replication into bucket 3
+   - Then objects created in bucket 1 are not replicated to bucket 3
+
+  
+## S3 Pre-Signed URLs
+   - Can generate pre-signed URLs using SDK or CLI
+   - For downloads (easy, can use the CLI)
+   - For uploads (harder, must use the SDK)
+   - Valid for a default of 3600 seconds, can change timeout with --expires-in [TIME_BY_SECONDS] argument
+   - Users given a pre-signed URL inherit the permissions of the person who generated the URL for GET / PUT
+   - Examples :
+   - Allow only logged-in users to download a premium video on your S3 bucket
+   - Allow an ever changing list of users to download files by generating URLs dynamically
+   - Allow temporarily a user to upload a file to a precise location in our bucket
+
+  
+## S3 Storage Classes
+   - Amazon S3 Standard - General Purpose
+   - Amazon S3 Standard-Infrequent Access (IA)
+   - Amazon S3 One Zone-Infrequent Access
+   - Amazon S3 Intelligent Tiering
+   - Amazon Glacier
+   - Amazon Glacier Deep Archive
+   - Amazon S3 Reduced Redundancy Storage (deprecated - omitted)
+
+  
+## S3 Standard – General Purpose
+   - High durability (99.999999999%) of objects across multiple AZ
+   - If you store 10,000,000 objects with Amazon S3, 
+   - you can on average expect to incur a loss of a single object once every 10,000 years
+   - 99.99% Availability over a given year
+   - Sustain 2 concurrent facility failures
+   - Use Cases: Big Data analytics, mobile & gaming applications, content distribution…
+
+  
+## S3 Standard – Infrequent Access (IA)
+   - Suitable for data that is less frequently accessed, but requires rapid access when needed
+   - High durability (99.999999999%) of objects across multiple AZs
+   - 99.9% Availability
+   - Low cost compared to Amazon S3 Standard
+   - Sustain 2 concurrent facility failures
+   - Use Cases: As a data store for disaster recovery, backups…
+
+  
+## S3 One Zone - Infrequent Access (IA)
+   - Same as IA but data is stored in a single AZ
+   - High durability (99.999999999%) of objects in a single AZ; 
+   - data lost when AZ is destroyed
+   - 99.5% Availability
+   - Low latency and high throughput performance
+   - Supports SSL for data at transit and encryption at rest
+   - Low cost compared to IA (by 20%)
+   - Use Cases: Storing secondary backup copies of on-premise data, or storing data you can recreate
+
+  
+## S3 Intelligent Tiering
+   - Same low latency and high throughput performance of S3 Standard
+   - Small monthly monitoring and auto-tiering fee
+   - Automatically moves objects between two access tiers based on changing access patterns
+   - Designed for durability of 99.999999999% of objects across multiple Availability Zones
+   - Resilient against events that impact an entire Availability Zone
+   - Designed for 99.9% availability over a given year
+
+  
+## Amazon Glacier    
+   - Low cost object storage meant for archiving / backup    
+   - Data is retained for the longer term (10s of years)    
+   - Alternative to on-premise magnetic tape storage    
+   - Average annual durability is 99.999999999%    
+   - Cost per storage per month ($0.004 / GB) + retrieval cost     
+   - Each item in Glacier is called “Archive” (up to 40TB)    
+   - Archives are stored in ”Vaults”
+
+  
+## Amazon Glacier & Glacier Deep Archive
+   - Amazon Glacier – 3 retrieval options:
+   - Expedited (1 to 5 minutes)
+   - Standard (3 to 5 hours)
+   - Bulk (5 to 12 hours)
+   - Minimum storage duration of 90 days
+   - Amazon Glacier Deep Archive – for long term storage – cheaper:
+   - Standard (12 hours)
+   - Bulk (48 hours)
+   - Minimum storage duration of 180 days
+
+## S3 – Moving between storage classes
+   - You can transition objects between storage classes
+   - For infrequently accessed object, move them to STANDARD_IA
+   - For archive objects you don’t need in real -time, GLACIER or DEEP_ARCHIVE
+   - Moving objects can be automated using a lifecycle configuration
+
+  
+## S3 Lifecycle Rules
+   - Transition actions: 
+     - It defines when objects are transitioned to another storage class.
+     - Move objects to Standard IA class 60 days after creation
+     - Move to Glacier for archiving after 6 months
+   - Expiration actions: 
+     - configure objects to expire (delete) after some time
+     - Access log files can be set to delete after a 365 days
+     - Can be used to delete old versions of files (if versioning is enabled)
+     - Can be used to delete incomplete multi-part uploads
+   - Rules can be created for a certain prefix (ex - s3://mybucket/mp3/*)
+   - Rules can be created for certain objects tags (ex - Department: Finance)
+
+  
+## S3 Lifecycle Rules – Scenario 1
+   - Your application on EC2 creates images thumbnails after profile photos are uploaded to Amazon S3. 
+   - These thumbnails can be easily recreated, and only need to be kept for 45 days. 
+   - The source images should be able to be immediately retrieved for these 45 days, and afterwards, the user can wait up to 6 hours. 
+   - How would you design this?
+     - S3 source images can be on STANDARD, with a lifecycle configuration to transition them to GLACIER after 45 days.
+     - S3 thumbnails can be on ONEZONE_IA, with a lifecycle configuration to expire them (delete them) after 45 days. 
+
+  
+## S3 Lifecycle Rules – Scenario 2
+   - A rule in your company states that you should be able to recover your deleted S3 objects immediately for 15 days, 
+   - although this may happen rarely. After this time, and for up to 365 days, 
+   - deleted objects should be recoverable within 48 hours.
+   - You need to enable S3 versioning in order to have object versions, 
+   - so that “deleted objects” are in fact hidden by a “delete marker” and can be recovered
+     - You can transition these “noncurrent versions” of the object to S3_IA
+     - You can transition afterwards these “noncurrent versions” to DEEP_ARCHIVE
+
+  
+## S3 – Baseline Performance
+   - Amazon S3 automatically scales to high request rates, latency 100-200 ms
+   - Your application can achieve at least 3,500 PUT/COPY/POST/DELETE 
+   - and 5,500 GET/HEAD requests per second per prefix in a bucket.
+   - There are no limits to the number of prefixes in a bucket.
+   - Example (object path => prefix):
+     - bucket/folder1/sub1/file => /folder1/sub1/
+     - bucket/folder1/sub2/file => /folder1/sub2/
+     - bucket/1/file => /1/
+     - bucket/2/file => /2/
+   - If you spread reads across all four prefixes evenly, you can achieve 22,000 requests per second for GET and HEAD
+
+  
+## S3 – KMS Limitation
+   - If you use SSE-KMS, you may be impacted by the KMS limits
+   - When you upload, it calls the GenerateDataKey KMS API
+   - When you download, it calls the Decrypt KMS API
+   - Count towards the KMS quota per second (5500, 10000, 30000 req/s based on region)
+   - As of today, you cannot request a quota increase for KMS
+  
+## S3 Performance
+   - Multi-Part upload:
+     - recommended for files > 100MB, must use for files > 5GB
+     - Can help parallelize uploads (speed up transfers)
+   - S3 Transfer Acceleration (upload only)
+     - Increase transfer speed by transferring file to an AWS edge location which will forward the data to the S3 bucket in the target region
+     - Compatible with multi-part upload
+  
+## S3 Performance – S3 Byte-Range Fetches
+   - Parallelize GETs by requesting specific byte ranges
+   - Better resilience in case of failures
+   - Can be used to speed up downloads
+   - Can be used to retrieve only partial data (for example the head of a file)
+  
+## S3 Select & Glacier Select
+   - Retrieve less data using SQL by performing server side filtering
+   - Can filter by rows & columns (simple SQL statements)
+   - Less network transfer, less CPU cost client-side
+  
+## S3 Event Notifications
+   - S3:ObjectCreated, S3:ObjectRemoved, S3:ObjectRestore, S3:Replication…
+   - Object name filtering possible (*.jpg)
+   - Use case: generate thumbnails of images uploaded to S3
+   - Can create as many “S3 events” as desired
+   - S3 event notifications typically deliver events in seconds but can sometimes take a minute or longer
+   - If two writes are made to a single non-versioned object at the same time, it is possible that only a single event notification will be sent
+   - If you want to ensure that an event notification is sent for every successful write, you can enable versioning on your bucket.
+   - Lambda 
+   - SQS
+   - SNS
+
+  
+## AWS Athena
+   - Serverless service to perform analytics directly against S3 files
+   - Uses SQL language to query the files
+   - Has a JDBC / ODBC driver
+   - Charged per query and amount of data scanned
+   - Supports CSV, JSON, ORC, Avro, and Parquet (built on Presto)
+   - Use cases: Business intelligence / analytics / reporting, analyze & query VPC Flow Logs, ELB Logs, CloudTrail trails, etc...
+   - Exam Tip: Analyze data directly on S3 => use Athena
+
+  
+## S3 Object Lock & Glacier Vault Lock
+   - S3 Object Lock
+     - Adopt a WORM (Write Once Read Many) model
+     - Block an object version deletion for a specified amount of time
+   - Glacier Vault Lock
+     - Adopt a WORM (Write Once Read Many) model
+     - Lock the policy for future edits (can no longer be changed)
+     - Helpful for compliance and data retention
+	 
+
+# CloudFront & AWS Global Accelerator
+
+
+## AWS CloudFront
+   - Content Delivery Network (CDN)
+   - Improves read performance, content is cached at the edge
+   - 216 Point of Presence globally (edgelocations)
+   - DDoS protection, integration with Shield, AWS Web Application Firewall
+   - Can expose external HTTPS and can talk to internal HTTPS backends
+  
+## CloudFront – Origins
+   - S3 bucket    
+     - For distributing files and caching them at the edge    
+	 - Enhanced security with CloudFront Origin Access Identity (OAI)    
+	 - CloudFront can be used as an ingress (to upload files to S3)    
+   - Custom Origin (HTTP)    
+     - Application Load Balancer    
+	 - EC2 instance    
+	 - S3 website (must first enable the bucket as a static S3 website)    
+	 - Any HTTP backend you want
+  
+## CloudFront Geo Restriction
+   - You can restrict who can access your distribution
+   - Whitelist: 
+     - Allow your users to access your content only if they're in one of the countries on a list of approved countries.
+   - Blacklist: 
+     - Prevent your users from accessing your content if they're in one of the countries on a blacklist of banned countries.
+   - The “country” is determined using a 3rd party Geo-IP database
+   - Use case: Copyright Laws to control access to content
+
+  
+## CloudFront vs S3 Cross Region Replication
+   - CloudFront:
+     - Global Edge network
+     - Files are cached for a TTL (maybe a day)
+     - Great for static content that must be available everywhere
+   - S3 Cross Region Replication:
+     - Must be setup for each region you want replication to happen
+     - Files are updated in near real-time
+     - Read only
+     - Great for dynamic content that needs to be available at low-latency in few regions
+
+
+  
+## CloudFront Signed URL / Signed Cookies
+   - You want to distribute paid shared content to premium users over the world
+   - We can use CloudFront Signed URL / Cookie. We attach a policy with:
+     - Includes URL expiration
+     - Includes IP ranges to access the data from
+     - Trusted signers (which AWS accounts can create signed URLs)
+   - How long should the URL be valid for?
+     - Shared content (movie, music): make it short (a few minutes)
+     - Private content (private to the user): you can make it last for years
+   - Signed URL = access to individual files (one signed URL per file)
+   - Signed Cookies = access to multiple files (one signed cookie for many files)
+
+  
+## CloudFront Signed URL vs S3 Pre-Signed URL
+   - CloudFront Signed URL:
+     - Allow access to a path, no matter the origin
+     - Account wide key-pair, only the root can manage it
+     - Can filter by IP, path, date, expiration
+     - Can leverage caching features
+   - S3 Pre-Signed URL:
+     - Issue a request as the person who pre-signed the URL
+     - Uses the IAM key of the signing IAM principal
+     - Limited lifetime
+
+## Global users for our application
+   - You have deployed an application and have global users who want to access it directly.
+   - They go over the public internet, which can add a lot of latency due to many hops
+   - We wish to go as fast as possible through AWS network to minimize latency
+  
+## Unicast IP vs Anycast IP    
+   - Unicast IP: one server holds one IP address
+   - Anycast IP: all servers hold the same IP address and the client is routed to the nearest one
+
+  
+## AWS Global Accelerator
+   - Leverage the AWS internal network to route to your application
+   - 2 Anycast IP are created for your application
+   - The Anycast IP send traffic directly to Edge Locations
+   - The Edge locations send the traffic to your application
+   - Works with Elastic IP, EC2 instances, ALB, NLB, public or private
+   - Consistent Performance
+     - Intelligent routing to lowest latency and fast regional failover
+     - No issue with client cache (because the IP doesn’t change)
+     - Internal AWS network
+   - Health Checks
+     - Global Accelerator performs a health check of your applications
+     - Helps make your application global (failover less than 1 minute for unhealthy)
+     - Great for disaster recovery (thanks to the health checks)
+   - Security
+     - only 2 external IP need to be whitelisted
+     - DDoS protection thanks to AWS Shield
+
+  
+## AWS Global Accelerator vs CloudFront
+   - They both use the AWS global network and its edge locations around the world
+   - Both services integrate with AWS Shield for DDoS protection.
+   - CloudFront
+     - Improves performance for both cacheable content (such as images and videos)
+     - Dynamic content (such as API acceleration and dynamic site delivery)
+     - Content is served at the edge
+   - Global Accelerator
+     - Improves performance for a wide range of applications over TCP or UDP
+     - Proxying packets at the edge to applications running in one or more AWS Regions.
+     - Good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or Voice over IP
+     - Good for HTTP use cases that require static IP addresses
+     - Good for HTTP use cases that required deterministic, fast regional failover	 
+
+# AWS Storage
+  
+## Snowball    
+   - Physical data transport solution that helps moving TBs or PBs of data in or out of AWS
+   - Alternative to moving data over the network (and paying network fees)
+   - Secure, tamper resistant, uses KMS 256 bit encryption
+   - Tracking using SNS and text messages. E -ink shipping label
+   - Pay per data transfer job    
+   - Use cases: large data cloud migrations, DC decommission, disaster recovery
+   - If it takes more than a week to transfer over the network, use Snowball devices!
+
+  
+## Snowball Process
+   - 1. Request snowball devices from the AWS console for delivery
+   - 2. Install the snowball client on your servers
+   - 3. Connect the snowball to your servers and copy files using the client
+   - 4. Ship back the device when you’re done (goes to the right AWS facility)
+   - 5. Data will be loaded into an S3 bucket
+   - 6. Snowball is completely wiped
+   - 7. Tracking is done using SNS, text messages and the AWS console
+  
+## Snowball Edge    
+   - Snowball Edges add computational capability to the device
+   - 100 TB capacity with either:    
+     - Storage optimized – 24 vCPU    
+	 - Compute optimized – 52 vCPU & optional GPU    
+   - Supports a custom EC2 AMI so you can perform processing on the go
+   - Supports custom Lambda functions    
+   - Very useful to pre-process the data while moving    
+   - Use case: data migration, image collation, IoT capture, machine learning
+
+## AWS Snowmobile
+   - Transfer exabytes of data (1 EB = 1,000 PB = 1,000,000 TBs)
+   - Each Snowmobile has 100 PB of capacity (use multiple in parallel)
+   - Better than Snowball if you transfer more than 10 PB
+
+## Snowball into Glacier
+   - Snowball cannot import to Glacier directly
+   - You have to use Amazon S3 first, and an S3 lifecycle policy Snowball Amazon S3 Amazon Glacier import S3 lifecycle policy
+
+  
+## Hybrid Cloud for Storage
+   - AWS is pushing for ”hybrid cloud”
+     - Part of your infrastructure is on the cloud
+     - Part of your infrastructure is on-premise
+   - This can be due to
+     - Long cloud migrations
+     - Security requirements
+     - Compliance requirements
+     - IT strategy
+     - BLOCK
+       - EBS,  EC2 Instance Store
+     - FILE
+       - Amazon EFS
+     - OBJECT
+       -S3,  Glacier
+
+  
+## AWS Storage Gateway
+   - Bridge between on-premise data and cloud data in S3
+   - Use cases: disaster recovery, backup & restore, tiered storage
+   - 3 types of Storage Gateway:
+     - File Gateway
+     - Volume Gateway
+     - Tape Gateway
+   
+## File Gateway
+   - Configured S3 buckets are accessible using the NFS and SMB protocol
+   - Supports S3 standard, S3 IA, S3 One Zone IA
+   - Bucket access using IAM roles for each File Gateway
+   - Most recently used data is cached in the file gateway
+   - Can be mounted on many servers
+
+## Volume Gateway
+   - Block storage using iSCSI protocol backed by S3
+   - Backed by EBS snapshots which can help restore on-premise volumes!
+   - Cached volumes: low latency access to most recent data
+   - Stored volumes: entire dataset is on premise, scheduled backups to S3
+  
+## Tape Gateway
+   - Some companies have backup processes using physical tapes (!)
+   - With Tape Gateway, companies use the same processes but in the cloud
+   - Virtual Tape Library (VTL) backed by Amazon S3 and Glacier
+   - Back up data using existing tape-based processes (and iSCSI interface)
+   - Works with leading backup software vendors 
+  
+## AWS Storage Gateway Summary
+   - Exam tip: Read the question well, it will hint at which gateway to use
+   - On premise data to the cloud => Storage Gateway
+   - File access / NFS => File Gateway (backed by S3)
+   - Volumes / Block Storage / iSCSI => Volume gateway (backed by S3 with EBS snapshots)
+   - VTL Tape solution / Backup with iSCSI = > Tape Gateway (backed by S3 and Glacier)
+
+  
+## Amazon FSx for Windows (File Server)
+   - EFS is a shared POSIX system for Linux systems.
+   - FSx for Windows is a fully managed Windows file system share drive
+   - Supports SMB protocol & Windows NTFS
+   - Microsoft Active Directory integration, ACLs, user quotas
+   - Built on SSD, scale up to 10s of GB/s, millions of IOPS, 100s PB of data
+   - Can be accessed from your on-premise infrastructure
+   - Can be configured to be Multi-AZ (high availability)
+   - Data is backed-up daily to S3
+  
+## Amazon FSx for Lustre
+   - Lustre is a type of parallel distributed file system, for large-scale computing
+   - The name Lustre is derived from “Linux” and “cluster”
+   - Machine Learning, High Performance Computing (HPC)
+   - Video Processing, Financial Modeling, Electronic Design Automation
+   - Scales up to 100s GB/s, millions of IOPS, sub-ms latencies
+   - Seamless integration with S3
+   - Can “read S3” as a file system (through FSx)
+   - Can write the output of the computations back to S3 (through FSx)
+   - Can be used from on-premise servers
+  
+## Storage Comparison
+   - S3: Object Storage
+   - Glacier: Object Archival
+   - EFS: Network File System for Linux instances, POSIX filesystem
+   - FSx for Windows: Network File System for Windows servers
+   - FSx for Lustre: High Performance Computing Linux file system
+   - EBS volumes: Network storage for one EC2 instance at a time
+   - Instance Storage: Physical storage for your EC2 instance (high IOPS)
+   - Storage Gateway: File Gateway, Volume Gateway (cache & stored), Tape Gateway
+   - Snowball / Snowmobile: to move large amount of data to the cloud, physically
+   - Database: for specific workloads, usually with indexing and querying
+
+# AWS Integration & Messaging
+
+## AWS SQS – Standard Queue
+   - Oldest offering (over 10 years old)
+   - Fully managed
+   - Scales from 1 message per second to 10,000s per second
+   - Default retention of messages: 4 days, maximum of 14 days
+   - No limit to how many messages can be in the queue
+   - Low latency (<10 ms on publish and receive)
+   - Horizontal scaling in terms of number of consumers
+   - Can have duplicate messages (at least once delivery, occasionally)
+   - Can have out of order messages (best effort ordering)
+   - Limitation of 256KB per message sent
+
+  
+## AWS SQS – Delay Queue
+   - Delay a message (consumers don’t see it immediately) up to 15 minutes
+   - Default is 0 seconds (message is available right away)
+   - Can set a default at queue level
+   - Can override the default using the DelaySeconds parameter Producer Consumer Send messages Poll messages
+
+## Attributes SQS – Producing Messages
+   - Define Body    - Add message attributes (metadata – optional)
+   - Provide Delay Delivery (optional)
+   - Get back    
+     - Message identifier
+	 - MD5 hash of the body
+  
+## SQS – Consuming Messages
+   - Consumers…
+   - Poll SQS for messages (receive up to 10 messages at a time)
+   - Process the message within the visibility timeout
+   - Delete the message using the message ID & receipt handle
+
+## SQS –Visibility timeout
+   - When a consumer polls a message from a queue, the message is “invisible” to other consumers for a defined period… the Visibility Timeout:
+     - Set between 0 seconds and 12 hours (default 30 seconds)
+     - If too high (15 minutes) and consumer fails to process the message, you must wait a long time before processing the message again
+     - If too low (30 seconds) and consumer needs time to process the message (2 minutes), another consumer will receive the message and the message will be processed more than once
+   - ChangeMessageVisibility API to change the visibility while processing a message
+   - DeleteMessage API to tell SQS the message was successfully processed
+
+## AWS SQS – Dead Letter Queue
+   - If a consumer fails to process a message within the Visibility Timeout… the message goes back to the queue!
+   - We can set a threshold of how many times a message can go back to the queue 
+   – it’s called a “redrive policy”
+   - After the threshold is exceeded, the message goes into a dead letter queue (DLQ)
+   - We have to create a DLQ first and then designate it dead letter queue
+   - Make sure to process the messages in the DLQ before they expire! 
+  
+## AWS SQS - Long Polling
+   - When a consumer requests message from the queue, it can optionally “wait” for messages to arrive if there are none in the queue
+   - This is called Long Polling 
+   - LongPolling decreases the number of API calls made to SQS while increasing the efficiency and latency of your application.
+   - The wait time can be between 1 sec to 20 sec (20 sec preferable)
+   - Long Polling is preferable to Short Polling
+   - Long polling can be enabled at the queue level or at the API level using WaitTimeSeconds
+  
+## AWS SQS – FIFO Queue
+   - Newer offering (First In - First out)
+   – not available in all regions!
+   - Name of the queue must end in .fifo    
+   - Lower throughput (up to 3,000 per second with batching, 300/s without)
+   - Messages are processed in order by the consumer    
+   - Messages are sent exactly once    
+   - No per message delay (only per queue delay)    
+   - Ability to do content based de-duplication    
+   - 5-minute interval de-duplication using “Duplication ID”    
+   - Message Groups:    
+     - Possibility to group messages for FIFO ordering using “Message GroupID”
+     - Only one worker can be assigned per message group so that messages are processed in order
+     - Message group is just an extra tag on the message!
+
+  
+## AWS SNS
+   - What if you want to send one message to many receivers?
+   - The “event producer” only sends message to one SNS topic
+   - As many “event receivers” (subscriptions) as we want to listen to the SNS topic notifications
+   - Each subscriber to the topic will get all the messages (note: new feature to filter messages)
+   - Up to 10,000,000 subscriptions per topic
+   - 100,000 topics limit
+   - Subscribers can be:
+     - SQS
+     - HTTP / HTTPS (with delivery retries – how many times)
+     - Lambda
+     - Emails
+     - SMS messages
+     - Mobile Notifications
+  
+## SNS integrates with a lot of Amazon Products
+   - Some services can send data directly to SNS for notifications
+   - CloudWatch (for alarms)
+   - Auto Scaling Groups notifications
+   - Amazon S3 (on bucket events)
+   - CloudFormation (upon state changes => failed to build, etc)
+   - Etc…
+  
+## AWS SNS – How to publish
+   - Topic Publish (within your AWS Server – using the SDK)
+     - Create a topic    
+	 - Create a subscription (or many)    
+	 - Publish to the topic
+   - Direct Publish (for mobile apps SDK)    
+     - Create a platform application    
+	 - Create a platform endpoint    
+	 - Publish to the platform endpoint    
+	 - Works with Google GCM, Apple APNS, Amazon ADM…
+  
+## SNS + SQS: Fan Out
+   - Push once in SNS, receive in many SQS
+   - Fully decoupled
+   - No data loss
+   - Ability to add receivers of data later
+   - SQS allows for delayed processing
+   - SQS allows for retries of work
+   - May have many workers on one queue and one worker on the other queue
+
+  
+## AWS Kinesis Overview
+   - Kinesis is a managed alternative to Apache Kafka
+   - Great for application logs, metrics, IoT, clickstreams
+   - Great for “real-time” big data
+   - Great for streaming processing frameworks (Spark, NiFi, etc…)
+   - Data is automatically replicated to 3 AZ
+   - 3 components
+     - Kinesis Streams: low latency streaming ingest at scale
+     - Kinesis Analytics: perform real-time analytics on streams using SQL
+     - Kinesis Firehose: load streams into S3, Redshift, ElasticSearch… 
+   - Streams are divided in ordered Shards / Partitions
+   - Data retention is 1 day by default, can go up to 7 days
+   - Ability to reprocess / replay data
+   - Multiple applications can consume the same stream
+   - Real-time processing with scale of throughput
+   - Once data is inserted in Kinesis, it can’t be deleted (immutability)
+
+## Kinesis Streams Shards
+   - One stream is made of many different shards
+   - 1MB/s or 1000 messages/s at write PER SHARD
+   - 2MB/s at read PER SHARD
+   - Billing is per shard provisioned, can have as many shards as you want
+   - Batching available or per message calls.
+   - The number of shards can evolve over time (reshard / merge)
+   - Records are ordered per shard
+   - Choose a partition key that is highly distributed (helps prevent “hot partition”)
+     - user_id if many users
+     - Not country_id if 90% of the users are in one country
+
+## AWS Kinesis API – Put records
+   - PutRecord API + Partition key that gets hashed
+   - The same key goes to the same partition (helps with ordering for a specific key)
+   - Messages sent get a “sequence number” 
+   - Choose a partition key that is highly distributed (helps prevent “hot partition”)
+     - user_id if many users
+     - Not country_id if 90% of the users are in one country
+   - Use Batching with PutRecords to reduce costs and increase throughput
+   - ProvisionedThroughputExceeded if we go over the limits
+   - Can use CLI, AWS SDK, or producer libraries
+
+## AWS Kinesis API – Exceptions
+   - ProvisionedThroughputExceeded Exceptions
+     - Happens when sending more data (exceeding MB/s or TPS for any shard)
+     - Make sure you don’t have a hot shard (such as your partition key is bad and too much data goes to that partition)
+   - Solution:
+     - Retries with backoff
+     - Increase shards (scaling)
+     - Ensure your partition key is a good one
+
+  
+## AWS Kinesis API – Consumers
+   - Can use a normal consumer (CLI, SDK, etc…)
+   - Can use Kinesis Client Library (in Java, Node, Python, Ruby, .Net)
+   - KCL uses DynamoDB to checkpoint offsets
+   - KCL uses DynamoDB to track other workers and share the work amongst shards
+  
+## Kinesis Security    
+   - Control access / authorization using IAM policies    
+   - Encryption in flight using HTTPS endpoints    
+   - Encryption at rest using KMS    
+   - Possibility to encrypt / decrypt data client side (harder)    
+   - VPC Endpoints available for Kinesis to access within VPC
+
+  
+## AWS Kinesis Data Firehose
+   - Fully Managed Service, no administration, automatic scaling, serverless
+   - Load data into Redshift / Amazon S3 / ElasticSearch / Splunk
+   - Near Real Time
+     - 60 seconds latency minimum for non full batches
+     - Or minimum 32 MB of data at a time
+   - Supports many data formats, conversions, transformations, compression
+   - Pay for the amount of data going through Firehose
+  
+## Kinesis Data Streams vs Firehose    
+   - Streams    
+     - Going to write custom code (producer / consumer)    
+     - Real time (~200 ms)    
+     - Must manage scaling (shard splitting / merging)    
+	 - Data Storage for 1 to 7 days, replay capability, multi consumers    
+   - Firehose    
+     - Fully managed, send to S3, Splunk, Redshift, ElasticSearch    
+	 - Serverless data transformations with Lambda    
+	 - Near real time (lowest buffer time is 1 minute)    
+	 - Automated Scaling    
+	 - No data storage
+
+## Kinesis Data Analytics    
+   - Perform real-time analytics on Kinesis Streams using SQL    
+   - Kinesis Data Analytics:    
+     - Auto Scaling    
+     - Managed: no servers to provision    
+     - Continuous: real time    
+   - Pay for actual consumption rate    
+   - Can create streams out of the real-time queries
+
+  
+## Ordering data into Kinesis
+   - Imagine you have 100 trucks (truck_1, truck_2, … truck_100) on the road sending their GPS positions regularly into AWS.
+   - You want to consume the data in order for each truck, so that you can track their movement accurately.
+   - How should you send that data into Kinesis?
+   - Answer: send using a “Partition Key” value of the “truck_id”
+   - The same key will always go to the same shard
+   
+## Ordering data into SQS
+   - For SQS standard, there is no ordering.
+   - For SQS FIFO, if you don’t use a Group ID, messages are consumed in the order they are sent, with only one consumer
+   - You want to scale the number of consumers, but you want messages to be “grouped” when they are related to each other
+   - Then you use a Group ID (similar to Partition Key in Kinesis)
+   - https://aws.amazon.com/blogs/compute/solving-complex-ordering-challenges-with-amazon-sqs-fifo-queues/
+  
+## Kinesis vs SQS ordering
+   - Let’s assume 100 trucks, 5 kinesis shards, 1 SQS FIFO
+   - Kinesis Data Streams:
+     - On average you’ll have 20 trucks per shard
+     - Trucks will have their data ordered within each shard
+     - The maximum amount of consumers in parallel we can have is 5
+     - Can receive up to 5 MB/s of data
+   - SQS FIFO
+     - You only have one SQS FIFO queue
+     - You will have 100 Group ID
+     - You can have up to 100 Consumers (due to the 100 Group ID)
+     - You have up to 300 messages per second (or 3000 if using batching)
+  
+## SQS vs SNS vs Kinesis
+   - SQS:
+     - Consumer “pull data”
+     - Data is deleted after being consumed
+     - Can have as many workers (consumers) as we want
+     - No need to provision throughput
+     - No ordering guarantee (except FIFO queues)
+     - Individual message delay capability
+   - SNS:
+     - Push data to many subscribers
+     - Up to 10,000,000 subscribers
+     -  Data is not persisted (lost if not delivered)
+     - Pub/Sub
+     - Up to 100,000 topics 
+     - No need to provision throughput
+     - Integrates with SQS for fan- out architecture pattern
+   - Kinesis:
+     - Consumers “pull data”
+     - As many consumers as we want
+     - Possibility to replay data
+     - Meant for real-time big data, analytics and ETL
+     - Ordering at the shard level
+     - Data expires after X days
+     - Must provision throughput
+  
+## Amazon MQ
+   - SQS, SNS are “cloud-native” services, and they’re using proprietary protocols from AWS.
+   - Traditional applications running from on-premise may use open protocols such as: MQTT, AMQP, STOMP, Openwire, WSS
+   - When migrating to the cloud, instead of re-engineering the application to use SQS and SNS, we can use Amazon MQ
+   - Amazon MQ = managed Apache ActiveMQ
+   - Amazon MQ doesn’t “scale” as much as SQS / SNS
+   - Amazon MQ runs on a dedicated machine, can run in HA with failover
+   - Amazon MQ has both queue feature (~SQS) and topic features (~SNS)
+
+# Serverless 
+  
+## What’s serverless?
+   - Serverless is a new paradigm in which the developers don’t have to manage servers anymore…
+   - They just deploy code
+   - They just deploy… functions !
+   - Initially... Serverless == FaaS (Function as a Service)
+   - Serverless was pioneered by AWS Lambda but now also includes anything that’s managed: “databases, messaging, storage, etc.”
+   - Serverless does not mean there are no servers… it means you just don’t manage / provision / see them
+
+## Serverless in AWS    
+   - AWS Lambda    
+   - DynamoDB    
+   - AWS Cognito    
+   - AWS API Gateway    
+   - Amazon S3    
+   - AWS SNS & SQS    
+   - AWS Kinesis Data Firehose    
+   - Aurora Serverless    
+   - Step Functions    
+   - Fargate
+  
+## AWS Lambda
+   - Easy Pricing:
+   - Pay per request and compute time
+   - Free tier of 1,000,000 AWS Lambda requests and 400,000 GBs of compute time
+   - Integrated with the whole AWS suite of services
+   - Integrated with many programming languages
+   - Easy monitoring through AWS CloudWatch
+   - Easy to get more resources per functions (up to 3GB of RAM!)
+   - Increasing RAM will also improve CPU and network!
+
+  
+## AWS Lambda language support    
+   - Node.js (JavaScript)   
+   - Python    
+   - Java (Java 8 compatible)    
+   - C# (.NET Core)    
+   - Golang    
+   - C# / Powershell    
+   - Ruby    
+   - Custom Runtime API (community supported, example Rust)    
+   - Important: Docker is not for AWS Lambda, it’s for ECS / Fargate
+
+  
+## AWS Lambda Integrations
+   - CloudWatch Logs SNS SQS Cognito API Gateway Kinesis DynamoDB S3 CloudFront CloudWatch Events EventBridge
+  
+## AWS Lambda Pricing: example    
+   - Pay per calls :
+     - First 1,000,000 requests are free    
+	 - $0.20 per 1 million requests thereafter ($0.0000002 per request)
+   - Pay per duration: (in increment of 100ms)    
+     - 400,000 GB-seconds of compute time per month if FREE    
+     - == 400,000 seconds if function is 1GB RAM    
+     - == 3,200,000 seconds if function is 128 MB RAM    
+     - After that $1.00 for 600,000 GB-seconds    
+     - It is usually very cheap to run AWS Lambda so it’s very popular
+
+  
+## AWS Lambda Limits to Know - per region
+   - Execution:
+     - Memory allocation: 128 MB – 3008 MB (64 MB increments)
+     - Maximum execution time: 900 seconds (15 minutes)
+     - Environment variables (4 KB)
+     - Disk capacity in the “function container” (in /tmp): 512 MB
+     - Concurrency executions: 1000 (can be increased)
+   - Deployment:
+     - Lambda function deployment size (compressed .zip): 50 MB
+     - Size of uncompressed deployment (code + dependencies): 250 MB
+     - Can use the /tmp directory to load other files at startup
+     - Size of environment variables: 4 KB
+  
+## Lambda@Edge
+   - You have deployed a CDN using CloudFront
+   - What if you wanted to run a global AWS Lambda alongside?
+   - Or how to implement request filtering before reaching your application?
+   - For this, you can use Lambda@Edge: deploy Lambda functions alongside your CloudFront CDN
+     - Build more responsive applications
+     - You don’t manage servers, Lambda is deployed globally
+     - Customize the CDN content
+     - Pay only for what you use
+   - You can use Lambda to change CloudFront requests and responses:
+     - After CloudFront receives a request from a viewer (viewer request)
+     - Before CloudFront forwards the request to the origin (origin request)
+     - After CloudFront receives the response from the origin (origin response)
+     - Before CloudFront forwards the response to the viewer (viewer response)
+   - You can also generate responses to viewers without ever sending the request to the origin.
+  
+## Lambda@Edge: Use Cases    
+   - Website Security and Privacy    
+   - Dynamic Web Application at the Edge    
+   - Search Engine Optimization (SEO)    
+   - Intelligently Route Across Origins and Data Centers    
+   - Bot Mitigation at the Edge    
+   - Real-time Image Transformation    
+   - A/B Testing    
+   - User Authentication and Authorization    
+   - User Prioritization    
+   - User Tracking and Analytics
+  
+## DynamoDB
+   - Fully Managed, Highly available with replication across 3 AZ
+   - NoSQL database - not a relational database
+   - Scales to massive workloads, distributed database
+   - Millions of requests per seconds, trillions of row, 100s of TB of storage
+   - Fast and consistent in performance (low latency on retrieval)
+   - Integrated with IAM for security, authorization and administration
+   - Enables event driven programming with DynamoDB Streams
+   - Low cost and auto scaling capabilities
+  
+## DynamoDB - Basics
+   - DynamoDB is made of tables
+   - Each table has a primary key (must be decided at creation time)
+   - Each table can have an infinite number of items (= rows)
+   - Each item has attributes (can be added over time – can be null)
+   - Maximum size of a item is 400KB
+   - Data types supported are:
+     - Scalar Types: String, Number, Binary, Boolean, Null
+     - Document Types: List, Map
+     - Set Types: String Set, Number Set, Binary Set
+  
+## DynamoDB – Provisioned Throughput
+   - Table must have provisioned read and write capacity units
+   - Read Capacity Units (RCU): throughput for reads ($0.00013 per RCU)
+     - 1 RCU = 1 strongly consistent read of 4 KB per second
+     - 1 RCU = 2 eventually consistent read of 4 KB per second
+   - Write Capacity Units (WCU): throughput for writes ($0.00065 per WCU)
+     - 1 WCU = 1 write of 1 KB per second
+   - Option to setup auto-scaling of throughput to meet demand
+   - Throughput can be exceeded temporarily using “burst credit”
+   - If burst credit are empty, you’ll get a “ProvisionedThroughputException”.
+   - It’s then advised to do an exponential back-off retry
+
+## DynamoDB - DAX
+   - DAX = DynamoDB Accelerator    
+   - Seamless cache for DynamoDB, no application re- write
+   - Writes go through DAX to DynamoDB    
+   - Micro second latency for cached reads & queries    
+   - Solves the Hot Key problem (too many reads)    
+   - 5 minutes TTL for cache by default    
+   - Up to 10 nodes in the cluster    
+   - Multi AZ (3 nodes minimum recommended for production)
+   - Secure (Encryption at rest with KMS, VPC, IAM, CloudTrail…)
+  
+## DynamoDB Streams
+   - Changes in DynamoDB (Create, Update, Delete) can end up in a DynamoDB Stream
+   - This stream can be read by AWS Lambda, and we can then do:
+     - React to changes in real time (welcome email to new users)
+     - Analytics
+     - Create derivative tables / views
+     - Insert into ElasticSearch
+   - Could implement cross region replication using Streams
+   - Stream has 24 hours of data retention
+  
+## DynamoDB - New Features
+   - Transactions (new from Nov 2018)
+     - All or nothing type of operations
+     - Coordinated Insert, Update & Delete across multiple tables
+     - Include up to 10 unique items or up to 4 MB of data
+   - On Demand (new from Nov 2018)
+     - No capacity planning needed (WCU / RCU) – scales automatically
+     - 2.5x more expensive than provisioned capacity (use with care)
+     - Helpful when spikes are un-predictable or the application is very low throughput
+  
+## DynamoDB – Security & Other Features
+   - Security:
+     - VPC Endpoints available to access DynamoDB without internet
+     - Access fully controlled by IAM
+     - Encryption at rest using KMS
+     - Encryption in transit using SSL / TLS
+   - Backup and Restore feature available
+     - Point in time restore like RDS
+     - No performance impact
+   - Global Tables
+     - Multi region, fully replicated, high performance
+   - Amazon DMS can be used to migrate to DynamoDB (from Mongo, Oracle, MySQL, S3, etc…)
+   - You can launch a local DynamoDB on your computer for development purposes
+  
+## DynamoDB – Other features
+   - Global Tables: (cross region replication)
+     - Active Active replication, many regions
+     - Must enable DynamoDB Streams
+     - Useful for low latency, DR purposes
+   - Capacity planning:
+     - Planned capacity: provision WCU & RCU, can enable auto scaling
+     - On-demand capacity: get unlimited WCU & RCU, no throttle, more expensive
+	 
+## AWS API Gateway    
+   - AWS Lambda + API Gateway: No infrastructure to manage    
+   - Support for the WebSocket Protocol    
+   - Handle API versioning (v1, v2…)    
+   - Handle different environments (dev, test, prod…)    
+   - Handle security (Authentication and Authorization)    
+   - Create API keys, handle request throttling    
+   - Swagger / Open API import to quickly define APIs    
+   - Transform and validate requests and responses    
+   - Generate SDK and API specifications    
+   - Cache API responses
+  
+## API Gateway – Integrations High Level
+   - Lambda Function
+     - Invoke Lambda function
+     - Easy way to expose REST API backed by AWS Lambda
+   - HTTP
+     - Expose HTTP endpoints in the backend
+     - Example: internal HTTP API on premise, Application Load Balancer…
+     - Why? Add rate limiting, caching, user authentications, API keys, etc…
+   - AWS Service
+     - Expose any AWS API through the API Gateway?
+     - Example: start an AWS Step Function workflow, post a message to SQS
+     - Why? Add authentication, deploy publicly, rate control… 
+  
+## API Gateway - Endpoint Types
+   - Edge-Optimized (default): For global clients
+     - Requests are routed through the CloudFront Edge locations (improves latency)
+     - The API Gateway still lives in only one region
+   - Regional:
+     - For clients within the same region
+     - Could manually combine with CloudFront (more control over the caching strategies and the distribution)
+   - Private:
+     - Can only be accessed from your VPC using an interface VPC endpoint (ENI)
+     - Use a resource policy to define access
+  
+## API Gateway – Security IAM Permissions
+   - Create an IAM policy authorization and attach to User / Role
+   - API Gateway verifies IAM permissions passed by the calling application
+   - Good to provide access within your own infrastructure
+   - Leverages “Sig v4” capability where IAM credential are in headers
+
+## API Gateway – Security Lambda Authorizer (formerly Custom Authorizers)
+   - Uses AWS Lambda to validate the token in header being passed
+   - Option to cache result of authentication
+   - Helps to use OAuth / SAML / 3rd party type of authentication
+   - Lambda must return an IAM policy for the user
+  
+## API Gateway – Security Cognito User Pools    
+   - Cognito fully manages user lifecycle    
+   - API gateway verifies identity automatically from AWS Cognito    
+   - No custom implementation required    
+   - Cognito only helps with authentication, not authorization
+  
+API Gateway – Security – Summary
+   - IAM:
+     - Great for users / roles already within your AWS account
+     - Handle authentication + authorization
+     - Leverages Sig v4
+   - Custom Authorizer:
+     - Great for 3rd party tokens
+     - Very flexible in terms of what IAM policy is returned
+     - Handle Authentication + Authorization
+     - Pay per Lambda invocation
+   - Cognito User Pool:
+     - You manage your own user pool (can be backed by Facebook, Google login etc…)
+     - No need to write any custom code
+     - Must implement authorization in the backend 
+  
+## AWS Cognito
+   - We want to give our users an identity so that they can interact with our application.
+   - Cognito User Pools:
+     - Sign in functionality for app users
+     - Integrate with API Gateway
+   - Cognito Identity Pools (Federated Identity):
+     - Provide AWS credentials to users so they can access AWS resources directly
+     - Integrate with Cognito User Pools as an identity provider
+   - Cognito Sync:
+     - Synchronize data from device to Cognito.
+     - May be deprecated and replaced by AppSync 
+  
+## AWS Cognito User Pools (CUP)
+   - Create a serverless database of user for your mobile apps
+   - Simple login: Username (or email) / password combination
+   - Possibility to verify emails / phone numbers and add MFA
+   - Can enable Federated Identities (Facebook, Google, SAML…)
+   - Sends back a JSON Web Tokens (JWT)
+   - Can be integrated with API Gateway for authentication
+
+## AWS Cognito – Federated Identity Pools
+   - Goal:
+     - Provide direct access to AWS Resources from the Client Side
+   - How:
+   - Log in to federated identity provider (Google, FB, Amazon or CUP) – or remain anonymous  
+   - Get temporary AWS credentials back from the Federated Identity Pool
+   - These credentials come with a pre-defined IAM policy stating their permissions
+   - Example:
+     - provide (temporary) access to write to S3 bucket using Facebook Login
+     - login to facebook 
+	 - facebook provide token 
+	 - send token to cognito Federated Identity Pools
+	 - cognito validates the token with facebook
+	 - if token valid, requests STS to provide temp credentials to access S3
+	 
+## AWS Cognito Sync
+   - Deprecated – use AWS AppSync now
+   - Store preferences, configuration, state of app
+   - Cross device synchronization (any platform – iOS, Android, etc…)
+   - Offline capability (synchronization when back online)
+   - Requires Federated Identity Pool in Cognito (not User Pool)
+   - Store data in datasets (up to 1MB)
+   - Up to 20 datasets to synchronise
+
+## AWS SAM - Serverless Application Model
+   - SAM = Serverless Application Model
+   - Framework for developing and deploying serverless applications
+   - All the configuration is YAML code
+     - Lambda Functions
+     - DynamoDB tables
+     - API Gateway
+     - Cognito User Pools
+   - SAM can help you to run Lambda, API Gateway, DynamoDB locally
+   - SAM can use CodeDeploy to deploy Lambda functions   
