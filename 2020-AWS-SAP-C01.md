@@ -27,27 +27,27 @@
 
 ## IAM AWS Managed Policies
    - AdministratorAccess
-     - "Effect": "Allow",
-     - "Action": "*",
-     - "Resource": "*"
+     - Effect: Allow,
+     - Action: *,
+     - Resource: *
    - PowerUserAccess
-	- "Effect": "Allow",
-	- "NotAction": 
-	   - "iam:*",
-       - "organizations:*",
-       - "account:*"
-     - "Resource": "*"
+	- Effect: Allow,
+	- NotAction: 
+	   - iam:*,
+       - organizations:*,
+       - account:*
+     - Resource: *
      - …
-     - "Effect": "Allow",
-     - "Action": 
-       - "iam:CreateServiceLinkedRole",
-       - "iam:DeleteServiceLinkedRole",
-       - "iam:ListRoles",
-       - "organizations:DescribeOrganization”,
-       - "account:ListRegions"
-     - "Resource": "*"
+     - Effect: Allow,
+     - Action: 
+       - iam:CreateServiceLinkedRole,
+       - iam:DeleteServiceLinkedRole,
+       - iam:ListRoles,
+       - organizations:DescribeOrganization”,
+       - account:ListRegions
+     - Resource: *
      - Note how ”NotAction” is used instead of Deny
-
+     
 ## IAM Policies Conditions
     - "Condition" : { "{condition-operator}" : { "{condition-key}" : "{condition-value}" }}
     - Operators:
