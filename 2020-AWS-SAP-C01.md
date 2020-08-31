@@ -31,9 +31,9 @@
      - Action: *,
      - Resource: *
    - PowerUserAccess
-	- Effect: Allow,
-	- NotAction: 
-	   - iam:*,
+     - Effect: Allow,
+     - NotAction: 
+       - iam:*,
        - organizations:*,
        - account:*
      - Resource: *
