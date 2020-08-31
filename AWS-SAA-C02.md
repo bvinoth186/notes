@@ -4047,6 +4047,48 @@ AWS Config
      - Ability to set CloudWatch alarms when reaching limits
 
 
-# Shorts 
+# Exam Notes 
   - IOPS - MongoDB, Cassandra, Microsoft SQL Server, MySQL, PostgreSQL, Oracle
   - Throughput -  Big data, Data warehouses, Log processing, Apache Kafka	 
+  - 2 services that supports gateway endpoints -  S3 and DynamoDB
+  - Network Load Balancers expose a fixed IP to the public web, therefore allowing your application to be predictably reached using these IPs
+  - Application and Classic Load Balancers expose a fixed DNS (=URL) rather than the IP address. 
+  - Amazon EFS Infrequent Access (EFS IA) is a storage class that provides price/performance that is cost-optimized for files, not accessed every day, with storage prices up to 92% lower compared to Amazon EFS Standard.
+  - Amazon Aurora Global Database provides read access to a database in multiple regions – it does not provide active-active configuration with bi-directional synchronization (though you can failover to your read-only DBs and promote them to writable).
+  - Redshift will not be able to access VPC endpoints without enabling Enhanced VPC Routing
+  - One CloudTrail can be enabled for all regions
+  - if you want to route traffic randomly to multiple resources - Multi Value routing in Route53
+  - Elastic Fabric Adapter (EFA gives better performance when compared to Enhanced networking (Elastic Network Adaptor) and ENI
+  - ClassicLink should be used to communicate between Classic EC2 instances and resources in VPC 
+  - Multi-AZ RDS instances cannot be promoted as Read Replica 
+  - DMS SCT for heterogeneous conversion and Engine conversion tool for homogeneous conversion
+  - Signed cookies are not supported in RTMP CloudFront distribution.   only signed URL's are allowed
+  - S3 Glacier Select is used to query the data directly in Glacier
+  - EC2 hibernate is not supported in Instance Store and ASG.  it supported only with EBS
+  - Without cross-zone load balancing enabled, the NLB will distribute traffic 50/50 between AZs. As there are an odd number of instances across the two AZs some instances will not receive any traffic. Therefore enabling cross-zone load balancing will ensure traffic is distributed evenly between available instances in all AZs.
+  - To provide backup to your direct connect - implement IPSec VPN connection and use Border Gateway Protocol (BGP)
+  - To add encryption to Direct Connect - Configure an IPSec VPN connection over the Direct Connect link
+  - You cannot invoke a Lambda function using Amazon SQS. SNS can 
+  - Data in transit between an instance and an encrypted volume is also encrypted (data is encrypted in trans.
+  - AWS allow penetration for some resources without prior authorization
+  - With MySQL, authentication is handled by AWSAuthenticationPlugin—an AWS-provided plugin that works seamlessly with IAM to authenticate your IAM users.
+  - You can access the instance metadata through a URI or by using the Instance Metadata Query tool.
+  - You can attach one or more Target Groups to your ASG to include instances behind an ALB and the ELBs must be in the same region. Once you do this any EC2 instance existing or added by the ASG will be automatically registered with the ASG defined ELBs. If adding an instance to an ASG would result in exceeding the maximum capacity of the ASG the request will fail.
+  - File gateway offers SMB or NFS-based access to data in Amazon S3 with local caching.
+  - ALB supports authentication from OIDC compliant identity providers such as Google, Facebook and Amazon. It is implemented through an authentication action on a listener rule that integrates with Amazon Cognito to create user pools.
+  - The memached engine supports multiple cores and threads and large nodes and multi threaded
+  - Amazon FSx for Windows File Server provides fully managed, highly reliable, and scalable file storage that is accessible over the industry-standard Server Message Block (SMB) protocol.
+  - The company should implement an AWS Direct Connect connection to the closest region. A Direct Connect gateway can then be used to create private virtual interfaces (VIFs) to each AWS region.
+  - Direct Connect gateway provides a grouping of Virtual Private Gateways (VGWs) and Private Virtual Interfaces (VIFs) that belong to the same AWS account and enables you to interface with VPCs in any AWS Region (except AWS China Region).
+  - You can share a private virtual interface to interface with more than one Virtual Private Cloud (VPC) reducing the number of BGP sessions required.
+  - You must create a VPG in your VPC before you can establish an AWS Managed site-to-site VPN connection. The other end of the connection is the customer gateway which must be established on the customer side of the connection.
+  - The NAT gateway is created in a public subnet and a route must be created in the private subnet pointing to the NAT gateway for internet-bound traffic. An internet gateway must be attached to the VPC to facilitate outbound connections.
+  - DynamoDb Store more frequently and less frequently accessed data in separate tables
+  - All instance families support encryption, but not all instance types.
+  - Run Command can be used to implement configuration changes across Windows instances on a consistent yet ad hoc basis and is accessible from the AWS Management Console, the AWS Command Line Interface (CLI), the AWS Tools for Windows PowerShell, and the AWS SDKs.
+  - Create a VPC flow log for each network interface associated with the ELB then creating VPC flow log for the subsets where ELB running for more security and reliability
+  - Zonal redundancy indicates  2 AZs
+  - ASG can be mapped with ELB health check to terminate unhealthy instances
+  - You can specify the instance store volumes for your instance only when you launch an instance. You can’t attach instance store volumes to an instance after you’ve launched it.
+  - Default security groups have inbound allow rules (allowing traffic from within the group) whereas custom security groups do not have inbound allow rules (all inbound traffic is denied by default). All outbound traffic is allowed by default in custom and default security groups.
+  
