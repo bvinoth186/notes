@@ -207,13 +207,38 @@
 # EC2
 - Elastic Compute Cloud 
 - Allowing only to pay capacity you used 
-- OnDemand – Pay a fixed rate by hour or second, low cost, flexible, short time, unpredictable workload,  first time, no upfront payment, no long-term commitment
+- OnDemand 
+  – Pay a fixed rate by hour or second, flexible, short time, unpredictable workload,  first time, no upfront payment, no long-term commitment
+  - has the highest cost 
 - Linux by second,  windows are by hour
-- Reserved – Reserve 1 year to 3 year terms, steady state, predictable usage, and reserved capacity, standard RI, convertible RI, and Scheduled RI.  (RI – Reserved Instances) 
-- Spot – bid price,  flexible start and end times
+- Reserved 
+  – Reserve 1 year to 3 year terms, steady state, predictable usage, and reserved capacity. (RI – Reserved Instances) 
+  - 75% discount compared to OnDemand
+  - min 1 year
+  - standard RI 
+  - convertible RI
+    - m5 for 6 months and c5 for next 6 months 
+  - Scheduled RI.  
+    - need only for every Thursday 8 am to 8 pm for 1 year
+- Spot 
+  - 90 % discount compare to onDemand
+  – bid price,  flexible start and end times
   - If you terminate the instance, you have pay for the partial hour
   - If amazon terminate the instance (bid range), you don’t have to pay
-- Dedicated – Physical, use existing software licenses. 
+  - Batch Job
+  - Data Analysis 
+  - Image Processing retry 
+  - Best practice
+    - use RI for base line and OnDemand / Spot for peaks 
+- Dedicated instances 
+  - no other customers shares your hardware 
+- Dedicated Hosts
+  - book entire physical server 
+  - Physical, use existing software licenses. 
+  - full control 
+  - 3 year reservation 
+  - more expensive 
+  - BYOL 
 - Public IP or Elastic IP address 
 - Evaluation logic – default deny 
 - For penetration test – request to amazon and get the approval 
@@ -224,6 +249,58 @@
 - Xen - underlying hypervisor 
 - Auto scaling group of spot instaces in primary and Auto scaling group of OnDemand instances in secondary is cost effective 
 
+# Spot Instances 
+  - Spot instances are not suitable for crtical jobs and databases 
+  - Define max spot price
+  - you will get instance if current spot price < your max spot price 
+  - if it goes like current spot price > your max spot price 
+    - you have 2 options 
+	  - stop the instance 
+	  - or terminate 
+	  - AWS give 2 mins grace period 
+	  - in case of terminate you will loose all the data 
+  - Other strategy - Spot Block 
+    - can block the spot instances for the specific period of time 
+	- 1 to 6 hours 
+  - Spot Request created with below parameters
+    - max price 
+	- desired number of instances
+	- launch specification
+	- valid from
+	- valid until 
+	- request type 
+	  - one time (creates spot instances just one time) 
+	  - persistent 
+	  - spot request stays
+		- in case if spot instances terminated due to price 
+		- spins up the spot instances if price criteria matches 
+		- like auto scaling 
+	- Spot instance request status are 
+	  - Open 
+	  - Active 
+	  - Disabled 
+	  - Failed 
+	  - Canceled 
+	  - Closed 
+	- You can cancel spot requests only which are in open, active and disabled state 
+	- Canceling spot request doesn't terminate the instances 
+	  - it will stop spinning up the spot instances further 
+	  - its your responsibility to terminate the instances 
+	- you much cancel the spot request first and then terminate the instances 
+	  - if you terminate the instance first, you spot request will attempt to spin up the instances 
+	  - like auto scaling 
+
+# Spot Fleets
+  - for additional cost savings
+  - Spot Fleets = set of spot instances + (optional) on demand instances 
+  - define launch pools 
+    - instance type 
+	- os 
+	- AZ
+  - Can have multiple launch pool, so fleet can choose 
+  - Spot fleets stops launching when cost reaches max cost
+  - Spot fleets automatically request spot instances from the pool which has low cost 
+  
 # Instance Families 
 - D2 – Density – File servers / Dataware / Hadoop
 - R4 – RAM – Memory optimized Apps/DBs
@@ -249,62 +326,27 @@
 - M – Main choice for general purpose
 - C – Compute
 -  P – Graphics (think pics)
-- X – Extreme memory 
+- X – Extreme memory'
 
-# EBS 
-- Elastic Block Store - allows to create to storage volumes and attach with EC2 instance
-- Virtual disk
-- Think of disk in the cloud attached to EC2
-- Automatically replicated in AZ
-- IOPS 
-- General Purpose SSD - GP2 – upto 10000 IOPS
-  - boot volumes 
-  - low latency apps
-  - dev and test environments
-- Provisional IOPS SSD (IO1) – more than 10000 IOPS – designed for I/O intensive applications, 
-  - large relational or nosql DB, Mongo, Cassandra, Mysql, oracle etc
-  - Can provision upto 20000 IOPS per volumn
-- IOPS – input output operation per second 
-- Throughput Optimized HDD (ST1) – magnetic not SSD
-  - Big Data 
-  - Frequently accessed workloads
-  - Data warehouse 
-  - Cant boot volume 
-  - Minimum volumn is 500 GB
-- Cold HDD (SC1)
-  - Lowest cost 
-  - Less Frequently accessed workloads
-  - File server 
-  - Cant boot volume
-- Magnetic (standard) 
-  - Bootable 
-  - HDD
-  - Cheap
-  - Data accessed Infrequently 
-- Cannot mount 1 EBS volume to multiple EC2 instances – instead us EFS
-- Can transfer reserved instance from one AZ to another
-- Snapshot life cycle policy - for backups
-- EBS optimized instance provides additional, dedicated capacity for EBS I/O
-- Encryption availible only in certain instance types
-- To improve performance
-  - EBS optimized instances
-  - Modern linux Kernal 
-  - RAID 0 to maximize utilization of instance resources 
+# Burstable Instances 
+  - T2 / T3
+  - if there is spike, machine can burst so it can process
+  - if the machine bursts, it utilizes "burst credits"
+  - if the all the credits are gone, CPU will became bad 
+  - if the machine stops bursting, credits are accumulated over time 
+  - burstable instances and used to handle unexpected traffic
+  - if your instance consistently runs on low credit 
+    - move to non burst type M or C
+  - Credit Usage and Credit Balance charts can be seen in cloud watch logs
+  - credit balance and no of credits can be earned back will different for each instance type 
+  - less for t2.nano and more for t2.2xlarge
   
+# T2/T3 unlimited 
+  - Unlimited burst credit balance 
+  - pay extra money if you go over your credit balance
+  - 
 
-# Instance Store
-- Called as Ephemeral storage 
-- Volume cannot be stopped. If the underlying host fails you will lose the data.  But EBS backed instance can be stopped. You will not lose the data if the instance stopped. 
-- Cannot be attached or detached to other instances 
-- We can reboot both.  Will not lose the data ??
-- By default root volume will be deleted on termination.  But EBS we can have option
-- Usecase 
-  - boot volumes
-  - transactional and no sql Db
-  - datawarehosuing
-  - ETL 
-- Cannot attach instance store volumes once the EC2 is launched
-- few EC2 types doesnt support instace store volumes 
+
  
 # EC2 Lab
 
@@ -320,7 +362,7 @@
 - Monitoring – cloud watch 
 - Tenancy – dedicated 
 - Advanced Details – user input, Boot instructions (install PHP SDK, apache)
-- Boot instructions (install PHP SDK, apache) - User Data section 
+- Boot instructions (install PHP SDK, apache) - User Data section (execute command with root access, so sudo command is not required in here)
 - Storage – Root, Boot volume
 - By default Root volume can’t be encrypted.  Either bit locker, or encrypt when creating AMI or API.  
 - By Default Root EBS volume will be deleted on termination.  Option can be changed
@@ -348,8 +390,35 @@
   - chkconfig httpd on -  starts automatically with boot
 - Windows
   - Putty Keygen to convert pem to ppk
+- Windows 10
+  - Can login EC2 from Windows 10 via SSH
+  - Powershell 
+  - CMD
+  - to provide permissions to pem file, chmod will not work in windows
+  - open pem file properties dialog, security, remove other users and give full control to your account
+    - disable the inheritance before removing the other user accounts   
+- EC2 Instance Connect 
+  - Connects directly from browser 
+  - works only with amazon linux 2 and Ubuntu 16.04 or later 
+  - no need to give key 
+  - security group access to 22 is required 
 
-  # Security Group 
+# IP Address 
+  - Public 
+  - Private 
+  - Elastic IP
+    - only 5 ip allowed per account by default 
+	- avoid using this, use load balancer dns instead. 
+  - 2 types 
+    - IPv4
+	  - [0-255].[0-255].[0-255].[0-255]
+	  - most common format used online
+	- IPv6
+	  - eight groups of four hexadecimal digits
+	  - 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+	  - new and used in IOT
+
+# Security Group 
 - Its virtual  firewall
 - State Full
 - 1 instance can have multiple security groups
@@ -361,9 +430,212 @@
 - Can’t block specific IP address, instead use Network access control
 - All inbound traffic are blocked by default 
 - All Outbound traffic are allowed by default 
+- locked down to region / vpc combination
+- sg to sg reference (load balacer - ec2 use case)
 
-# EBS Volumn
-- Its virtual hard disk
+# AMI
+  - AMI are regional, AMI can be launched where it’s stored. 
+  - AMI id in region 1 cannot be accessed from region 2
+  - AMI can be copied to another region, using console, cli and aws EC2 api’s  
+  - you can rent your AMI's 
+  - use some one else AMI's by paying 
+  - AMI's can be published in market place 
+  - Stored in S3
+    - AMI pricing is pricing of S3 storage only 
+  - by default they are private, locked with in account / region 
+  - can make it public and share with other AWS accounts
+  - even if you share the AMI to other AWS account you will be the owner 
+  - but if they copy your AMI to their another region, then for the target AMI you will loose the ownership 
+    - they will become the owner
+  - To copy AMI that was shared with you from another account, 
+    - owner of the soure AMI must grant you read permissions to 
+	  - either associated EBS snapshot  (EBS backed AMI)
+	  - or associated S3 bucket (Instance store backed AMI)
+	- so you can restrict by this way 
+	- but still they can launch EC2 from your ami and create AMI from there 
+  - you cant copy encrypted AMI 
+    - you need a encryption key 
+  - you cant copy AMI, with an associated 'billing product' code that was shared from another account 
+    - this includes windows AMI's and AMI's from market place 
+	- to copy this, launch ec2 from ami and create image and copy 
+	
+
+
+# ENI
+  - Elastic Network Interface
+  - bound to az 
+  - can create ENI independently, attach them on the fly to EC2 for failover 
+  - can have 
+    - one primary private ipv4 and more secondary ipv4
+	- one elastic ip per private ipv4
+	- one public ipv4 
+	- one or more security groups 
+	- A Mac address 
+  - ENI can be moved from one EC2 to another for failover 
+  - primary ENI is created and attached with EC2 by default with launch instance options
+  - secondary ENI can be created independently and attached to Ec2
+  - Ec2 can have more then one ENI's 
+  - ENI's can be attached and detached to EC2 on the fly 
+  - create flow logs 
+
+# EC2 Hibernate
+  - to bring back stopped instances quickly 
+  - when you hibernate the instance
+  - The in memory (RAM) state is preserved 
+  - The OS is not stopped 
+  - RAM state is written to a file in the root EBS Volume 
+  - Root ebs volume must be encrypted 
+  - Use Cases 
+    - long running processing 
+	- saving the RAM state 
+	- services that take time to initialize 
+  - As of today 
+    - supported instance family - C, M and R
+	- RAM size must be less then 150 GB
+	- not supported for bare metal instances 
+	- on demand and reserved 
+	- cannot be hibernated for more then 60 days 
+  - While the instance is in hibernation, you pay only for the EBS storage and any Elastic IP addresses attached to the instance.
+  
+# Instance Store
+- Called as Ephemeral storage 
+- Physical disk attached to the physical server where your EC2 is
+- Very High IOPS (because physical) 
+- Block Storage (just like EBS) 
+- Cannot be increased in size 
+- Risk of data loss if hardware fails
+- Volume cannot be stopped. If the underlying host fails you will lose the data.  But EBS backed instance can be stopped. You will not lose the data if the instance stopped. 
+- Cannot be attached or detached to other instances 
+- We can reboot both.  Will not lose the data 
+- By default root volume will be deleted on termination.  But EBS we can have option
+- Usecase 
+  - boot volumes
+  - transactional and no sql Db
+  - datawarehosuing
+  - ETL 
+- Cannot attach instance store volumes once the EC2 is launched
+- few EC2 types doesnt support instance store volumes 
+- Pros:
+  - Better I/O performance (EBS gp2 has an max IOPS of 16000, io1 of 64000)
+  - Good for buffer / cache / scratch data / temporary content
+  - Data survives reboots
+- Cons:
+  - On stop or termination, the instance store is lost
+  - You can’t resize the instance store
+  - Backups must be operated by the user
+  
+# EBS 
+
+- Elastic Block Store - allows to create to storage volumes and attach with EC2 instance
+- Virtual disk
+- Think of disk in the cloud attached to EC2
+- Automatically replicated in AZ
+- locked with in AZ, means EBS in us-east-1 cannot be used in us-east-2
+- but can move around by creating snapshots 
+- IOPS 
+- IOPS – input output operation per second 
+
+- General Purpose SSD - GP2 
+  – upto 16000 IOPS
+  - 1 GiB - 16 TiB
+  - boot volumes 
+  - low latency apps
+  - dev and test environments
+  - Recommended for most workloads
+  - cheap 
+  
+- Provisional IOPS SSD (IO1) 
+  - costly 
+  – more than 16000 IOPS  
+  – designed for I/O intensive applications, 
+  - large relational or nosql DB, Mongo, Cassandra, Mysql, oracle etc
+  - Can provision upto 20000 IOPS per volumn
+  - 4 GiB - 16 TiB
+  - can boot os
+  - pricey 
+  
+
+- Throughput Optimized HDD (ST1) 
+  – magnetic not SSD
+  - Big Data 
+  - Frequently accessed workloads
+  - Data warehouse 
+  - Streaming workloads requiring consistent, fast throughput at a low price.
+  - Big data, Data warehouses, Log processing
+  - Apache Kafka
+  - Cant boot volume 
+  - Minimum volumn is 500 GB
+  - 500 GiB - 16 TiB
+  - Max IOPS is 500
+  - Max throughput of 500 MiB/s – can burst
+  
+- Cold HDD (SC1)
+  - Lowest cost 
+  - Less Frequently accessed workloads
+  - File server 
+  - Cant boot volume
+  - Throughput-oriented storage for large volumes of data that is infrequently accessed
+  - Scenarios where the lowest storage cost is important
+  - 500 GiB - 16 TiB
+  - Max IOPS is 250
+  - Max throughput of 250 MiB/s – can burst
+  
+- Magnetic (standard) 
+  - Bootable 
+  - HDD
+  - Cheap
+  - Data accessed Infrequently 
+  
+- Cannot mount 1 EBS volume to multiple EC2 instances – instead us EFS
+- Can transfer reserved instance from one AZ to another
+- Snapshot life cycle policy - for backups
+- EBS optimized instance provides additional, dedicated capacity for EBS I/O
+- Encryption availible only in certain instance types
+- To improve performance
+  - EBS optimized instances
+  - Modern linux Kernal 
+  - RAID 0 to maximize utilization of instance resources 
+  
+- EBS RAID Options 
+  - not available in the console.  you have do it direclty in the os level
+  - EBS is already redundant storage (replicated within an AZ) 
+  - But what if you want to increase IOPS to say 100000 IOPS? - RAID 0
+  - What if you want to mirror your EBS volumes? - RAID 1
+  - You would mount volumes in parallel in RAID settings
+  - RAID is possible as long as your OS supports it 
+  - Some RAID options are: 
+    - RAID 0 
+	- RAID 1 
+	- RAID 5 (not recommended for EBS – see documentation) 
+	- RAID 6 (not recommended for EBS – see documentation
+  - RAID 0 
+    - To increase performance
+    - Combining 2 or more volumes and getting the total disk space and I/O
+    - But one disk fails, all the data is failed
+    - Use cases would be:
+      - An application that needs a lot of IOPS and doesn’t need fault-tolerance
+	  - A database that has replication already built-in
+    - Using this, we can have a very big disk with a lot of IOPS
+    - For example
+      - two 500 GiB Amazon EBS io1 volumes with 4,000 provisioned IOPS each will create a…
+      - 1000 GiB RAID 0 array with an available bandwidth of 8,000 IOPS and 1,000 MB/s of throughput
+  - RAID 1 
+    - To increase fault tolerance
+    - RAID 1 = Mirroring a volume to another
+	- replication 
+    - If one disk fails, our logical volume is still working
+    - We have to send the data to two EBS volume at the same time (2x network)
+    - Use case:
+      - Application that need increase volume fault tolerance
+      - Application where you need to service disks
+    - For example:
+      - two 500 GiB Amazon EBS io1 volumes with 4,000 provisioned IOPS each will create a…
+      - 500 GiB RAID 1 array with an available bandwidth of 4,000 IOPS and 500 MB/s of throughput
+
+
+	 
+
+# EBS Snapshots
 - Snapshot – point in time copy of volume. 
 - Volumns exists on EBS
 - Snapshots exists in S3. 
@@ -383,10 +655,20 @@
 - With Copy, you can move it to another region 
 - TO create snapshot for root, you should stop the instance. however you can create the snapshot when instance is running 
 - From Snapshot, both volume and image can be created
-- AMI are regional, AMI can be launched where it’s stored. 
-- AMI can be copied to another region, using console, cli and aws EC2 api’s  
 - Snapshot of RAID array – take an application consistent snapshot.   Stop the application and flush all cashes to disk.  (Freeze the file system 0r unmount the RAID array or stop EC2 before snapshot) – stop any kind of IO 	
 - you cant delete the snapshot of EBS volume that is used as root device of a registered AMI
+- Not necessary to detach volume to do snapshot, but recommended
+- Max 100,000 snapshots
+- Can copy snapshots across AZ or Region
+- Can make Image (AMI) from Snapshot
+- Snapshots can be automated using Amazon Data Lifecycle Manager
+
+- EBS Migration 
+  - EBS Volumes are only locked to a specific AZ 
+  - To migrate it to a different AZ (or region)
+    - Snapshot the volume 
+	- (optional) Copy the volume to a different region 
+	- Create a volume from the snapshot in the AZ of your 
 
 # Encrypt EBS Volume
 
@@ -397,7 +679,7 @@
 - Root volume will not be encrypted by default
 - To encrypt root volume, 2 ways
 - 1. OS level like bit locker 
-- 2.  Create snapshot, Copy, while copying to do encrypt, from encrypted snapshot, create image and launch Image.  Launching will not supported in free tier 
+- 2.  Create snapshot, Copy, while copying to do encrypt, from encrypted snapshot, either create image and launch Image or attach the volume with existing EC2.  Launching will not supported in free tier 
 - Encryption – Master Key – Default – aws/ebs
 - lsblk – List the block devices 
 - file –s  {/dev/xvdf}  - to view the filesystem 
@@ -501,16 +783,25 @@
 
 
 
-# EFS – Elastic File System
--  File storage service 
+# EFS 
+– Elastic File System
+- File storage service 
 - Elastic – grow and shrink based on the need. 
+- Highly available, scalable, expensive (3x gp2), pay per use 
 - Can share EFS across multiple EC2.  EC2 instances should be in same security group as EFS
 - Block based storage (S3 is object based storage)
 - Read after write consistency 
 - Pay only what you use 
 - Scale upto petabytes 
-- Supports NFSv4
-- Supports 1000 of concurrent NFS connections 
+- Supports NFSv4.1 protocol
+- Supports 1000 of concurrent NFS connections
+- 10 GB+ /s throughput
+- Grow to Petabyte-scale network file system, automatically
+- Uses security group to control access to EFS
+- Compatible with Linux based AMI (not Windows)
+- Encryption at rest using KMS
+- POSIX file system (~Linux) that has a standard file API
+- File system scales automatically, pay-per-use, no capacity planning!
 - Data stored in multiple AZ within the region 
 - EFS can be mounted in multiple AZ
 - EFS can be used only within one VPC at a time
@@ -529,7 +820,9 @@
   - encryption at rest cannot be done during mounting. it can be done only during craetion. 
 - Performance Mode 
   - General purpose - recommended for most file system, low latency 
-  - Max I/O - recommended for tens or hundreds or thousands of EC2 sharing EFS. slightly higher latency. big data 
+  - Max I/O 
+    - recommended for tens or hundreds or thousands of EC2 sharing EFS. slightly higher latency. big data 
+	- higher latency, throughput, highly parallel (big data, media processing)
 - Throughput mode 
   - Provisioned - can configure specific throughput irrespective of EFS data size
   - Bursting - throughput on EFS scales as file system grows 
@@ -539,6 +832,15 @@
   - content managment
   - web serving 
   - home directories 
+- Storage Tiers 
+  - lifecycle management feature 
+  – move file after N days
+  - lets says policy to move the file to EFS-IA if the file is not accessed for last 7 days (14 days, 30, 60)
+	-  Standard: 
+	   - for frequently accessed files
+	- Infrequent access (EFS-IA): 
+	  - cost to retrieve files, 
+	  - lower price to store
 
 # AWS – CLI 
 - aws configure 
@@ -627,14 +929,59 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
 - No public IP. Only DNS name. Amazon manages public IP
 - Health check.   In service, out of service
 - It will cost if its running
-- Classic load balancer – TCP/IP layer or Http/Https, layer 7 or 4, legacy, not recommended. Important for exam
-- Application Load balancer – application layer,  operates at layer 7, best suited for http/https, Can look at till application level to decide routing 
-- Network Load balancer – level 4, most expensive, TCP, extreme performance, can handle millions of requests per second, supports only TCP. doesnt support http/https 
+
+- 3 kinds 
+  - Classic load balancer 
+    - v1
+    – TCP/IP layer or Http/Https, layer 7 or 4, legacy, not recommended. Important for exam
+	
+  - Application Load balancer 
+    - v2
+    – application layer,  operates at layer 7, best suited for http/https, websocket
+	- Can look at till application level to decide routing 
+	- Load balancing to multiple HTTP applications across machines (target groups)
+	- Load balancing to multiple applications on the same machine(ex: containers)
+	- Routing tables to different target groups - Rules
+      - Routing based on path in URL (example.com/users & example.com/posts)
+	  - Routing based on hostname in URL (one.example.com & other.example.com)
+	  - Routing based on Query String, Headers (example.com/users?id=123&order=false
+	- ALB are a great fit for micro services & container-based application
+	- In comparison, we’d need multiple Classic Load Balancer per application
+	- with ALB, single ALB can be attached with multiple target groups 
+	- ruls can defined which target group ALB can route the traffic to
+	- Target Groups 
+	  - EC2 instances (autoscaling)
+	  - ECS tasks 
+	  - Lambda functions
+	  - IP Addresses – must be private IPs
+    - ALB can route to multiple target groups
+	- look headers to know client's 
+	  - Ip - X-Forwarded-For
+	  - port - X-Forwarded-Port
+	  - Protocol - X-Forwarded-Proto
+  
+  - Network Load balancer 
+    - v2
+	– level 4, most expensive, 
+	- TCP, TLS and UDP 
+	- extreme performance, can handle millions of requests per second, 
+	- Less latency ~100 ms (vs 400 ms for ALB)
+	- NLB has one static IP per AZ, and supports assigning Elastic IP
+    - (helpful for whitelisting specific IP)
+	- supports only TCP. doesnt support http/https 
+	- Not included in the AWS free tier
+	- No security group configuration 
+	- Network Load Balancers expose a public static IP, whereas an Application or Classic Load Balancer exposes a static DNS (URL)
+	
+- recommended to use V2 
 - Healthy threshold – no of success healthy checks before declare the instance as in service
 - UnHealthy threshold – no of failure healthy checks before declare the instance as out of service
 - Timeout
 - Interval
-- Error code 504 – Gateway Time out error. Issue is with application (web server or DB)
+- Error code 504 
+  – Gateway Time out error. Issue is with application (web server or DB)
+- Error code 503
+  - at capacity or no registered target
 - X-forwarded-For Header - Load balancer sending user’s source IP to EC2 in X forwarded for header. 
 - If you ipv4 public address of end user, look for x-forwarded-for header in classic load balancer. 
 - To maintain session state or even distribution session in ELB – use Elastic Cashe to store transient session data 
@@ -644,21 +991,75 @@ aws s3 cp s3://indexbucket-186/index.html /var/www/html --region ap-south-1
 - Subnet should have internet access. Private Subnet will not be allowed
 - If doing load test on ELB, 
   - Ensure to re-resolve DNS before every request
-  - Send requests from globally distributed clients or multiple test clients 
-- To split the traffic accross the AZ - Enable Cross Zone load balancing (for classic) 
+  - Send requests from globally distributed clients or multiple test clients
+  
 - Cross Zone load balancing 
-  - Enabled in Application and Network load balancer by default 
-  - Not Enabled in classic load balancer by default
+  - To split the traffic across the AZ - Enable Cross Zone load balancing 
+  - to evenly distribute traffic across AZ
+  - Classic
+    - disabled by default 
+	- No charges for inter AZ data if enabled
+  - ALB 
+    - Enabled by default 
+	- No charges for inter AZ data
+  - NLB
+    - disabled by default 
+	- You pay charges ($) for inter AZ data if enabled
+  
 - To monitor application load balancers 
   - Cloudwatch metrics 
   - Access logs
   - request tracing 
   - CloudTrail logs 
+  
 - Target Type 
   - instance Id 
   - Ip address
-- ELB can distribute the traffic only in one region. not across the region   
   
+- ELB can distribute the traffic only in one region. not across the region   
+- provides SSL termination 
+- enforce stickiness with cookies 
+- LBs can scale but not instantaneously – contact AWS for a “warm-up”
+
+- Load Balancer Stickiness 
+  - It is possible to implement stickiness so that the same client is always redirected to the same instance behind a load balancer
+  - This works for Classic Load Balancers & Application Load Balancers
+  - The “cookie” used for stickiness has an expiration date you control
+  - Use case: make sure the user doesn’t lose his session data
+  - Enabling stickiness may bring imbalance to the load over the backend EC2 instances 
+  - Enable Stickiness in target groups configuration with expiry time
+  
+- SSL/TLS - Basics
+  - An SSL Certificate allows traffic between your clients and your load balancer to be encrypted in transit (in-flight encryption)
+  - SSL refers to Secure Sockets Layer, used to encrypt connections
+  - TLS refers to Transport Layer Security, which is a newer version
+  - Nowadays, TLS certificates are mainly used, but people still refer as SSL
+  - Public SSL certificates are issued by Certificate Authorities (CA)
+  - Comodo, Symantec, GoDaddy, GlobalSign, Digicert, Letsencrypt, etc…
+  - SSL certificates have an expiration date (you set) and must be renewed
+  
+- Server Name Indication (SNI)
+  - SNI solves the problem of loading multiple SSL certificates onto one web server (to serve multiple websites)
+  - It’s a “newer” protocol, and requires the client to indicate the hostname of the target server in the initial SSL handshake
+  - The server will then find the correct certificate, or return the default one
+  - Only works for ALB & NLB (newer generation), CloudFront
+  - Does not work for CLB (older gen)
+  - Classic Load Balancer (v1)
+	- Support only one SSL certificate
+	- Must use multiple CLB for multiple hostname with multiple SSL certificates
+  - Application Load Balancer (v2) and Network Load Balancer (v2)
+    - Supports multiple listeners with multiple SSL certificates
+    - Uses Server Name Indication (SNI) to make it work  
+
+- ELB – Connection Draining
+  - Feature naming,
+	- CLB: Connection Draining
+	- Target Group: Deregistration Delay(for ALB & NLB)
+  - Time to complete “in-flight requests” while the instance is de-registering or unhealthy
+  - Stops sending new requests to the instance which is de-registering
+  - Between 1 to 3600 seconds, default is 300 seconds
+  - Can be disabled (set value to 0)
+  - Set to a low value if your requests are short
 
 # SDK 
 - Software Development Kit
@@ -1947,8 +2348,6 @@ S3 storage tiers / classes
   - monitor Cloudwatch alarm 
   - monitor other health cheks
   
-  
-
 
 # AutoScaling 
 - Free of cost 
@@ -1969,6 +2368,7 @@ S3 storage tiers / classes
   - Auto Scaling 
 - Launch configuration cannot be edited once its created
 - if you want to update launch configuration, you can use existing launch configuration as base, create new one, and update the new launch configuration in a auto scaling group. 
+
 - Scaling default metict types
   - Average CPU Utilization
   - Network In
@@ -1976,43 +2376,125 @@ S3 storage tiers / classes
   - Application ELB request count per target
 - Scalling based on Memory (RAM) - custom metric 
 - Health check grace period - even if the EC2 is unhealthy, auto scaling will not act until the health check grace period expires 
+
 - Termination Policy 
   - Default - useful if you have more then one scaling policy for the group 
   - Oldest Instance - useful if you are upgrading the instances in the auto scaling group. This will be helpful to get rid of old instance types
   - Newest instance - useful if you want to test your new launch configuration 
   - Oldest launch configuration - useful if you have updated the launch configuration 
   - ClosestToNextInstanceHour - terminates the instances that are closest to next billing hour. helps to manage EC2 usage costs
-- Scaling policy 
-  - Simple scaling 
-  - Step Scaling 
-  - Target tracking scaling 
+  
 - Default Termination poilcy 
   - If multiple AZ, choose AZ which has more instances
   - select the instance which has oldest launch configuration
-  - if more then 1 instace with oldest launch configuration, then select the instance which is close to next billing hour 
+  - if more then 1 instance with oldest launch configuration, then select the instance which is close to next billing hour 
   - if more then one then select random 
+  - ASG tries the balance the number of instances across AZ by default
+  
+- Scaling policy
+  - Target Tracking Scaling 
+    - Most simple and easy to set-up
+    - Example: I want the average ASG CPU to stay at around 40%
+  - Simple / Step scaling 
+    - When a CloudWatch alarm is triggered (example CPU > 70%), then add 2 units
+    - When a CloudWatch alarm is triggered (example CPU < 30%), then remove 1
+  - Scheduled Scaling 
+    - Anticipate a scaling based on known usage patterns
+	- Example: increase the min capacity to 10 at 5 pm on Fridays
+  
 - Cooldown period 
+  - The cooldown period helps to ensure that your Auto Scaling group doesn't launch or terminate additional instances before the previous scaling activity takes effect.
+  - In addition to default cooldown for Auto Scaling group, we can create cooldowns that apply to a specific simple scaling policy
+  - A scaling-specific cooldown period overrides the default cooldown period.
+  - One common use for scaling-specific cooldowns is with a scale-in policy—a policy that terminates instances based on a specific criteria or metric. Because this policy terminates instances, Amazon EC2 Auto Scaling needs less time to determine whether to terminate additional instances.
+  - If the default cooldown period of 300 seconds is too long—you can reduce costs by applying a scaling-specific cooldown period of 180 seconds to the scale-in policy.
+  - If your application is scaling up and down multiple times each hour, modify the Auto Scaling Groups cool-down timers and the CloudWatch Alarm Period that triggers the scale in
+
 - Autoscaling used to scale both proxy servers and backend instances 
 
+- Auto Scaling New Rules
+  - It is now possible to define ”better” auto scaling rules that are directly managed by EC2
+  - Target Average CPU Usage
+  - Number of requests on the ELB per instance
+  - Average Network In
+  - Average Network Out
+  - We can auto scale based on a custom metric (ex: number of connected users)
+  
+- Lifecycle Hooks
+  - By default as soon as an instance is launched in an ASG it’s in service.
+  - You have the ability to perform extra steps before the instance goes in service (Pending state)
+  - You have the ability to perform some actions before the instance is terminated (Terminating state)
+  - ASG States are 
+    - Scale Out 
+	  - Pending 
+	    - hooks 
+		  - Pending: wait (can do some extra steps in here )
+		  - Pending: approved 
+	  - Inservice 
+	- Scale In 
+	  - Terminating
+        - hooks
+          - Terminating: wait (can do some extra steps in here ) 
+          - Terminating: approved		  
+	  - Terminated 
+  
+- General 
+  - Scaling policies can be on CPU, Network… and can even be on custom metrics or based on a schedule (if you know your visitors patterns)
+  - ASGs use Launch configurations or Launch Templates (newer)
+  - To update an ASG, you must provide a new launch configuration / launch template
+  - IAM roles attached to an ASG will get assigned to EC2 instances
+  - ASG are free. You pay for the underlying resources being launched
+  - Having instances under an ASG means that if they get terminated for whatever reason, the ASG will automatically create new ones as a replacement. Extra safety!
+  - ASG can terminate instances marked as unhealthy by an LB (and hence replace them)
+  - Launch Template
+    - New
+	- Can do spot fleet of instances 
+	- Can have multiple versions
+	- Create parameters subsets (partial configuration for re-use and inheritance)
+	- Provision using both On-Demand and Spot instances (or a mix)
+	- Can use T2 unlimited burst feature
+	- Recommended by AWS going forward
+  - Launch configuration 
+    - Old
+	- can specify one instance type 
+	- Must be re-created every time
+
 # Placement Group
-- Placement group nane is unique per AWS account
+- Placement group name is unique per AWS account
+- We will not have direct control over hardwares where the EC2 are placed
+- But we can request AWS to know how our EC2 can be places
 - AWS supports, hemogenous instances with in placement group. Same family, storage, size
 - You cant merge placement groups
 - you cant move existing instance into placement group
 - you can create AMI from existing instance, launch new instance from AMI into placement group
-- Two types
-  - Clustered placement group
-    - grouping of instances within single AZ
-	- recommended for applications that require low network latency or high network throughput or both 
-	- Big data, you dont want to spread
-	- in exam, by default clustered 
-	- only certain instances can be launched.  you cant launch t2 micro
-	- Instance families are compute optimized, GPU, memory optimized, storage optimized
-	- cant span mutiple AZ
-  - Spread placement group
-    - grouping of instances that are each placed on distinct underlying hardware
-	- recommended for applications that have small number of critical instances that should be kept seperate from each other. 
-	- can span mutiple AZ
+  - 3 strategies 
+    - Cluster 
+	  - place cluster of EC2 in single AZ
+	  - same rack
+	  - Same AZ
+	  - for low latency
+	  - great network
+	  - low availability
+	  - if the rack fails everything fails 
+	  - high risk 
+	  - not available for t2 instance
+	  - available big instances like m5 large
+	- Spread 
+	  - spread across AZ's 
+	  - span across az
+	  - different rack with in AZ 
+	  - max 7 instances per AZ per group 
+	  - critical apps
+	  - HA
+	- Partition 
+	  - similler to spread 
+	  - spread across many partitions which relay on different set of racks within AZ
+	  - scales to 100 ec2 per group
+	  - upto 7 partitions per AZ
+	  - within AZ, different racks 
+	  - Hadoop
+	  - Cassandra
+	  - Kafka 
 
 # Shared Responsibility 
  - AWS 
