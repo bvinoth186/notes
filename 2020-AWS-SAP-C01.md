@@ -501,7 +501,7 @@ STS Important APIs
    - Can copy an un-encrypted RDS snapshot into an encrypted one
    - CloudTrail cannot be used to track queries made within RDS
 
-SSL/TLS - Basics
+## SSL/TLS - Basics
    - SSL refers to Secure Sockets Layer, used to encrypt connections
    - TLS refers to Transport Layer Security, which is a newer version
    - Nowadays, TLS certificates are mainly used, but people still refer as SSL
@@ -894,4 +894,923 @@ Balancing (ELB), Amazon CloudFront, AWS Global Accelerator, and Route 53
      - DNS Logs: compromised EC2 instances sending encoded data within DNS queries
    - Can setup CloudWatch Event rules to be notified in case of findings
    - CloudWatch Events rules can target AWS Lambda or SNS
+   
+# Compute and Load Balancing
+
+## EC2 Instance Types 
+   - R: applications that needs a lot of RAM – in-memory caches
+   - C: applications that needs good CPU – compute / databases
+   - M: applications that are balanced (think “medium”) – general / web app
+   - I: applications that need good local I/O (instance storage) – databases
+   - G: applications that need a GPU – video rendering / machine learning
+   - T2 / T3: burstable instances (up to a capacity)
+   - T2 / T3 - unlimited: unlimited burst
+   - Real-world tip: use https://www.ec2instances.info
+
+## EC2 - Placement Groups
+   - Control the EC2 Instance placement strategy using placement groups
+   - Group Strategies:
+     - Cluster—clusters instances into a low-latency group in a single Availability Zone
+     - Spread—spreads instances across underlying hardware (max 7 instances per group per
+AZ) – critical applications
+     - Partition—spreads instances across many different partitions (which rely on different sets
+of racks) within an AZ. Scales to 100s of EC2 instances per group (Hadoop, Cassandra,
+Kafka)
+   - You can move an instance into or out of a placement group
+     - Your first need to stop it
+     - You then need to use the CLI (modify-instance-placement)
+     - You can then start your instance
+
+## Placement Groups Cluster
+   - Pros: Great network (10 Gbps bandwidth between instances)
+   - Cons: If the rack fails, all instances fails at the same time
+   - Note: choose than instance type that has Enhanced Networking
+   - Use case:
+   - Big Data job that needs to complete fast
+   - Application that needs extremely low latency and high network throughput
+
+## Placement Groups Spread
+   - Pros:
+     - Can span across Availability
+Zones (AZ)
+     - Reduced risk is simultaneous
+failure
+     - EC2 Instances are on different
+physical hardware
+   - Cons:
+     - Limited to 7 instances per AZ
+per placement group
+   - Use case:
+     - Application that needs to
+maximize high availability
+     - Critical Applications where
+each instance must be isolated
+from failure from each other
+
+## Placements Groups Partition
+   - Up to 7 partitions per AZ
+   - Up to 100s of EC2 instances
+   - The instances in a partition do
+not share racks with the instances
+in the other partitions
+   - A partition failure can affect many
+EC2 but won’t affect other
+partitions
+   - EC2 instances get access to the
+partition information as metadata
+   - Use cases: HDFS, HBase,
+Cassandra, Kafka
+
+## EC2 Instance Launch Types
+   - On Demand Instances: short workload, predictable pricing, reliable
+   - Spot Instances: short workloads, for cheap, can lose instances (not reliable)
+   - Reserved: (MINIMUM 1 year)
+     - Reserved Instances: long workloads
+     - Convertible Reserved Instances: long workloads with flexible instances
+     - Scheduled Reserved Instances: example – every Thursday between 3 and 6 pm
+   - Dedicated Instances: no other customers will share your hardware
+   - Dedicated Hosts: book an entire physical server, control instance placement
+     - Great for software licenses that operate at the core, or CPU socket level
+     - Can define host affinity so that instance reboots are kept on the same host
+
+## EC2 included metrics    
+   - CPU: CPU Utilization + Credit Usage / Balance    
+   - Network: Network In / Out    
+   - Status Check:    
+     - Instance status = check the EC2 VM    
+     - System status = check the underlying hardware    
+   - Disk: Read / Write for Ops / Bytes (only for instance store)    
+   - RAM is NOT included in the AWS EC2 metrics
+
+## EC2 Instance Recovery
+   - CloudWatch Alarm - StatusCheckFailed_System
+   - Status Check:
+     - Instance status = check the EC2 VM
+     - System status = check the underlying hardware
+   - Recovery: Same Private, Public, Elastic IP, metadata, placement group
+
+## Auto Scaling – Scaling Policies
+   - Simple / Step Scaling: increase or decrease instances based on two CW
+alarms
+   - Target Tracking: select a metric and a target value, ASG will smartly
+adjust
+     - Keep average CPU at 40%
+     - Keep request count per target at 1000
+   - To scale based on RAM, you must use a Custom CloudWatch Metric
+
+## Auto Scaling – Good to know
+   - Spot Fleet support (mix on Spot and On-Demand instances)
+   - To upgrade an AMI, must update the launch configuration / template
+     - You must terminate instances manually
+     - CloudFormation can help with that step (we’ll see it later)
+   - Scheduled scaling actions:
+     - Modify the ASG settings (min / max / desired) at pre-defined time
+     - Helpful when patterns are known in advance
+   - Lifecycle Hooks:
+     - Perform actions before an instance is in service, or before it is terminated
+     - Examples: cleanup, log extraction, special health checks
+
+Auto Scaling – Scaling Processes
+   - Launch: Add a new EC2 to the group, increasing the capacity
+   - Terminate: Removes an EC2 instance from the group, decreasing its capacity.
+   - HealthCheck: Checks the health of the instances
+   - ReplaceUnhealthy:Terminate unhealthy instances and re-create them
+   - AZRebalance: Balancer the number of EC2 instances across AZ
+   - AlarmNotification: Accept notification from CloudWatch
+   - ScheduledActions: Performs scheduled actions that you create.
+   - AddToLoadBalancer: Adds instances to the load balancer or target group
+   - We can suspend these processes!
+
+## Auto Scaling – Health Checks
+   - Health checks available:
+     - EC2 Status Checks
+     - ELB Health Checks (HTTP)
+   - ASG will launch a new
+instance after terminating
+an unhealthy one
+   - Make sure the health check
+is simple and checks the
+correct thing
+   - GOOD HEALTH CHECK /health-server  
+   - BAD HEALTH CHECK  /number-customers DB call
+
+## EC2 Spot Instances
+   - Can get a discount of up to 90% compared to On-demand
+   - Define max spot price and get the instance while current spot price < max
+     - The hourly spot price varies based on offer and capacity
+     - If the current spot price > your max price you can choose to stop or terminate your
+instance with a 2 minutes grace period.
+   - Other strategy: Spot Block
+     - “block” spot instance during a specified time frame (1 to 6 hours) without interruptions
+     - In rare situations, the instance may be reclaimed
+   - Used for batch jobs, data analysis, or workloads that are resilient to failures.
+   - Not great for critical jobs or databases
+
+## Spot Fleets
+   - Collection (Fleet) of Spot Instances and optionally on-demand instances
+   - Set a maximum price you’re willing to pay per Spot Instances or all
+   - Can have a mix of instance types (M5.large, M5.xlarge, C5.2xlarge, etc..)
+   - Supports: EC2 standalone, Auto Scaling Groups (launch template), ECS
+(underlying ASG), AWS Batch (Managed Compute Environment)
+   - Soft limits:
+     - Target capacity per Spot Fleet or EC2 fleet: 10,000
+     - Target capacity across all Spot Fleet and EC2 Fleet in a region: 100,000
+
+## AWS ECS – Elastic Container Service
+   - ECS is a container orchestration service
+   - ECS helps you run Docker containers on EC2 machines
+   - ECS is complicated, and made of:
+     - “ECS Core”: Running ECS on user-provisioned EC2 instances
+     - Fargate: Running ECS tasks on AWS-provisioned compute (serverless)
+     - EKS: Running ECS on AWS-powered Kubernetes (running on EC2)
+     - ECR: Docker Container Registry hosted by AWS
+   - ECS & Docker are very popular for microservices
+
+## What’s Docker?
+   - Docker is a “container technology”
+   - Run a containerized application on any machine with Docker installed
+   - Containers allows our application to work the same way anywhere
+   - Containers are isolated from each other
+   - Control how much memory / CPU is allocated to your container
+   - Ability to restrict network rules
+   - More efficient than Virtual machines
+   - Scale containers up and down very quickly (seconds)
+
+## AWS ECS – Use cases
+   - Run microservices
+     - Ability to run multiple docker containers on the same machine
+     - Easy service discovery features to enhance communication
+     - Direct integration with Application Load Balancers
+     - Auto scaling capability
+   - Run batch processing / scheduled tasks
+     - Schedule ECS containers to run on On-demand / Reserved / Spot instances
+   - Migrate applications to the cloud
+     - Dockerize legacy applications running on premise
+     - Move Docker containers to run on ECS
+
+## AWS ECS – Concepts
+   - ECS cluster: set of EC2
+instances
+   - ECS service: applications
+definitions running on ECS
+cluster
+   - ECS tasks + definition:
+containers running to create
+the application
+   - ECS IAM roles: roles assigned
+to tasks to interact with
+AWS
+
+## AWS ECS – ALB integration
+   - Application Load Balancer (ALB)
+has a direct integration feature
+with ECS called “port mapping”
+   - This allows you to run multiple
+instances of the same application
+on the same EC2 machine
+   - Use cases:
+     - Increased resiliency even if running
+on one EC2 instance
+     - Maximize utilization of CPU / cores
+     - Ability to perform rolling upgrades
+without impacting application uptime
+
+## Fargate
+   - When launching an ECS Cluster, we have to create our EC2 instances
+   - If we need to scale, we need to add EC2 instances
+   - So we manage infrastructure…
+   - With Fargate, it’s all Serverless!
+   - We don’t provision EC2 instances
+   - We just create task definitions, and AWS will run our containers for us
+   - To scale, just increase the task number. Simple! No more EC2 J
+
+## ECS – Security & Networking
+   - IAM security
+     - EC2 Instance Role must have basic ECS permissions
+     - ECS Task level should have an IAM Task Role (maximum security)
+   - Secrets and Configuration injection into parameters, environment variables:
+     - Integration with SSM Parameter Store & Secrets Manager
+   - Tasks networking:
+     - none: no network connectivity, no port mappings
+     - bridge: uses Docker’s virtual container-based network
+     - host: bypass Docker’s network, uses the underlying host network interface
+     - awsvpc:
+       - Every tasks launched on the instance gets its own ENI and a private IP address
+       - Simplified networking, enhanced security, security groups, monitoring, VPC flow logs
+       - Default mode for Fargate 
+
+## ECS – Service Auto Scaling
+   - CPU and RAM is tracked in CloudWatch at the ECS service level
+   - Target Tracking: target a specific average CloudWatch metric
+   - Step Scaling: scale based on CloudWatch alarms
+   - Scheduled Scaling: based on predictable changes
+   - ECS Service Scaling (task level) ≠ EC2 Auto Scaling (instance level)
+   - Fargate Auto Scaling is much easier to setup (because serverless)
+
+## ECS – Spot Instances
+   - ECS Classic:
+     - Can have the underlying EC2 instances as Spot Instances (managed by an ASG)
+     - Instances may go into draining mode to remove running tasks
+     - Good for cost savings, but will impact reliability
+   - Fargate: Spot Instances are available as of Dec 2019:
+     - Specify minimum of tasks for on-demand baseline workload
+     - Add tasks running on Fargate Spot for cost-savings (can be reclaimed by AWS)
+     - Regardless of On-demand or Spot, Fargate scales well based on load
+
+## AWS Lambda Integrations
+   - API Gateway 
+   - Kinesis 
+   - DynamoDB 
+   - AWS S3 –
+   - CloudWatch Events 
+   - CloudWatch Logs 
+   - AWS SNS 
+   - AWS Cognito
+   - AWS IoT
+   - SQS
+   - Example: Serverless Thumbnail creation
+   - Example: Serverless CRON Job
+
+## AWS Lambda Language Support (runtimes)
+   - AWS supported: Node.js (JavaScript), Python, Ruby, Java (Java 8
+compatible), Golang, C# (.NET Core), C# / Powershell
+   - Ability to write / use a custom runtime (community supported):
+     - Ex: C++, Rust, etc…
+   - If Docker, you should use ECS, Fargate or Batch, not Lambda
+
+
+Lambda – Limits to know
+   - RAM: 128 MB to 3G
+   - CPU:
+     - is linked to RAM (cannot be set manually)
+     - 2 vCPU are allocated after 1.5G of RAM
+   - Timeout: up to 15 minutes
+   - /tmp storage: 512 MB (can’t process BIG files)
+   - Deployment package limit: 250 MB including layers
+   - Concurrency execution: 1000 – soft limit that can be increased
+
+## Lambda – Latencies Considerations
+   - Lambda Latency:
+     - Cold Lambda Invocation: ~100ms
+     - Warm Lambda Invocation: ~ms
+     - New feature of “provisioned concurrency”
+(Dec 2019) to reduce # of cold starts
+   - API Gateway invocation: 100 ms
+   - CloudFront invocation: 100 ms
+   - If you chain with other services (API
+Gateway, CloudFront, ALB, Lambda, SQS,
+Step Functions…), add their latencies as
+well
+   - X-Ray can help visualize the end-to-end
+latency
+
+## Lambda - Security
+   - IAM Roles for Lambda to grant
+access to other AWS services
+   - Resource-based Policies for
+Lambda (similar to S3 bucket
+policies):    
+     - Allow other accounts to invoke or
+manage Lambda
+     - Allow other services to invoke or
+manage Lambda
+(define through the CLI)
+write
+
+## Lambda in a VPC
+   - to allow lambda to communicate with resources in private network 
+   - Note: Lambda - CloudWatch Logs works even without endpoint or NAT Gateway
+
+## AWS Lambda Logging, Monitoring and Tracing
+   - CloudWatch:
+     - AWS Lambda execution logs are stored in AWS CloudWatch Logs
+     - AWS Lambda metrics are displayed in AWS CloudWatch Metrics (successful
+invocations, error rates, latency, timeouts, etc…)
+     - Make sure your AWS Lambda function has an execution role with an IAM policy
+that authorizes writes to CloudWatch Logs
+   - X-Ray:
+     - It’s possible to trace Lambda with X-Ray
+     - Enable in Lambda configuration (runs the X-Ray daemon for you)
+     - Use AWS SDK in Code
+     - Ensure Lambda Function has correct IAM Execution Role
+
+## Lambda – Synchronous Invocations
+   - Synchronous: CLI, SDK, API Gateway
+     - Results is returned right away
+     - Error handling must happen client side (retries, exponential backoff, etc…)
+
+## Lambda – Asynchronous Invocation
+   - S3, SNS, CloudWatch Events…
+   - Lambda attempts to retry on
+errors (3 tries total)
+   - Make sure the processing is
+idempotent (in case of retries)
+   - Can define a DLQ (dead-letter
+queue) – SNS or SQS – for
+failed processing
+
+## Lambda – Event Source Mapping
+   - Kinesis Data Streams, SQS, SQS FIFO
+queue, DynamoDB Streams
+   - Common denominator: records need
+to be polled from the source
+   - All records are respect ordering
+properties except for SQS standard
+   - If your function returns an error, the
+entire batch is reprocessed until
+success
+     - Kinesis, DynamoDB Stream: stop shard
+processing
+     - SQS FIFO: stop, unless a SQS DLQ has
+been defined
+     - Need to make sure your Lambda
+function is idempotent
+
+Lambda – Destinations
+   - Nov 2019: Can configure to send result to a
+destination
+   - Asynchronous invocations - can define destinations for
+successful and failed event:
+     - Amazon SQS
+     - Amazon SNS
+     - AWS Lambda
+     - Amazon EventBridge bus
+   - Note: AWS recommends you use destinations instead of
+DLQ now (but both can be used at the same time)
+   - Event Source mapping: for discarded event batches    
+     - Amazon SQS
+     - Amazon SNS
+   - Note: you can send events to a DLQ directly from SQS
+https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html
+https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html
+
+## AWS Lambda Versions    
+   - When you work on a Lambda function,
+we work on $LATEST
+   - When we’re ready to publish a Lambda
+function, we create a version
+   - Versions are immutable    
+   - Versions have increasing version numbers    
+   - Versions get their own ARN (Amazon
+Resource Name)
+   - Version = code + configuration (nothing
+can be changed - immutable)
+   - Each version of the lambda function can
+be accessed
+
+## AWS Lambda Aliases    
+   - Aliases are ”pointers” to Lambda
+function versions
+   - We can define a “dev”, ”test”,
+“prod” aliases and have them point
+at different lambda versions
+   - Aliases are mutable    - Aliases enable Blue / Green
+deployment by assigning weights to
+lambda functions
+   - Aliases enable stable configuration
+of our event triggers / destinations
+   - Aliases have their own ARNs
+
+## AWS Lambda Aliases with API Gateway
+
+## Lambda & CodeDeploy
+   - CodeDeploy can help you automate traffic shift for Lambda aliases
+   - Feature is integrated within the SAM
+framework
+   - Linear: grow traffic every N minutes until 100%
+     - Linear10PercentEvery3Minutes
+     - Linear10PercentEvery10Minutes
+   - Canary: try X percent then 100%
+     - Canary10Percent5Minutes
+     - Canary10Percent30Minutes
+   - AllAtOnce: immediate
+   - Can create Pre & Post Traffic hooks to
+check the health of the Lambda function
+
+## Types of load balancer on AWS
+   - AWS has 3 kinds of managed Load Balancers
+   - Classic Load Balancer (v1 - old generation) – 2009
+     - HTTP, HTTPS, TCP
+   - Application Load Balancer (v2 - new generation) – 2016
+     - HTTP, HTTPS, WebSocket
+   - Network Load Balancer (v2 - new generation) – 2017
+     - TCP, TLS (secure TCP) & UDP
+   - Overall, it is recommended to use the newer / v2 generation load balancers as they
+provide more features
+   - You can setup internal (private) or external (public) ELBs
+
+## Classic Load Balancers (v1)
+   - Health Checks can be HTTP (L7) or TCP (L4) based
+   - Supports only one SSL certificate
+     - The SSL certificate can have many SAN (Subject Alternate Name), but the SSL
+certificate must be changed anytime a SAN is added / edited / removed
+     - Better to use ALB with SNI (Server Name Indication) if possible
+     - Can use multiple CLB if you want distinct SSL certificates
+   - TCP => TCP passes all the traffic to the EC2 instance
+     - Only way to use 2-way SSL authentication 
+
+## Application Load Balancer (v2)
+   - Application load balancers is Layer 7 (HTTP)
+   - Load balancing to multiple HTTP applications across machines
+(target groups)
+   - Load balancing to multiple applications on the same machine
+(ex: containers)
+   - Support for HTTP/2 and WebSocket
+   - Support redirects (from HTTP to HTTPS for example)
+   - Routing tables to different target groups:
+     - Routing based on path in URL (example.com/users & example.com/posts)
+     - Routing based on hostname in URL (one.example.com & other.example.com)
+     - Routing based on Query String, Headers
+(example.com/users?id=123&order=false)
+   - ALB are a great fit for micro services & container-based application
+(example: Docker & Amazon ECS)
+   - Has a port mapping feature to redirect to a dynamic port in ECS
+   - In comparison, we’d need multiple Classic Load Balancer per application
+   - Target Groups:
+     - EC2 instances (can be managed by an ASG) – HTTP
+     - ECS tasks (managed by ECS itself) – HTTP
+     - Lambda functions – HTTP request is translated into a JSON event
+     - IP Addresses – must be private IPs (ex: instances in peered VPC, on-premise)
+     - ALB can route to multiple target groups
+     - Health checks are at the target group level
+   - SSL certificates:
+     - Supports multiple listeners
+     - Supports SNI - Server Name Indication
+
+## Network Load Balancer (v2)    
+   - Network load balancers (Layer 4) allow to do:    
+   - Forward TCP traffic to your instances (UDP support
+– Jun 2019)
+   - Handle millions of request per seconds    
+   - NLB has one static IP per AZ, and supports assigning Elastic IP
+(helpful for whitelisting specific IP)
+   - Less latency ~100 ms (vs 400 ms for ALB)    
+   - Support for TLS    
+   - Support for WebSockets
+   - Network Load Balancers are mostly used:    
+     - for extreme performance, TCP or UDP traffic    
+	 - with AWS Private Link to expose a service internally
+   - Target Groups:
+     - EC2 instances (can be managed by an ASG) –TCP
+     - ECS tasks (managed by ECS itself) –TCP
+     - IP addresses – Private IP only, even outside your VPC
+   - Proxy Protocol:
+     - Send additional connection information such as the source and destination
+     - The load balancer prepends a proxy protocol header to the TCP data
+     - Helpful when you have the “IP addresses” target group type
+    - You can retrieve the source IP address of the originating client
+
+## Cross Zone Load Balancing
+   - With Cross Zone Load
+Balancing: each load
+balancer instance
+distributes evenly
+across all registered
+instances in all AZ
+   - Otherwise, each load
+balancer node
+distributes requests
+evenly across the
+registered instances in
+its Availability Zone
+only.
+   - Classic Load Balancer    
+     - Disabled by default    
+	 - No charges for inter AZ data if enabled    
+   - Application Load Balancer    
+     - Always on (can’t be disabled)    
+	 - No charges for inter AZ data    
+   - Network Load Balancer    
+	 - Disabled by default    
+	 - You pay charges ($) for inter AZ data if enabled
+
+## Load Balancer Stickiness    
+   - It is possible to implement stickiness so that
+the same client is always redirected to the
+same instance behind a load balancer
+   - This works for Classic Load Balancers &
+Application Load Balancers
+   - The “cookie” used for stickiness has an
+expiration date you control
+   - Use case: make sure the user doesn’t lose his
+session data
+   - Enabling stickiness may bring imbalance to the
+load over the backend EC2 instances
+   - Alternative is to cache session data in
+ElastiCache, DynamoDB for example
+
+## API Gateway – Overview
+   - Helps expose Lambda, HTTP & AWS Services as an API
+   - API versioning, authorization, traffic management (API keys, throttles),
+huge scale, serverless, req/resp transformations, OpenAPI spec, CORS
+   - Limits to know:
+     - 29 seconds timeout
+     - 10 MB max payload size
+	 
+## API Gateway – Deployment Stages
+   - API changes are deployed to “Stages” (as many as you want)
+   - Use the naming you like for stages (dev, test, prod)
+   - Stages can be rolled back as a history of deployments is kept
+
+## API Gateway – Integrations
+   - HTTP
+     - Expose HTTP endpoints in the backend
+     - Example: internal HTTP API on premise, Application Load Balancer…
+     - Why? Add rate limiting, caching, user authentications, API keys, etc…
+   - Lambda Function
+     - Invoke Lambda function
+     - Easy way to expose REST API backed by AWS Lambda
+   - AWS Service
+     - Expose any AWS API through the API Gateway?
+     - Example: start an AWS Step Function workflow, post a message to SQS
+     - Why? Add authentication, deploy publicly, rate control… 
+
+## API Gateway - Endpoint Types
+   - Edge-Optimized (default): For global clients
+     - Requests are routed through the CloudFront Edge locations (improves latency)
+     - The API Gateway still lives in only one region
+   - Regional:
+     - For clients within the same region
+     - Could manually combine with CloudFront (more control over the caching
+strategies and the distribution)
+   - Private:
+     - Can only be accessed from your VPC using an interface VPC endpoint (ENI)
+     - Use a resource policy to define access
+
+## Caching API responses
+   - Caching reduces the number of calls made to the
+backend
+   - Default TTL (time to live) is 300 seconds (min: 0s, max: 3600s)
+   - Caches are defined per stage
+   - Possible to override cache settings per method
+   - Clients can invalidate the cache with header:
+Cache-Control: max-age=0 (with proper IAM authorization)
+   - Able to flush the entire cache (invalidate it)
+immediately
+   - Cache encryption option
+   - Cache capacity between 0.5GB to 237GB
+   
+## API Gateway - Errors
+   - 4xx means Client errors
+     - 400: Bad Request
+     - 403: Access Denied, WAF filtered
+     - 429: Quota exceeded, Throttle
+   - 5xx means Server errors
+     - 502: Bad Gateway Exception, usually for an incompatible output returned from a
+Lambda proxy integration backend and occasionally for out-of-order invocations due to
+heavy loads.
+     - 503: Service Unavailable Exception
+     - 504: Integration Failure – ex Endpoint Request Timed-out Exception API Gateway requests time out after 29 second maximum
+
+API Gateway – Security
+   - Load SSL certificates and use Route53 to define a CNAME
+   - Resource Policy (~S3 Bucket Policy):
+     - control who can access the API
+     - Users from AWS accounts, IP or CIDR blocks, VPC or VPC Endpoints
+   - IAM Execution Roles for API Gateway at the API level
+     - To invoke a Lambda Function, an AWS service…
+   - CORS (Cross-origin resource sharing):
+     - Browser based security
+     - Control which domains can call your API
+
+## API Gateway – Authentication
+   - IAM based access
+     - Good for providing access within your own
+infrastructure
+     - Pass IAM credentials in headers through Sig V4
+   - Lambda Authorizer (formerly Custom
+Authorizer)
+     - Use Lambda to verify a custom OAuth / SAML /
+3rd party authentication
+   - Cognito User Pools
+     - Client authenticates with Cognito
+     - Client passes the token to API Gateway
+     - API Gateway knows out-of-the-box how to verify to token
+
+## API Gateway – Logging, Monitoring, Tracing
+   - CloudWatch Logs:
+     - Enable CloudWatch logging at the Stage level (with Log Level – ERROR, INFO)
+     - Can log full requests / responses data
+     - Can send API Gateway Access Logs (customizable)
+     - Can send logs directly into Kinesis Data Firehose (as an alternative to CW logs)
+   - CloudWatch Metrics:
+     - Metrics are by stage, possibility to enable detailed metrics
+     - IntegrationLatency, Latency, CacheHitCount, CacheMissCount
+   - X-Ray:
+     - Enable tracing to get extra information about requests in API Gateway
+     - X-Ray API Gateway + AWS Lambda gives you the full picture
+
+## Route 53 – Records
+   - Route53 is a Managed DNS (Domain Name System)    
+   - A: hostname to IPv4    
+   - AAAA: hostname to IPv6    
+   - CNAME: hostname to hostname    
+   - Alias: hostname to AWS resource    
+     - Use for: CLB, ALB, NLB, CloudFront, S3 bucket, Elastic Beanstalk    
+     - Can be used for root apex record (mydomain.com)    
+   - Other record types are not needed for the exam
+
+## DNS Records TTL (Time to Live)
+   - High TTL: (e.g. 24hr)
+     - Less traffic on DNS
+     - Possibly outdated
+records
+   - Low TTL: (e.g 60 s)
+     - More traffic on DNS
+     - Records are outdated
+for less time
+     - Easy to change records
+   - TTL is mandatory for
+each DNS record
+
+## Simple Routing Policy    
+   - Maps a hostname to a single
+resource
+   - You can’t attach health
+checks to simple routing
+policy
+   - If multiple values are
+returned, a random one is
+chosen by the client
+
+## Weighted Routing Policy    
+   - Control the % of the requests
+that go to specific endpoint
+   - Helpful to test 1% of traffic on
+new app version for example
+   - Helpful to split traffic between
+two regions
+– Load Balancing
+   - Can be associated with
+Health Checks
+   - Note: The weights don’t need
+to sum up to 100
+
+## Failover Routing Policy Active - Passive 
+
+## Latency Routing Policy    
+   - Redirect to the server that
+has the least latency close to
+us
+   - Super helpful when latency
+of users is a priority
+   - Latency is evaluated in terms
+of user to designated AWS
+Region
+   - Germany users may be
+directed to the US (if that’s
+the lowest latency)
+   - Has a failover capability if you
+enable health checks
+
+## Geo Location Routing Policy
+   - Different from Latency based!
+   - This is routing based on user
+location
+   - Here we specify: traffic from the
+UK should go to this specific IP
+   - Should create a “default” policy
+(in case there’s no match on
+location)
+
+## Route 53 - Complex / Nested Records
+
+## Multi Value Routing Policy
+   - Use when routing traffic to multiple resources
+   - Want to associate a Route 53 health checks with records
+   - Up to 8 healthy records are returned for each Multi Value query
+   - Multi Value is not a substitute for having an ELB
+
+
+Route 53 – Good to know
+   - Private DNS:
+     - Can use Route 53 for internal private DNS
+     - Must enable the VPC settings enableDnsHostNames and enableDnsSupport
+   - DNSSEC (protect against Man In the Middle attack):
+     - Amazon Route 53 supports DNSSEC for domain registration
+     - Route 53 does not support DNSSEC for DNS service
+     - To configure DNSSEC for a Route 53 domain, use another DNS provider or
+custom DNS server on Amazon EC2 (Bind, dnsmasq, KnotDNS, PowerDNS)
+   - 3rd party registrar:
+     - You can buy the domain out of AWS and use Route 53 as your DNS provider
+     - Update the NS records on the 3rd party registrar
+
+## Health Checks with Route 53
+   - Health Check => automated DNS failovers:
+     - 1. Health checks that monitor an endpoint
+(application, server, other AWS resource)
+     - 2. Health checks that monitor other health checks
+(calculated health checks)
+     - 3. Health checks that monitor CloudWatch alarms
+(full control !!) – e.g. throttles of DynamoDB, alarms on RDS, custom metrics, etc
+   - Health Checks are integrated with CW metrics
+   
+## Route 53 Health Checks – good to know
+   - Health Checks can be setup to pass / fail
+based on
+text in the first 5120 bytes of the response
+   - Health Checks pass only with the 2xx and
+3xx status response
+   - Calculated health checks
+     - Create separate individual health checks
+     - Specify how many of the health checks need to
+pass to make the parent pass
+   - Health Checks can trigger CW Alarms
+
+## Health Checks – Private Hosted Zones
+   - Route 53 health checkers are outside
+the VPC
+   - They can’t access private endpoints (private VPC or on-premise resource)
+   - Options:
+     - To check a resource within a VPC, you
+must assign a public IP address
+     - You can configure the health checker to
+check the health of an external resource
+the instance relies on, for example a
+database server
+     - You can create a CloudWatch metric
+and associate an alarm. You then create
+a health check that checks the alarm
+itself
+
+## Route 53 Solution Architecture Sharing a Private Zone across VPC
+   - Having a central private
+“Shared Services” DNS can
+ease management
+   - Oher accounts may want to
+access the central private DNS
+records
+     - 1. Connectivity between VPC
+must be established (VPC
+peering)
+     - 2. Must programmatically (CLI)
+associate the VPC with the
+central hosted zone
+   - One association must be
+created for each new account
+
+## Solution Architecture Comparisons    
+   - EC2 on its own with Elastic IP    
+   - EC2 with Route53    
+   - ALB + ASG    
+   - ALB + ECS on EC2    
+   - ALB + ECS on Fargate    
+   - ALB + Lambda    
+   - API Gateway + Lambda    
+   - API Gateway + AWS Service    
+   - API Gateway + HTTP backend (ex: ALB)
+
+## EC2 with Elastic IP
+   - Quick failover
+   - The client should not
+see the change
+happen
+   - Helpful if the client
+needs to resolve by
+static Public IP
+address
+   - Does not scale
+   - Cheap
+
+## Stateless web app - scaling horizontally
+   - “DNS-based load
+balancing”
+   - Ability to use multiple
+instances
+   - Route53 TTL implies
+client may get outdated
+information
+   - Clients must have logic to
+deal with hostname
+resolution failures
+   - Adding an instance may
+not receive full traffic
+right away due to DNS
+TTL
+
+## ALB + ASG
+   - Scales well, classic architecture    
+   - New instances are in service right away.    
+   - Users are not sent to instances that are out-of-service
+   - Time to scale is slow (EC2 instance
+startup + bootstrap) – AMI can help
+   - ALB is elastic but can’t handle sudden,
+huge peak of demand (pre -warm)
+   - Could lose a few requests if instances
+are overloaded
+   - CloudWatch used for scaling    
+   - Cross-Zone balancing for even traffic distribution    
+   - Target utilization should be between 40% and 70%
+
+## ALB + ECS on EC2 (backed by ASG)
+   - Same properties as ALB +
+ASG
+   - Application is run on
+Docker
+   - ASG + ECS allows to have
+dynamic port mappings
+   - Tough to orchestrate ECS
+service auto-scaling + ASG
+auto-scaling
+
+## ALB + ECS on Fargate
+   - Application is run on
+Docker
+   - Service Auto Scaling is easy
+   - Time to be in-service is
+quick (no need to launch an
+EC2 instance in advance)
+   - Still limited by the ALB in
+case of sudden peaks
+   - “serverless” application tier
+   - “managed” load balancer
+
+## ALB + Lambda
+   - Limited to Lambda’s runtimes    - Seamless scaling thanks to
+Lambda
+   - Simple way to expose
+Lambda functions as HTTP/S
+without all the features from
+API Gateway
+   - Can combine with WAF
+(Web Application Firewall)
+   - Good for hybrid
+microservices
+   - Example: use ECS for some
+requests, use Lambda for
+others
+
+## API Gateway + Lambda
+   - Pay per request, seamless scaling,
+fully serverless
+   - Soft limits: 10000/s API Gateway,
+1000 concurrent Lambda
+   - API Gateway features:
+authentication, rate limiting,
+caching, etc…
+   - Lambda Cold Start time may
+increase latency for some
+requests
+   - Fully integrated with X-Ray
+   
+## API Gateway + AWS Service (as a proxy)
+   - Lower latency, cheaper
+   - Not using Lambda concurrent
+capacity, no custom code
+   - Expose AWS APIs securely
+through API Gateway
+   - SQS, SNS, Step Functions…
+   - Remember API Gateway has a
+payload limit of 10 MB (can be
+a problem for S3 proxy)
+
+## API Gateway + HTTP backend (ex: ALB)
+   - Use API Gateway features on
+top of custom HTTP backend
+(authentication, rate control,
+API keys, caching…)
+   - Can connect to…
+   - On-premise service
+   - Application Load Balancer
+   - 3rd party HTTP service   
 
