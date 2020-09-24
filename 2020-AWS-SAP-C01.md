@@ -920,6 +920,44 @@ Kafka)
      - Your first need to stop it
      - You then need to use the CLI (modify-instance-placement)
      - You can then start your instance
+     
+     
+ ## Tips 
+ - For EC2 instances, always use a Type A Record without an Alias. For ELB, Cloudfront and S3, always use a Type A Record with an Alias and finally, for RDS, always use the CNAME Record with no Alias.
+
+- After you’ve created your VPC, you further expand your network by adding associating one to utmost 4 secondary CIDR blocks to your VPC.
+
+- Data Pipeline is for batch jobs
+
+- Lambda can be triggered from SQS
+- In Multi-AZ RDS,  standby instance cannot be accessed for read
+
+- HTTPS between viewers and CloudFront
+    – You can use a certificate that was issued by a trusted certificate authority (CA) such as Comodo, DigiCert, Symantec or other third-party providers.
+    – You can use a certificate provided by AWS Certificate Manager (ACM)
+HTTPS between CloudFront and a custom origin
+    – If the origin is not an ELB load balancer, such as Amazon EC2, the certificate must be issued by a trusted CA such as Comodo, DigiCert, Symantec or other third-party providers.
+    – If your origin is an ELB load balancer, you can also use a certificate provided by ACM.
+- Although the on-premises data center is using a tape gateway, you can still set up a solution to use a file gateway in order to properly process the videos using Amazon Rekognition. Keep in mind that the tape gateway in AWS Storage Gateway service is primarily used as an archive solution.  That’s glacier
+- AWS Organizations, SCPs DO NOT affect any service-linked role. Service-linked roles enable other AWS services to integrate with AWS Organizations and can't be restricted by SCPs
+- You can use the same SSL certificate from ACM in more than one AWS Region but it depends on whether you’re using Elastic Load Balancing or Amazon CloudFront. To use a certificate with Elastic Load Balancing for the same site (the same fully qualified domain name, or FQDN, or set of FQDNs) in a different Region, you must request a new certificate for each Region in which you plan to use it. To use an ACM certificate with Amazon CloudFront, you must request the certificate in the US East (N. Virginia) region.
+- Amazon EC2 now allows peering relationships to be established between Virtual Private Clouds (VPCs) across different AWS regions. Inter-Region VPC Peering allows VPC resources like EC2 instances, RDS databases, and Lambda functions running in different AWS regions to communicate with each other using private IP addresses, without requiring gateways, VPN connections or separate network appliances.
+- With AWS Certificate Manager, you can generate public or private SSL/TLS certificates that you can use to secure your site. Public SSL/TLS certificates provisioned through AWS Certificate Manager are free. You pay only for the AWS resources that you create to run your application. For private certificates, the ACM Private Certificate Authority (CA) is priced along two dimensions: (1) You pay a monthly fee for the operation of each private CA until you delete it and (2) you pay for the private certificates you issue each month.
+- Public certificates generated from ACM can be used on Amazon CloudFront, Elastic Load Balancing, or Amazon API Gateway but not directly on EC2 instances, unlike private certificates.
+- Gateway-Cached volumes can support volumes of 1,024TB in size, whereas Gateway-stored volume supports volumes of 512 TB size.
+- Service Control Policies (SCP) vs IAM Policies:
+https://tutorialsdojo.com/aws-cheat-sheet-service-control-policies-scp-vs-iam-policies/
+- Service Control Policies (SCP) vs IAM Policies  References: https://aws.amazon.com/premiumsupport/knowledge-center/iam-policy-service-control-policy/
+- SCPs are available only when you enable all features in your organization.
+- network device that supports Border Gateway Protocol (BGP) and BGP MD5 authentication is needed to establish a Direct Connect link from your data center to your VPC
+- Global accelerator
+- Transit Gateway
+- only one virtual private gateway (VGW) can be attached to a VPC at a time
+- APIGateway error codes
+- Redshift - Automated snapshots are enabled by default when you create a cluster. cross-region snapshot copy is not by default
+- certificate can be stored in AWS Certificate Manager (ACM) or in IAM
+- SNS can be used to fan out notifications to end users using mobile push, SMS, and email.
+
 
 ## Placement Groups Cluster
    - Pros: Great network (10 Gbps bandwidth between instances)
@@ -1812,5 +1850,43 @@ API keys, caching…)
    - Can connect to…
    - On-premise service
    - Application Load Balancer
-   - 3rd party HTTP service   
+   - 3rd party HTTP service  
+   
+   
+ ## Tips
+ - For EC2 instances, always use a Type A Record without an Alias. For ELB, Cloudfront and S3, always use a Type A Record with an Alias and finally, for RDS, always use the CNAME Record with no Alias.
+
+- After you’ve created your VPC, you further expand your network by adding associating one to utmost 4 secondary CIDR blocks to your VPC.
+
+- Data Pipeline is for batch jobs
+
+- Lambda can be triggered from SQS
+- In Multi-AZ RDS,  standby instance cannot be accessed for read
+
+- HTTPS between viewers and CloudFront
+    – You can use a certificate that was issued by a trusted certificate authority (CA) such as Comodo, DigiCert, Symantec or other third-party providers.
+    – You can use a certificate provided by AWS Certificate Manager (ACM)
+HTTPS between CloudFront and a custom origin
+    – If the origin is not an ELB load balancer, such as Amazon EC2, the certificate must be issued by a trusted CA such as Comodo, DigiCert, Symantec or other third-party providers.
+    – If your origin is an ELB load balancer, you can also use a certificate provided by ACM.
+- Although the on-premises data center is using a tape gateway, you can still set up a solution to use a file gateway in order to properly process the videos using Amazon Rekognition. Keep in mind that the tape gateway in AWS Storage Gateway service is primarily used as an archive solution.  That’s glacier
+- AWS Organizations, SCPs DO NOT affect any service-linked role. Service-linked roles enable other AWS services to integrate with AWS Organizations and can't be restricted by SCPs
+- You can use the same SSL certificate from ACM in more than one AWS Region but it depends on whether you’re using Elastic Load Balancing or Amazon CloudFront. To use a certificate with Elastic Load Balancing for the same site (the same fully qualified domain name, or FQDN, or set of FQDNs) in a different Region, you must request a new certificate for each Region in which you plan to use it. To use an ACM certificate with Amazon CloudFront, you must request the certificate in the US East (N. Virginia) region.
+- Amazon EC2 now allows peering relationships to be established between Virtual Private Clouds (VPCs) across different AWS regions. Inter-Region VPC Peering allows VPC resources like EC2 instances, RDS databases, and Lambda functions running in different AWS regions to communicate with each other using private IP addresses, without requiring gateways, VPN connections or separate network appliances.
+- With AWS Certificate Manager, you can generate public or private SSL/TLS certificates that you can use to secure your site. Public SSL/TLS certificates provisioned through AWS Certificate Manager are free. You pay only for the AWS resources that you create to run your application. For private certificates, the ACM Private Certificate Authority (CA) is priced along two dimensions: (1) You pay a monthly fee for the operation of each private CA until you delete it and (2) you pay for the private certificates you issue each month.
+- Public certificates generated from ACM can be used on Amazon CloudFront, Elastic Load Balancing, or Amazon API Gateway but not directly on EC2 instances, unlike private certificates.
+- Gateway-Cached volumes can support volumes of 1,024TB in size, whereas Gateway-stored volume supports volumes of 512 TB size.
+- Service Control Policies (SCP) vs IAM Policies:
+https://tutorialsdojo.com/aws-cheat-sheet-service-control-policies-scp-vs-iam-policies/
+- Service Control Policies (SCP) vs IAM Policies  References: https://aws.amazon.com/premiumsupport/knowledge-center/iam-policy-service-control-policy/
+- SCPs are available only when you enable all features in your organization.
+- network device that supports Border Gateway Protocol (BGP) and BGP MD5 authentication is needed to establish a Direct Connect link from your data center to your VPC
+- Global accelerator
+- Transit Gateway
+- only one virtual private gateway (VGW) can be attached to a VPC at a time
+- APIGateway error codes
+- Redshift - Automated snapshots are enabled by default when you create a cluster. cross-region snapshot copy is not by default
+- certificate can be stored in AWS Certificate Manager (ACM) or in IAM
+- SNS can be used to fan out notifications to end users using mobile push, SMS, and email.
+
 
