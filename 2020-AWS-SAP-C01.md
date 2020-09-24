@@ -1853,40 +1853,169 @@ API keys, caching…)
    - 3rd party HTTP service  
    
    
- ## Tips
- - For EC2 instances, always use a Type A Record without an Alias. For ELB, Cloudfront and S3, always use a Type A Record with an Alias and finally, for RDS, always use the CNAME Record with no Alias.
-
-- After you’ve created your VPC, you further expand your network by adding associating one to utmost 4 secondary CIDR blocks to your VPC.
-
-- Data Pipeline is for batch jobs
-
-- Lambda can be triggered from SQS
-- In Multi-AZ RDS,  standby instance cannot be accessed for read
-
-- HTTPS between viewers and CloudFront
-    – You can use a certificate that was issued by a trusted certificate authority (CA) such as Comodo, DigiCert, Symantec or other third-party providers.
-    – You can use a certificate provided by AWS Certificate Manager (ACM)
-HTTPS between CloudFront and a custom origin
-    – If the origin is not an ELB load balancer, such as Amazon EC2, the certificate must be issued by a trusted CA such as Comodo, DigiCert, Symantec or other third-party providers.
-    – If your origin is an ELB load balancer, you can also use a certificate provided by ACM.
-- Although the on-premises data center is using a tape gateway, you can still set up a solution to use a file gateway in order to properly process the videos using Amazon Rekognition. Keep in mind that the tape gateway in AWS Storage Gateway service is primarily used as an archive solution.  That’s glacier
-- AWS Organizations, SCPs DO NOT affect any service-linked role. Service-linked roles enable other AWS services to integrate with AWS Organizations and can't be restricted by SCPs
-- You can use the same SSL certificate from ACM in more than one AWS Region but it depends on whether you’re using Elastic Load Balancing or Amazon CloudFront. To use a certificate with Elastic Load Balancing for the same site (the same fully qualified domain name, or FQDN, or set of FQDNs) in a different Region, you must request a new certificate for each Region in which you plan to use it. To use an ACM certificate with Amazon CloudFront, you must request the certificate in the US East (N. Virginia) region.
-- Amazon EC2 now allows peering relationships to be established between Virtual Private Clouds (VPCs) across different AWS regions. Inter-Region VPC Peering allows VPC resources like EC2 instances, RDS databases, and Lambda functions running in different AWS regions to communicate with each other using private IP addresses, without requiring gateways, VPN connections or separate network appliances.
-- With AWS Certificate Manager, you can generate public or private SSL/TLS certificates that you can use to secure your site. Public SSL/TLS certificates provisioned through AWS Certificate Manager are free. You pay only for the AWS resources that you create to run your application. For private certificates, the ACM Private Certificate Authority (CA) is priced along two dimensions: (1) You pay a monthly fee for the operation of each private CA until you delete it and (2) you pay for the private certificates you issue each month.
-- Public certificates generated from ACM can be used on Amazon CloudFront, Elastic Load Balancing, or Amazon API Gateway but not directly on EC2 instances, unlike private certificates.
-- Gateway-Cached volumes can support volumes of 1,024TB in size, whereas Gateway-stored volume supports volumes of 512 TB size.
-- Service Control Policies (SCP) vs IAM Policies:
-https://tutorialsdojo.com/aws-cheat-sheet-service-control-policies-scp-vs-iam-policies/
-- Service Control Policies (SCP) vs IAM Policies  References: https://aws.amazon.com/premiumsupport/knowledge-center/iam-policy-service-control-policy/
-- SCPs are available only when you enable all features in your organization.
-- network device that supports Border Gateway Protocol (BGP) and BGP MD5 authentication is needed to establish a Direct Connect link from your data center to your VPC
-- Global accelerator
-- Transit Gateway
-- only one virtual private gateway (VGW) can be attached to a VPC at a time
-- APIGateway error codes
-- Redshift - Automated snapshots are enabled by default when you create a cluster. cross-region snapshot copy is not by default
-- certificate can be stored in AWS Certificate Manager (ACM) or in IAM
-- SNS can be used to fan out notifications to end users using mobile push, SMS, and email.
+## Tips
+   - For EC2 instances, always use a Type A Record without an Alias. For ELB, Cloudfront and S3, always use a Type A Record with an Alias and finally, for RDS, always use the CNAME Record with no Alias.
+   - After you’ve created your VPC, you further expand your network by adding associating one to utmost 4 secondary CIDR blocks to your VPC.
+   - Data Pipeline is for batch jobs
+   - Lambda can be triggered from SQS
+   - In Multi-AZ RDS,  standby instance cannot be accessed for read
+   - HTTPS between viewers and CloudFront
+     – You can use a certificate that was issued by a trusted certificate authority (CA) such as Comodo, DigiCert, Symantec or other third-party providers.
+     – You can use a certificate provided by AWS Certificate Manager (ACM)
+   - HTTPS between CloudFront and a custom origin
+     – If the origin is not an ELB load balancer, such as Amazon EC2, the certificate must be issued by a trusted CA such as Comodo, DigiCert, Symantec or other third-party providers.
+     – If your origin is an ELB load balancer, you can also use a certificate provided by ACM.
+   - Although the on-premises data center is using a tape gateway, you can still set up a solution to use a file gateway in order to properly process the videos using Amazon Rekognition. Keep in mind that the tape gateway in AWS Storage Gateway service is primarily used as an archive solution.  That’s glacier
+   - AWS Organizations, SCPs DO NOT affect any service-linked role. Service-linked roles enable other AWS services to integrate with AWS Organizations and can't be restricted by SCPs
+   - You can use the same SSL certificate from ACM in more than one AWS Region but it depends on whether you’re using Elastic Load Balancing or Amazon CloudFront. To use a certificate with Elastic Load Balancing for the same site (the same fully qualified domain name, or FQDN, or set of FQDNs) in a different Region, you must request a new certificate for each Region in which you plan to use it. To use an ACM certificate with Amazon CloudFront, you must request the certificate in the US East (N. Virginia) region.
+   - Amazon EC2 now allows peering relationships to be established between Virtual Private Clouds (VPCs) across different AWS regions. Inter-Region VPC Peering allows VPC resources like EC2 instances, RDS databases, and Lambda functions running in different AWS regions to communicate with each other using private IP addresses, without requiring gateways, VPN connections or separate network appliances.
+   - With AWS Certificate Manager, you can generate public or private SSL/TLS certificates that you can use to secure your site. Public SSL/TLS certificates provisioned through AWS Certificate Manager are free. You pay only for the AWS resources that you create to run your application. For private certificates, the ACM Private Certificate Authority (CA) is priced along two dimensions: (1) You pay a monthly fee for the operation of each private CA until you delete it and (2) you pay for the private certificates you issue each month.
+   - Public certificates generated from ACM can be used on Amazon CloudFront, Elastic Load Balancing, or Amazon API Gateway but not directly on EC2 instances, unlike private certificates.
+   - Gateway-Cached volumes can support volumes of 1,024TB in size, whereas Gateway-stored volume supports volumes of 512 TB size.
+   - Service Control Policies (SCP) vs IAM Policies: https://tutorialsdojo.com/aws-cheat-sheet-service-control-policies-scp-vs-iam-policies/
+   - Service Control Policies (SCP) vs IAM Policies  References: https://aws.amazon.com/premiumsupport/knowledge-center/iam-policy-service-control-policy/
+   - SCPs are available only when you enable all features in your organization.
+   - network device that supports Border Gateway Protocol (BGP) and BGP MD5 authentication is needed to establish a Direct Connect link from your data center to your VPC
+   - Global accelerator
+   - Transit Gateway
+   - only one virtual private gateway (VGW) can be attached to a VPC at a time
+   - APIGateway error codes
+   - Redshift    
+     - Automated snapshots are enabled by default when you create a cluster. cross-region snapshot copy is not by default
+   - certificate can be stored in AWS Certificate Manager (ACM) or in IAM
+   - SNS can be used to fan out notifications to end users using mobile push, SMS, and email.
+   - Access S3 From Mobile App
+     - IAM Role.STS actions such as "AssumeRole", "AssumeRoleWithSAML", and "AssumeRoleWithWebIdentity"
+   - The online auditing system needs to access certain AWS resources in your network to perform the audit. 
+     - Create a new IAM role for cross-account access which allows the online auditing system account to assume the role. Assign it a policy that allows only the actions required for the compliance audit
+   - Handle rapid influx of incoming traffic in the most cost-effective way 
+     - SQS
+   - Handle high number of write operations on database tier
+     - SQS
+   - Amazon Mechanical Turk can send a notification to 
+     - SQS or SNS
+   - Mobile phone push notification 
+     - Amazon SNS mobile push
+   - EBS boot volume for  EC2 instance
+     - General Purpose SSD (gp2)/Provisioned IOPS (io1) 
+   - Redshift fast-running queries won't get stuck in queues behind long-running group queries.
+     - Redshift workload management (WLM)
+   - HTTPS between viewers and CloudFront
+     -  1) use a certificate that was issued by a trusted certificate authority (CA) such as Comodo, DigiCert, Symantec or other third-party providers.
+     -  2) use a certificate provided by AWS certificate Manager (ACM)"
+   - HTTPS between CloudFront and a custom origin
+     - If the origin is not an ELB load balancer, such as Amazon EC2, the certificate must be issued by a trusted CA such as Comodo, DigiCert, Symantec or other third-party providers.
+     - If your origin is an ELB load balancer, you can also use a certificate provided by ACM."
+   - Cloud Front - deliver content over HTTPS using your own domain name
+     - SSL/TLS certificate provided by AWS Certificate Manager (ACM), or import a certificate from a third-party certificate authority into ACM or the IAM certificate store.
+   - your own domain name in CloudFront is not required.
+     - default CloudFront certificate
+   - Public certificates generated from ACM can be used on Amazon CloudFront, Elastic Load Balancing, or Amazon API Gateway but not directly on EC2 instances unlike private certificates.
+   - real-time data collection such as video, audio, application logs, website clickstreams, and IoT telemetry data for machine learning, analytics
+     - Kinesis
+   - POSIX-compliant shared file storage
+     - EFS
+   - Grant Access to User-Specific Folders in an Amazon S3 Bucket
+     - IAM Policies
+   - Cache supports multiple cores or threads
+     - Memcached
+   - Amazon EC2 uses an instance profile as a container for an IAM role
+   - Block the series of attacks coming from a set of determined IP ranges
+     - NACL
+   - To diagnose and troubleshoot problems on Amazon EC2 Linux and Windows Server instances.
+     - EC2Rescue 
+   - Prevent anyone from bypassing CloudFront and using the direct Amazon S3 URLs
+     - Origin access identity (OAI)
+   - When I/O performance is more important than fault tolerance; stripe multiple volumes together
+     - RAID 0
+   - When fault tolerance is more important than I/O performance,mirror two volumes together
+     - RAID 1
+   - Secure Desktop-as-a-Service (DaaS) 
+     - Amazon WorkSpaces
+   - CloudFormation templates which are regularly updated to map the latest AMI IDs
+     - Use CloudFormation with Systems Manager Parameter Store
+   - To improve the data durability of your ElastiCache cluster
+     - "Daily automatic backups
+     - Manual backups using Redis append-only file (AOF)
+     - Setting up a Multi-AZ with automatic Failover"
+   - Cookie used in sticky session feature, which enables the elastic load balancer to bind a user's session to a specific EC2 instance.
+     - AWSELB
+   - On-premise to multiple VPCs in various AWS regions - private network dedicated to each region for enhanced security
+     -  AWS Direct Connect gateway to connect your AWS Direct Connect connection over a private virtual interface to one or more VPCs in your account that are located in the same or different Regions.
+   - Database replication to other regions
+     - Global DynamoDB table by choosing your preferred AWS region, enabling the DynamoDB Streams option and creating replica tables in the other AWS regions where you want to replicate your data.
+   - dedicated secrets store with lifecycle management /integration with RDS
+     - Secrets Manager
+   - single store for configuration and secrets
+     - Systems Manager Parameter Store 
+   - Failed EC2 instances will be automatically replaced to avoid any downtime
+     -  OpsWorks with Auto Healing capability enabled
+   - You can deploy AWS WAF on Amazon CloudFront as part of your CDN solution/Cloud Front, the Application Load Balancer that fronts your web servers or origin servers running on EC2, or Amazon API Gateway for your APIs.
+   - ECS- use security groups and standard network monitoring tools at the container level
+     - Use awsvpc network mode in the task definition in Amazon ECS Cluster
+   - If VPC Lambda function requires Internet access
+     -  add a NAT gateway to your VPC and Ensure associated security group of the Lambda function allows outbound connections
+   - To route domain traffic to an ELB load balancer
+     - Amazon Route 53 alias record
+   - To migrate EC2 instance from one region to another, and use its same PEM key
+     - copy the AMI of your EC2 machine to your new region and start up an instance using the AMI.
+   - AWS Well Architected Framework - Operational Excellence
+     - Perform operations as code
+     - Annotate documentation
+     - Make frequent, small, reversible changes
+     - Refine operations procedures frequently
+     - Anticipate failure
+     - Learn from all operational failures"
+   -  AWS Well Architected Framework - Security
+      - Implement a strong identity foundation
+      - Enable traceability
+      - Apply security at all layers
+      - Automate security best practices
+      - Protect data in transit and at rest
+      - Prepare for security events"
+   - AWS Well Architected Framework - Reliability pillar
+     - Ability of a system to recover from infrastructure or service disruptions, dynamically acquire computing resources to meet demand, and mitigate disruptions such as misconfigurations or transient network issues. This can be achieved by scaling your resources horizontally and using a combination of Auto Scaling and utilization of multiple Availability Zones.
+   - AWS Well Architected Framework -Performance Efficiency
+     - Democratize advanced technologies
+     - Go global in minutes
+     - Use serverless architectures
+     - Experiment more often
+     - Mechanical sympathy"
+   - AWS Well Architected Framework -Cost Optimization
+     - Adopt a consumption model
+     - Measure overall efficiency
+     - Stop spending money on data center operations
+     - Analyze and attribute expenditure
+     - Use managed services to reduce cost of ownership"
+   - prevent man-in-the-middle attacks 
+     - Amazon Route 53 supports DNSSEC for domain registration. However, Route 53 does not support DNSSEC for DNS service, regardless of whether the domain is registered with Route 53
+   -  To use a SSL certificate with Elastic Load Balancing for the same site (the same fully qualified domain name, or FQDN, or set of FQDNs) in a different Region
+     - Must request a new certificate for each Region
+   -  To use an ACM certificate with Amazon CloudFront
+     - Must request the certificate in the US East (N. Virginia) region.
+   - SSE-S3 provides strong multi-factor encryption in which each object is encrypted with a unique key. It also encrypts the key itself with a master key that it rotates regularly
+   - Amazon RDS does not support certain features in Oracle such as Multitenant Database, Real Application Clusters (RAC), Unified Auditing, Database Vault and many more.
+   - Amazon RDS Multi-AZ deployments provide enhanced availability and durability for Database (DB) Instances, making them a natural fit for production database workloads.
+   - Elastic Container Service (ECS) scalability improvement
+     - Service Auto Scaling
+   - AWS organization - Access master account to child account
+     - Create IAM roles in child accounts(can use cloud formation stacksets), Assume role with STS cross account capability
+   - SCPs cannot affect service linked roles.
+   - An SCP does not grant any permissions. Instead, SCPs are JSON policies that specify the maximum permissions for an organization or organizational unit (OU). The SCP limits permissions for entities in member accounts, including each AWS account root user.
+   - KMS helps to encrypt data upto 4 Kb. If its more than 4KB, use envelope encryption
+     - Enabling Amazon S3 Block Public Access in the S3 bucket 
+   - S3 - no file should have a public read nor public write access.
+     -  AWS CloudFormation, AWS Elastic Beanstalk
+   - To deploy applications to the cloud and also launch the required AWS resources automatically
+   - A network device that supports Border Gateway Protocol (BGP) and BGP MD5 authentication is needed to establish a Direct Connect link from your data center to your VPC.
+   - Only one virtual private gateway (VGW) can be attached to a VPC at a time
+     - Create cloud watch matrix and associate an alram for private subnet ec2.monitor that alram.
+   - Route 53 health for private hosted zone, don’t have direct access to resources in private subnet
+     - For Amazon S3 REST API calls, you have to include the following HTTP Request Headers: x-amz-server-side-encryption-customer-algorithm, x-amz-server-side-encryption-customer-key, x-amz-server-side-encryption-customer-key-MD5
+     - For presigned URLs, you should specify the algorithm using the x-amz-server-side-encryption-customer-algorithm request header."
+   - Using server-side encryption with customer-provided encryption keys (SSE-C)
+     - Set up AWS Service Catalog to tag the provisioned resources with corresponding unique identifiers for portfolio, product, and users.
+     - Set up the CloudFormation Resource Tags property to apply tags to certain resource types upon creation."
+   - To ensure that the tags are always added when your resources are created    
 
 
