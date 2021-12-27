@@ -1,21 +1,13 @@
-# AWS SAA-CO2 Notes - 2020
+# AWS Certified Security - Specialty SCS-C01 Dec 2021 - Notes
 
-# AWS Fundamentals: IAM & EC2
+  - Amazon Inspector assessment 
+    - Network reachability  
+    - CVE common vulnerability and exposure 
+    - Center of Internet security benchmarks CIS
+    - security best practice 
 
-## AWS Regions 
+  - Once vpc flow logs are created it can't be edited. Delete and recreate for any modifications 
 
-  - AWS has Regions all around the world 
-  - Names can be: us-east-1, eu-west-3… 
-  - A region is a cluster of data centers 
-  - Most AWS services are region-scoped
+  - AWS KMS also gives you the ability to add an additional layer of authentication for your KMS API calls utilizing encryption context. The encryption context is a key-value pair of additional data that you want associated with AWS KMS-protected information. This is then incorporated into the additional authenticated data (AAD) of the authenticated encryption in AWS KMS-encrypted ciphertexts.
 
-## AWS Availability Zones
-
-  - Each region has many availability zones (usually 3, min is 2, max is 6). 
-  - Example:
-  - ap-southeast-2a
-  - ap-southeast-2b
-  - ap-southeast-2c
-  - Each availability zone (AZ) is one or more discrete data centers with redundant power, networking, and connectivity
-  - They’re separate from each other, so that they’re isolated from disasters
-  - They’re connected with high bandwidth, ultra-low latency networking
+  - Encryption Context - Iam policies for CMk, AAD, audit trail and authorisation context 
