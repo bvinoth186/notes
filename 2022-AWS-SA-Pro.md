@@ -206,3 +206,75 @@ launched has completed its cool down period. In this case the cool down period f
 starts after 3 minutes and finishes at the 10th minute (3+7 cool down), while for the second instance it starts at the 4th minute and finishes at the 11th minute (4+7 cool down). Thus, the Auto Scaling group will receive another request only after 11 minutes. 
 
 - UDP, global usage - AWS Global Accelerator. 
+
+- Aws org got 2 features 1. All features 2. Consolidated billing.
+
+- For aws sso - first set up the AWS Organizations service and have All features set to enabled
+
+- RPO RTO -> mode
+- 24 24hr -> backup
+- 12 4hr -> pilot light
+- 1.4 15min -> warm standup
+- 15min 5min -> active-active
+
+- Kinesis Streams: By default, of a stream are accessible for up to 24 hours from the time they are added to the stream. You can raise this limit to up to 7 days by enabling
+extended data retention.
+
+- Direct Connect location provides access to Amazon Web Services in the region it is associated with, as well as access to other US regions. To use
+AWS Direct Connect, your network is collocated with an existing AWS Direct Connect location.”
+
+- IAM - Evaluation Logic for Conditions with Multiple Keys or Values If your policy has multiple condition operators or multiple keys attached to a single condition operator, the conditions are evaluated using a logical AND. If a single condition operator includes multiple values for one key, that condition operator is evaluated using a logical OR. All conditions musi
+resolve to true to trigger the desired Allow or Deny effect.
+
+- s3 access log don't support cross account log delivery
+
+- RAID 0 offers striping, which translates to better performance, but no-fault tolerance or data redundancy. RAID 1, on the other hand, offers mirroring, so the same data is available in two disks. RAID 1 is slightly slower than RAID 0 because there are two writes, but the read operations are equally fast.
+
+- Amazon DynamoDB allows atomic increment and decrement operations on scalar values.
+
+- DynamoDB supports atomic counters, where you use the update method to increment or decrement the value of an existing attribute without
+interfering with other write requests. (All write requests are applied in the order in which they are received.)
+
+- With Global Accelerator, you are provided two global static public IPs that act as a fixed entry point to your application, improving availability. On the back end, add or remove your AWS application endpoints, such as Application Load Balancers, Network Load Balancers, EC2 Instances, and Elastic IPs without making user-facing changes. Global Accelerator automatically re-routes your traffic to your nearest healthy available endpoint to mitigate endpoint failure.
+
+- An global accelerator supports multiple endpoints in different regions 
+
+- Global Accelerator does not support client IP address preservation for Network Load Balancer and Elastic IP address endpoints.
+
+- CloudFront does not support UDP. Instead, Global Accelerator can be used for UDP
+
+- AWS WAF can be deployed on Amazon CloudFront, the Application Load Balancer (ALB), Amazon API Gateway, and AWS AppSync. As part of Amazon CloudFront it can be part of your Content Distribution Network (CDN) protecting your resources and content at the Edge locations. As part of the Application Load Balancer it can protect your origin web servers running behind the ALBs. As part of Amazon API Gateway, it can help secure and protect your REST APIs. As part of AWS AppSync, it can help secure and protect your GraphQL APIs.
+
+- NLB not supported by WAF
+
+- IPS/IDS - EC2 does not allow promiscuous mode,  Implement IDS/IPS agents on each Instance running in VPC Or Implement a reverse proxy layer in front of web servers and configure IDS/IPS agents on each reverse proxy server.
+
+- An internet gateway and NAT gateway is not required to establish an AWS Site-to-Site VPN connection
+
+- An AWS VPN over a Direct Connect connection to your VPC is likely faster and more secure than a VPN over the internet. An AWS VPN connection over a Direct Connect connection provides consistent levels of throughput and encryption algorithms that protect your data.  Public VIF required and not the private VIF
+
+- Private VIFs do not provide encryption.. Public VIFs can via IPSEC. you also cannot establish a VPN connection without a Public VIF.
+
+- If ENI interfaces created using aws-cli-> create-network-interface without option -> DeleteOnTermination, It will persist. Also, Before you can delete a VPC, you must terminate any instances that are running in the VPC. If you delete a VPC using the VPC console, it
+also deletes resources that are associated with the VPC, such as subnets, security groups, network ACLs, DHCP options sets, route tables, and Internet gateways.
+
+- You can stream the file from Amazon S3 to the client through your server without downloading the file to your server, by opening a stream to the Amazon S3 file then read from it and write on the client stream (buffer by buffer).
+
+- To detect the PutObjectAcl call and modify the ACL on the object, I: Turn on object-level logging in CloudTrail for the buckets I want to monitor.
+Create an IAM execution role to be used when the Lambda function is being executed so that Lambda can make API calls to S3 on my behalf.
+Create a Lambda function that receives the PutObjectAcl API call event, checks whether the call is for a monitored bucket, and, if so, ensures the object is private. Create a CloudWatch Events rule that matches the PutObjectAcl API call event and invokes the Lambda function created in the previous step.
+
+- SMS is meant for migration of Virtual machines to AWS whereas Cloud Endure can be used for Physical, Virtual or Cloud Server. 
+
+- AWS Application Migration Service (MGN) is a highly automated lift-and-shift (rehost) solution that simplifies, expedites, and reduces the cost of
+migrating applications to AWS. It enables companies to lift-and-shift a large number of physical, virtual, or cloud servers
+
+- AWS Application Migration Service (MGN) is the primary migration service recommended for lift-and-shift migrations to the AWS Cloud.
+Customers who currently use CloudEndure Migration or AWS Server Migration Service (AWS SMS) are encouraged to switch to MGN for future
+migrations.
+
+- Q: Do | need to use Amazon Cognito to use the Amazon Mobile Analytics service? No. You can initialize Amazon Mobile Analytics using AWS IAM accounts. However, we recommend using Amazon Cognito for security best practices. Amazon Mobile Analytics is now Amazon Pinpoint. ;-)
+
+- S3 Replication Time Control (S3 RTC) helps you meet compliance or business requirements for data replication and provides visibility into Amazon S3 replication times. S3 RTC replicates most objects that you upload to Amazon S3 in seconds, and 99.99 percent of those objects within 15 minutes.
+
+- DataSync task can copies objects from one S3 bucket to another without deploying an agent on EC2.  cross-Region and cross-account use cases are supported.
