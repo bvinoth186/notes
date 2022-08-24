@@ -278,3 +278,39 @@ migrations.
 - S3 Replication Time Control (S3 RTC) helps you meet compliance or business requirements for data replication and provides visibility into Amazon S3 replication times. S3 RTC replicates most objects that you upload to Amazon S3 in seconds, and 99.99 percent of those objects within 15 minutes.
 
 - DataSync task can copies objects from one S3 bucket to another without deploying an agent on EC2.  cross-Region and cross-account use cases are supported.
+
+- 600 to 700 
+
+- When a Fargate task is launched, its elastic network interface requires a route to the internet to pull container images. If you receive an error similar to the following when launching a task, it is because a route to the internet does not exist:   CannotPullContainerError: API error (500): Get https://11122223333.dkr.ecr.us-east-1.amazonaws.com/v2/:net/http: request canceled while waiting for connection” To resolve this issue, you can: o For tasks in public subnets, specify ENABLED for Auto-assign public IP when launching the task. o For tasks in private subnets, specify DISABLED for Auto-assign public IP when launching the task, and configure a NAT gateway in your VPC to route requests to the internet.
+
+- When you set up custom NFS client settings, it takes up to three seconds for an Amazon EC2 instance to see a write operation being performed on a file system from another Amazon EC2 instance. To solve this issue, you must unmount and remount your file system with the noac option to disable attribute caching if the
+
+- NAT instance - disable source/destination check, public subnet, public ip or elastic ip
+
+- An AWS Direct Connect location provides access to Amazon Web Services in the region it is associated with, as well as access to other US regions. For example, you can provision a single connection to any AWS Direct Connect location in the US and use it to access public AWS services in all US Regions and AWS GovCloud (US).
+
+- AWS GovCloud (US) can access public services in any other public Region (excluding China (Beijing and Ningxia)). In addition, AWS Direct Connect connections in public Regions or AWS GovCloud (US) can be configured to access a VPC in your account in any other public Region (excluding China (Beijing and Ningxia). You can therefore use a single AWS Direct Connect connection to build multi-Region services. All networking traffic remains on the AWS global network backbone, regardless of whether you access public AWS services or a VPC in another Region.
+
+- The CloudWatch embedded metric format is a JSON specification used to instruct CloudWatch Logs to automatically extract metric values embedded in structured log events. You can use CloudWatch to graph and create alarms on the extracted metric values.
+
+- Amazon WorkDoes is a fully managed, secure content creation, storage, and collaboration service. With Amazon WorkDoes, you can easily create edit, and share content, and because it's stored centrally on AWS, access it from anywhere on any device. Amazon WorkDocs makes it easy to collaborate with others, and lets you easily share content, provide rich feedback, and collaboratively edit documents. You can use Amazon WorkDo¢s to retire legacy file share infrastructure by moving file shares to the cloud. Amazon WorkDo¢es lets you integrate with your existing systems, and offers a rich API so that you can develop your own content-rich applications  
+
+- When the user registers a multi-homed instance (an instance that has an Elastic Network Interface (ENI) attached) with a load balancer, the load balancer will route the traffic to the IP address of the primary network interface (eth0). 
+
+- AWS CloudFormation provides a WaitCondition resource that acts as a barrier and blocks the creation of other resources until a completion signal is received from an external source, such as a user application or management system.
+
+- DependsOn doesn’t wait for success or failure signals from AWS resources before moving forward. While, on the other hand, WaitCondition waits for success signals from your AWS resources and resumes the execution of the CloudFormation template. However, WaitCondition and DependsOn can work together when there is a resource creation dependency requirement. 
+
+- ARN format - arn:aws:service:region:account:resource
+
+- For iam resources region is blanks so - arn:aws:iam::12345678901 2:instance-profile/Webserver
+
+- To centrally manage users in multi account architecture, Create a new AWS account to hold user and service accounts, such as an identity account. Create users and groups in the identity account. Create roles with appropriate permissions in the production and testing accounts. Add the identity account to the trust policies for the roles.
+
+- The maximum number of BGP advertised routes allowed per route table is 100.
+
+- Amazon Cognito identity pools support both authenticated and unauthenticated identities. Authenticated identities belong to users who are authenticated by a public login provider or your own backend authentication process. Unauthenticated identities typically belong to guest users.
+
+- DMS supports Elasticsearch as a target, not a source
+
+- Index snapshots are a popular way to migrate from a self-managed Elasticsearch cluster to Amazon Elasticsearch Service.
