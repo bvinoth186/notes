@@ -314,3 +314,100 @@ migrations.
 1. DMS supports Elasticsearch as a target, not a source
 
 1. Index snapshots are a popular way to migrate from a self-managed Elasticsearch cluster to Amazon Elasticsearch Service.
+
+1. 701 to 800
+
+1. We can create the CloudTrail in Parent Account and the set the level to Entire Orgranization, Automatically Cloud Trail applied to all member accounts.
+
+1. Kinesis just like SQS FIFO provides ordering of records. The only difference is that Kinesis is near real time.
+
+1. By default, FIFO queues support up to 3,000 messages per second with batching or up to 300 messages per second (300 send, receive, or delete operations per second) without batching. If you require higher throughput, you can enable high throughput mode for FIFO on the Amazon SQS console, which will support up to 30,000 messages per second with batching, or up to 3,000 messages per second without batching.
+
+1. Every root, OU, and account must have at least one SCP attached. If you want to replace the default FullAWSAccess policy with an SCP that limits the permissions that can be delegated, you must attach the replacement SCP before you can remove the default SCP. This is the authorization strategy of an "allow list". If you instead attach a second SCP and leave the FullAWSAccess SCP still attached, and specify "Effect": "Deny" in the second SCP to override the "Effect": "Allow" in the FullAWSAccess policy (or any other attached SCP), you're using the authorization strategy of a "deny list".
+
+1. By default, an SCP named FullAWSAccess is attached to every organization root, OU, and account. This default SCP allows all actions and all services. So in a new organization, until you start creating or manipulating the SCPs, all of your existing IAM permissions continue to operate as they did. As soon as you apply a new or modified SCP to the organization root or an OU that contains an account, the permissions that your users have in that account become filtered by the SCP. Permissions that used to work might now be denied if they're not allowed by the SCP at every level of the hierarchy down to the specified account.
+
+1. To connect to on prem from vpcs from 2 regions via direct connect - Provision a Direct Connect gateway and attach the virtual private gateway (VGW) for the VPC in us-east-1 and the VGW for the VPC in us-west-2. Create a private VIF on the Direct Connect connection and associate it to the Direct Connect gateway.  2 DC not required
+
+1. In 2017 AWS launched PrivateLink. This is a Hyperplane-based service that makes it easy to publish an API or application endpoint between VPCs, including those that have overlapping IP address ranges. It’s also ideal for service providers who must deliver connectivity to multiple customers, and thus have no control over the remote IP address range. Furthermore, it provides the same benefit to customers with complex networks where IP addresses overlap. This is by far the simplest option presented here, as it requires no change to the underlying network address scheme
+
+1. AWS Import/Export is a service you can use to transfer large amounts of data from physical storage devices into AWS. You mail your portable storage devices to AWS and AWS Import/Export transfers data directly off of your storage devices using Amazon's high-speed internal network.
+
+1. AWS Backup has support for continuous backup and point-in-time recovery (PITR) of Amazon Relational Database Service (Amazon RDS). This feature enables customers to recover Amazon RDS backup data from a specified time within their retention period. With this feature, database and backup administrators are able to reduce their recovery point objective (RPO) to 5 minutes or under, directly from the AWS Backup console.
+
+1. An AWS Direct Connect location provides access to AWS in the region it is associated with. You can establish connections with AWS Direct Connect locations in multiple regions, but a connection in one region does not provide connectivity to other regions. Note: If the cross connect is not completed within 90 days, the authority granted by the LOA-CFA expires.
+
+1. Use the NotPrincipal element to specify the IAM user, federated user, IAM role, AWS account, AWS service, or other principal that is not allowed or denied access to a resource.
+
+1. You cannot use the NotPrincipal element in an IAM identity-based policy or in an IAM role trust policy. You can use it in resource-based policies for some AWS services. Resource-based policies are policies that you embed directly in a resource.
+
+1. To enable isolation between dev and prod VPC's - Create separate route tables for production and development traffic. Delete each account's association and route propagation to the default AWS Transit Gateway route table. Attach development VPCs to the development AWS Transit Gateway route table and production VPCs to the production route table, and enable automatic route propagation on each attachment.
+
+1. Using 1Gbps internet speed you can transfer around 10TB of data per day
+
+1. 1 Gbps = (1024/8) MBPs = 128 MBps (128 MBps * 3600 sees * 24 Hrs)/1024 = 10,800 GB/Day = 10TB/Day
+
+1. If you have attached a load balancer to your Auto Scaling group, you can have Auto Scaling include the results of Elastic Load Balancing health checks when it determines the health status of an instance. After you add ELB health checks, Auto Scaling will mark an instance as unhealthy if Elastic Load Balancing reports the instance state as Out of Service. Frequently, an Auto Scaling instance that has just come into service needs to warm up before it can pass the Auto Scaling health check. Auto Scaling waits until the health check grace period ends before checking the health status of the instance. While the EC2 status checks and ELB health checks can complete before the health check grace period expires, Auto Scaling does not act on them until the health check grace period expires. To provide ample warm-up time for your instances, ensure that the health check grace period covers the expected startup time for your application
+
+1. With AWS Resource Access Manager (AWS RAM), the owner of a prefix list can share a prefix list with the following: 1. Specific AWS accounts inside or outside of its organization in AWS Organizations 2. An organizational unit inside its organization in AWS Organizations 3. An entire organization in AWS Organizations
+
+1. Organizations usually implement proxy solutions to provide URL and web content filtering, IDS/IPS, data loss prevention, monitoring, and advanced threat protection
+
+1. AWS API Gateway has a max timeout of 29 seconds for all integration types, which includes Lambda as well. It means that any API call coming through API Gateway cannot exceed 29 seconds.
+
+1. @connections command for call back doesnt seem to be available in Appsyne( but yes with API gateway with web socket api) as it manages these constructs internally.
+
+1. We cannot create local secondary indexes(LSI) for existing tables. LSI can only be created during the table creation. GSI can be crated after the table creation
+
+1. when the user has attached more than one network interface with an instance, AWS cannot assign public IPs to them. Use elastic ips
+
+1. Temporary credentials in IAM are valid throughout their defined duration of time and hence can't be revoked. However, because permissions are evaluated each time an AWS request is made using the credentials, you can achieve the effect of revoking the credentials by changing the permissions for the credentials even after they have been issued. 
+
+1. Managed VPN max throughput 1.25Gbps
+
+1. Your mobile app authenticates with the identity provider (IdP) using the provider's SDK. Once the end user is authenticated with the IdP, the OAuth or OpenlD Connect token returned from the IdP is passed by your app to Amazon Cognito, which returns a new Cognito ID for the user and a set of temporary, limited- privilege AWS credentials.
+
+1. To update existing single az FSx to multi az, Create a new Amazon FSx file system with a deployment type of Multi-AZ. Use AWS DataSync to transfer data to the new Amazon FSx file system. Point users to the new location.
+
+1. RDS only Supports Aurora, PostgreSQL, MySQL, MariaDB, Oracle & MS SQL Server.  DB2 is not supported
+
+1. If you create a VPN connection, you must specify the type of routing that you plan to use, which will depend upon on the make and model of your VPN devices. If your VPN device supports Border Gateway Protocol (BGP), you need to specify dynamic routing when you configure your VPN connection. If your device does not support BGP you should specify static routing. 
+
+1. In Amazon ElastiCache, the number of cache nodes in the cluster is a key factor in the availability of your cluster running Memcached. The failure of a single cache node can have an impact on the availability of your application and the load on your back-end database while ElastiCache provisions a replacement for the failed cache node and it get repopulated.
+
+1. You can reduce this potential availability impact by spreading your memory and compute capacity over a larger number of cache nodes, each with smaller capacity, rather than using a fewer number of high capacity nodes.
+
+1. RAID 1 on Amazon EBS volumes, which creates a greater fault tolerance capability, and makes it ideal for use cases where data durability is part of the requirement. However, it does not provide write performance improvement because the data is written to multiple volumes simultaneously.
+
+1. RAID 10 improves performance on non-optimized queries and large write volumes.
+
+1. RAID 10 is prohibitively expensive on a cost-to-performance ratio.
+
+1. Optimizing schema yields exponentially better return on investment than RAID 10.
+
+1. Raid 0 is used for stripping. Raid 10 does both Stripping & mirroring but expensive
+
+1. A dimension is a key-value pair used to uniquely identify a metric. CloudWatch treats each unique combination of dimensions as a separate metric.  Thus, if the user is making 4 calls with the same metric name but a separate dimension, it will create 4 separate metrics.
+
+1. You can use a network address translation (NAT) gateway to map multiple IP addresses into a single publicly exposed IP address. When your Elastic Beanstalk environment uses a NAT gateway, the backend instances in your environment are launched in private subnets. Elastic Beanstalk routes outbound traffic through the NAT gateway. You can identify the source of the outbound traffic from the backend instances by the Elastic IP address. The Elastic IP address is a static IP address required by the NAT gateway
+
+1. If you launch an instance into a VPC that has an instance tenancy of dedicated, your instance is automatically a Dedicated Instance, regardless of the tenancy of the instance
+
+1. When configuring your customer gateway to connect to your VPC, several steps need to be completed. The IKE Security Association is established first between the virtual private gateway and customer gateway using the Pre-Shared Key as the authenticator.
+
+1. ElasticCache doesn't have default/global TTL
+
+1. When you update the launch template or launch configuration for an Auto Scaling group, this update action does not deploy any change across the running Amazon EC2 instances in the Auto Scaling group. All new instances will get the updated configuration, but existing instances continue to run with the configuration that they were originally launched with. This works the same way as any other Auto Scaling group.  You can add an UpdatePolicy attribute to your stack to perform rolling updates (or replace the group) when a change has been made to the  group.
+
+1. You can use AWS CodeDeploy to deploy an application to Amazon EC2 instances running within an Amazon Virtual Private Cloud (VPC). However, the AWS CodeDeploy agent installed on the Amazon EC2 instances must be able to access the public AWS CodeDeploy and Amazon $3 service endpoints.
+
+1. A single shard can ingest up to 1 MB of data per second (including partition keys) or 1,000 records per second for writes. Similarly, if you scale your stream to 5,000 shards, the stream can ingest up to 5 GB per second or 5 million records per second. If you need more ingest capacity, you can easily scale up the number of shards in the stream using the AWS Management Console or the UpdateShardCount API.
+
+1. Read replicas available in rds mysql, postgresql, mariadb oracle sql server and aurora
+ 
+1. It is not possible to set up a VPC peering connection with another VPC if there are any overlapping IP address ranges. This fact is true even if you add additional IP address ranges.
+
+
+1. privateLink uses elastic network interfaces within the client VPC so that there are no IP address conflicts with the service provider. You can access PrivateLink endpoints over VPC peering, VPN, and AWS Direct Connect connections
+
+1. MySQL does not support auto scaling for read replicas.
