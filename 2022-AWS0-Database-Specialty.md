@@ -144,3 +144,159 @@ If you want to improve the performance when migrating a large table, you can bre
 
 1. Before you move the RDS DB instance to a new network, configure the new VPC, including the security group inbound rules, the subnet group, and the route tables. When you change the VPC for a DB instance, the instance reboots when the instance moves from one network to another. Because the DB instance isn’t accessible during the network modification, change the VPC during a scheduled maintenance window.
 
+1. One cannot modify the VPC of an Aurora cluster or instance. However, you can change the VPC of an Aurora cluster by using one of the following methods:  (Single AZ RDS VPC can be mofified, Aurora storage is multi AZ by default)
+   1) Create a clone in a different VPC.
+   2) Take a snapshot and then restore the snapshot in a different VPC.
+   3) Set up replication using binary logging (MySQL only).
+
+1. You can use the high-performance Advanced Auditing feature in Amazon Aurora MySQL to audit database activity. To do so, you enable the collection of audit logs by setting several DB cluster parameters. When Advanced Auditing is enabled, you can use it to log any combination of supported events.
+
+1. Use the server_audit_logging parameter to enable or disable Advanced Auditing.
+
+1. Use the server_audit_events parameter to specify what events to log.
+
+1. Use the server_audit_incl_users and server_audit_excl_users parameters to specify who gets audited. By default, all users are audited. 
+
+
+1. CONNECT – Logs both successful and failed connections and also disconnections. This event includes user information.
+
+1. QUERY – Logs all queries in plain text, including queries that fail due to syntax or permission errors..
+
+1. QUERY_DCL – Similar to the QUERY event, but returns only data control language (DCL) queries (GRANT, REVOKE, and so on).
+
+1. QUERY_DDL – Similar to the QUERY event, but returns only data definition language (DDL) queries (CREATE, ALTER, and so on).
+
+1. QUERY_DML – Similar to the QUERY event, but returns only data manipulation language (DML) queries (INSERT, UPDATE, and so on, and also SELECT).
+
+1. TABLE – Logs the tables that were affected by query execution.
+
+
+1. Each DB instance in an Amazon Aurora DB cluster uses local solid-state drive (SSD) storage to store temporary tables for a session. This local storage for temporary tables doesn’t automatically grow like the Aurora cluster volume. Instead, the amount of local storage is limited. The limit is based on the DB instance class for DB instances in your DB cluster.
+
+1. Instances in Aurora clusters have two types of storage:
+
+1. Storage for persistent data (called the cluster volume). This storage type increases automatically when more space is required.
+Local storage for each Aurora instance in the cluster, based on the instance class. This storage type and size is bound to the instance class, and can be changed only by moving to a larger DB instance class. Aurora for MySQL uses local storage for storing error logs, general logs, slow query logs, audit logs, and non-InnoDB temporary tables.
+
+1. Error code 1290 commonly occurs in an Amazon Aurora DB cluster environment whenever the database cluster is configured to be read-only or if the connection is attempting to commit write transactions to an endpoint that points to the Aurora replica. Reader endpoint
+
+1. The maximum number of connections allowed to an Aurora MySQL DB instance is determined by the max_connections parameter in the instance-level parameter group for the DB instance.
+
+1. The default value of the max_connections parameter varies for each DB instance class available to Aurora MySQL. You can increase the maximum number of connections to your Aurora MySQL DB instance by scaling the instance up to a DB instance class with more memory, or by setting a larger value for the max_connections parameter in the DB parameter group for your instance, up to 16,000.
+
+1. With Amazon Aurora with MySQL compatibility, you can backtrack a DB cluster to a specific time, without restoring data from a backup.
+
+1. Backtracking allows you to rewind the DB cluster to the time you specify. When you specify a time for a backtrack, Aurora automatically chooses the nearest possible consistent time. 
+
+1. If two or more Aurora Replicas share the same priority, then Amazon RDS promotes the replica that is largest in size. If two or more Aurora Replicas share the same priority and size, then Amazon RDS promotes an arbitrary replica in the same promotion tier.
+
+1. You can test the fault tolerance of your Amazon Aurora DB cluster by using fault injection queries. Only available with Aurora not in RDS
+
+1. For Aurora MySQL, you can’t delete a DB instance in a DB cluster if both of the following conditions are true:
+   - The DB cluster is a read replica of another Aurora DB cluster
+   - The DB instance is the only instance in the DB cluster.
+
+1. To delete a DB instance in this case, first promote the DB cluster so that it’s no longer a read replica. After the promotion completes, you can delete the final DB instance in the DB cluster.
+
+1. To delete an Aurora cluster using the AWS CLI, you must first delete all instances inside the cluster. After you delete all instances inside a cluster, you can then delete the cluster by using delete-db-cluster. If you delete the last instance in the cluster using the Amazon RDS console, the empty cluster is also automatically deleted. If you have a cluster with only one instance and delete that instance using the Amazon RDS console, then both that instance and the cluster are deleted.
+
+1. RDS allows you to create an Aurora Read Replica. The migration process begins by creating a DB snapshot of the existing DB Instance and then using it as the basis for a fresh Aurora Read Replica. After the replica has been set up, replication is used to bring it up to date with respect to the source. Once the replication lag drops to 0, the replication is complete. At this point, you can make the Aurora Read Replica a standalone Aurora DB cluster and point your client applications at it.
+
+ˇUsing database cloning, you can quickly and cost-effectively create clones of all of the databases within an Aurora DB cluster. Not available with RDS
+
+1. To meet your connectivity and workload requirements, Aurora Auto Scaling dynamically adjusts the number of Aurora Replicas provisioned for an Aurora DB cluster using single-master replication. Aurora Auto Scaling is available for both Aurora MySQL and Aurora PostgreSQL. Aurora Auto Scaling enables your Aurora DB cluster to handle sudden increases in connectivity or workload. When the connectivity or workload decreases, Aurora Auto Scaling removes unnecessary Aurora Replicas so that you don’t pay for unused provisioned DB instances.
+
+1. For Amazon Aurora, you can use the LOAD DATA FROM S3 or LOAD XML FROM S3 statement to load data from files stored in an Amazon S3 bucket. The advantages of using this method diminish rapidly as transaction size increases.
+
+1. For fast recovery of the writer DB instance in your Aurora PostgreSQL clusters if there’s a failover, use cluster cache management for Amazon Aurora PostgreSQL. Cluster cache management ensures that application performance is maintained if there’s a failover.
+
+1. Configure all Aurora Replicas to have the same instance class as the primary DB instance. Implement Aurora PostgreSQL DB cluster cache management. Set the failover priority to tier-0 for the primary DB instance and one replica with the same instance class. Set the failover priority to tier-1 for the other Aurora Replicas.
+
+1. To migrate from an RDS PostgreSQL DB instance to an Aurora PostgreSQL DB cluster, it is recommended to create an Aurora Read Replica of your source PostgreSQL DB instance. When the replica lag between the PostgreSQL DB instance and the Aurora PostgreSQL Read Replica is zero, you can stop replication. At this point, you can promote the Aurora Read Replica to be a standalone Aurora PostgreSQL DB cluster. This standalone DB cluster can then accept write loads.
+
+1. To meet your connectivity and workload requirements, Aurora Auto Scaling dynamically adjusts the number of Aurora Replicas provisioned for an Aurora DB cluster using single-master replication.
+
+1. When you create a read replica, you first specify an existing DB instance as the source. Then Amazon RDS takes a snapshot of the source instance and creates a read-only instance from the snapshot. Amazon RDS then uses the asynchronous replication method for the DB engine to update the read replica whenever there is a change to the primary DB instance. The read replica operates as a DB instance that allows only read-only connections. Applications connect to a read replica the same way they do to any DB instance. Amazon RDS replicates all databases in the source DB instance.
+
+1. When creating a read replica, there are a few things to consider. First, you must enable automatic backups on the source DB instance by setting the backup retention period to a value other than 0.
+
+1. DB clusters that are encrypted can’t be modified to disable encryption. You can’t convert an unencrypted DB cluster to an encrypted one. However, you can restore an unencrypted Aurora DB cluster snapshot to an encrypted Aurora DB cluster. To do this, specify a KMS encryption key when you restore from the unencrypted DB cluster snapshot. How about RDS?
+
+1. For Aurora MySQL, you can’t delete a DB instance in a DB cluster if both of the following conditions are true:
+   - The DB cluster is a read replica of another Aurora DB cluster
+   - The DB instance is the only instance in the DB cluster.
+   - To delete a DB instance in this case, first promote the DB cluster so that it’s no longer a read replica. After the promotion completes, you can delete the final DB instance in the DB cluster.
+
+1. Amazon Aurora has four types of endpoints available:
+   - cluster endpoint (or writer endpoint),
+   - reader endpoint,
+   - instance endpoint
+   - custom endpoint
+   
+1. Each Aurora cluster has a single built-in reader and cluster endpoint, whose name and other attributes are managed by Aurora. You cannot create, delete, or modify both kinds of endpoints. An instance endpoint connects to a specific DB instance within an Aurora cluster.
+
+1. Meanwhile, each custom endpoint has an associated type that determines which DB instances are eligible to be associated with that endpoint. Currently, the type can be READER, WRITER, or ANY. Only DB instances that are read-only Aurora Replicas can be part of a READER custom endpoint. Both read-only Aurora Replicas and the read/write primary instance can be part of an ANY custom endpoint. Aurora directs connections to cluster endpoints with type ANY to any associated DB instance with equal probability. The WRITER type applies only to multi-master clusters because those clusters can include multiple read/write DB instances.
+
+1. You can configure an Aurora Serverless DB cluster when you restore a provisioned DB cluster snapshot with the AWS Management Console, the AWS CLI, or the RDS API.   You can't promote existing read replica to aurora serverless can do only from snapshot
+
+1. With Amazon DocumentDB (with MongoDB compatibility), you can audit events that were performed in your cluster. Examples of logged events include successful and failed authentication attempts, dropping a collection in a database, or creating an index. By default, auditing is disabled on Amazon DocumentDB and requires that you opt-in to use this feature.
+
+1. When auditing is enabled, Amazon DocumentDB records Data Definition Language (DDL), authentication, authorization, and user management events to Amazon CloudWatch Logs.
+
+1. DocumentDB requires manual management to scale the database, unlike DynamoDB
+
+1. DynamoDB deletes expired items on a best-effort basis to ensure there’s enough throughput for other data operations. Depending on the size and activity level of a table, an expired item’s actual delete operation can vary. Because TTL is meant to be a background process, the nature of the capacity used to expire and delete items via TTL is variable (but free of charge). TTL typically deletes expired items within 48 hours of expiration. Processing takes place automatically, in the background, and doesn’t affect read or write traffic to the table.
+
+1. A local secondary index maintains an alternate sort key for a given partition key value. A local secondary index also contains a copy of some or all of the attributes from its base table; you specify which attributes are projected into the local secondary index when you create the table. The data in a local secondary index is organized by the same partition key as the base table, but with a different sort key. This lets you access data items efficiently across this different dimension. For greater query or scan flexibility, you can create up to five local secondary indexes per table.
+
+1. To create a Local Secondary Index, make sure that the primary key of the index is the same as the primary key/partition key of the table, just as shown below. Then you must select an alternative sort key which is different from the sort key of the table.
+
+1. Strongly consistent reads are not supported on global secondary indexes.
+
+1. Local secondary indexes are created at the same time that you create a table. You cannot add a local secondary index to an existing table, nor can you delete any local secondary indexes that currently exist.
+
+1. You can reduce the cost of your provisioned DynamoDB by purchasing reserved capacity in advance. By reserving your read and write capacity units ahead of time, you will get significant cost savings compared to on-demand provisioned throughput settings. Any capacity that you provision in excess of your reserved capacity is billed at standard provisioned capacity rates.
+
+1. DynamoDB backups do not guarantee causal consistency across items; however, the skew between updates in a backup is usually much less than a second.
+
+1. While a backup is in progress, you cannot do the following:
+   – Pause or cancel the backup operation.
+   – Delete the source table of the backup.
+   – Disable backups on a table if a backup for that table is in progress
+
+1. All backups in DynamoDB work without consuming any provisioned throughput on the table.
+
+1. You can use the profiler in Amazon DocumentDB (with MongoDB compatibility) to log the execution time and details of operations that were performed on your cluster. The profiler is useful for monitoring the slowest operations on your cluster to improve individual query performance and overall cluster performance.
+
+1. Amazon Neptune provides a Loader command for loading data from external files directly into a Neptune DB instance. You can use this command instead of executing a large number of INSERT statements, addVertex and addEdge steps, or other API calls. The Neptune Loader command is faster, has less overhead, is optimized for large datasets, and supports both Gremlin data and the RDF (Resource Description Framework) data used by SPARQL.
+
+1. Amazon Timestream - database service is designed to easily store and analyze trillions of events per day – data that measures how things change over time
+
+1. Amazon Quantum Ledger Database (Amazon QLDB) is a fully managed ledger database that provides a transparent, immutable, and cryptographically verifiable transaction log owned by a central trusted authority. Amazon QLDB can be used to track every application data change and maintains a complete and verifiable history of changes over time.
+
+1. AUTH can only be enabled for ElastiCache for Redis clusters if in-transit encryption was enabled during creation. Furthermore, you can only enable in-transit encryption when you create an ElastiCache for Redis replication group using the AWS Management Console, the AWS CLI, or the ElastiCache API.
+
+1. By default, the data in a Redis node on ElastiCache resides only in memory and is not persistent. If a node is rebooted, or if the underlying physical server experiences a hardware failure, the data in the cache is lost.
+
+1. If you require data durability, you can enable the Redis append-only file feature (AOF). When this feature is enabled, the node writes all of the commands that change cache data to an append-only file. When a node is rebooted and the cache engine starts, the AOF is “replayed”; the result is a warm Redis cache with all of the data intact.
+
+1. AOF is disabled by default
+
+1. The default TCP port for Redis is 6379. This port must be allowed in the associated security group of the cluster. For Memcached, the default port is 11211.
+
+1. You can add data to your Amazon Redshift tables either by using an INSERT command or by using a COPY command. At the scale and speed of an Amazon Redshift data warehouse, the COPY command is many times faster and more efficient than INSERT commands.
+
+1. The COPY command uses the Amazon Redshift massively parallel processing (MPP) architecture to read and load data in parallel from multiple data sources. You can load from data files on Amazon S3, Amazon EMR, or any remote host accessible through a Secure Shell (SSH) connection. Or you can load directly from an Amazon DynamoDB table.
+
+1. Previously, you need to extract data from your PostgreSQL database to Amazon Simple Storage Service (Amazon S3) and load it to Amazon Redshift using COPY, or query it from Amazon S3 with Amazon Redshift Spectrum. Now, Amazon Redshift Federated Query enables you to use the analytic power of Amazon Redshift to directly query data stored in Amazon Aurora PostgreSQL and Amazon RDS for PostgreSQL databases.
+
+1. Loading flat files with LOAD DATA LOCAL INFILE can be the fastest and least costly method of loading data as long as transactions are kept relatively small. Compared to loading the same data with SQL, flat files usually require less network traffic, lowering transmission costs, and load much faster due to the reduced overhead in the database.
+
+1. Amazon Redshift also includes Amazon Redshift Spectrum, allowing you to run SQL queries directly against exabytes of unstructured data in Amazon S3 data lakes. No loading or transformation is required, and you can use open data formats, including Avro, CSV, Grok, Amazon Ion, JSON, ORC, Parquet, RCFile, RegexSerDe, Sequence, Text, and TSV. Redshift Spectrum automatically scales query compute capacity based on the data retrieved, so queries against Amazon S3 run fast, regardless of data set size.
+
+1. Concurrency Scaling is a feature in Amazon Redshift that provides consistently fast query performance, even with thousands of concurrent queries. With this feature, Amazon Redshift automatically adds transient capacity when needed to handle heavy demand. Amazon Redshift automatically routes queries to scaling clusters, which are provisioned in seconds and begin processing queries immediately.
+
+1. When you launch an Amazon Redshift cluster, you can choose to encrypt it with a master key from the AWS Key Management Service (AWS KMS). AWS KMS keys are specific to a region. If you want to enable cross-region snapshot copy for an AWS KMS-encrypted cluster, you must configure a snapshot copy grant for a master key in the destination region so that Amazon Redshift can perform encryption operations in the destination region.
+
+1. Amazon Redshift uses the Amazon Simple Notification Service (Amazon SNS) to communicate notifications of Amazon Redshift events. You enable notifications by creating an Amazon Redshift event subscription. In the Amazon Redshift subscription, you specify a set of filters for Amazon Redshift events and an Amazon SNS topic.
+
