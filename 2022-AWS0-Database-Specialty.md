@@ -72,7 +72,7 @@
 
 1. You can set up the DMS replication instance in the same VPC, Availability Zone, and AWS Region of either the source or target database. However, if you are only migrating or replicating a subset of data using filters or transformations, it is recommended that you launch the replication instance on the same VPC and Availability Zone where the source database is, to optimize the processing. Most of the time, the amount of data transferred over the network to the target database is less compared with the source database.
 
-1 AWS Database Migration Services (DMS) provides support for data validation to ensure that your data was migrated accurately from the source to the target. If you enable it for a task, AWS DMS begins comparing the source and target data immediately after a full load is performed for a table, and reports any mismatches. Also, for a CDC-enabled task, AWS DMS compares the incremental changes and reports any mismatches. 
+1. AWS Database Migration Services (DMS) provides support for data validation to ensure that your data was migrated accurately from the source to the target. If you enable it for a task, AWS DMS begins comparing the source and target data immediately after a full load is performed for a table, and reports any mismatches. Also, for a CDC-enabled task, AWS DMS compares the incremental changes and reports any mismatches. 
 
 1. Create the AWS DMS task with Enable validation and Enable CloudWatch logs settings turned on.
 
