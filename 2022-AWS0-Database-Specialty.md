@@ -202,7 +202,7 @@ Local storage for each Aurora instance in the cluster, based on the instance cla
 
 1. RDS allows you to create an Aurora Read Replica. The migration process begins by creating a DB snapshot of the existing DB Instance and then using it as the basis for a fresh Aurora Read Replica. After the replica has been set up, replication is used to bring it up to date with respect to the source. Once the replication lag drops to 0, the replication is complete. At this point, you can make the Aurora Read Replica a standalone Aurora DB cluster and point your client applications at it.
 
-ˇUsing database cloning, you can quickly and cost-effectively create clones of all of the databases within an Aurora DB cluster. Not available with RDS
+1. Using database cloning, you can quickly and cost-effectively create clones of all of the databases within an Aurora DB cluster. Not available with RDS
 
 1. To meet your connectivity and workload requirements, Aurora Auto Scaling dynamically adjusts the number of Aurora Replicas provisioned for an Aurora DB cluster using single-master replication. Aurora Auto Scaling is available for both Aurora MySQL and Aurora PostgreSQL. Aurora Auto Scaling enables your Aurora DB cluster to handle sudden increases in connectivity or workload. When the connectivity or workload decreases, Aurora Auto Scaling removes unnecessary Aurora Replicas so that you don’t pay for unused provisioned DB instances.
 
