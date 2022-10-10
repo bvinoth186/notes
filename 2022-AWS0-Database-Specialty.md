@@ -70,6 +70,53 @@
 
 1. For Amazon RDS as a source – AWS recommends ensuring that backups are enabled to set up CDC. It is also recommended to ensure that the source database is configured to retain change logs for a sufficient time—24 hours is usually enough.
 
+1. In Rds, You should set TCP keepalive to low value, not high one.
+
+1. Enabling TCP keepalive parameters and setting them aggressively ensures that if your client is no longer able to connect to the database, then any active connections are quickly closed. This action allows the application to react appropriately, such as by picking a new host to connect to
+
+1. Set JDBC connection string timeout variables to a low value.
+
+1. You can't stop a DB instance that has a read replica, or that is a read replica.
+
+1. You can't stop an Amazon RDS for SQL Server DB instance in a Multi-AZ configuration.
+
+1. You can't modify a stopped DB instance.
+
+1. You can't delete an option group that is associated with a stopped DB instance.
+
+1. You can't delete a DB parameter group that is associated with a stopped DB instance.
+
+1. In a Multi-AZ configuration, the primary and secondary Availability Zones might be switched after you start the DB instance.
+
+1. To connect to an existing Amazon RDS for SQL Server DB instance using their corporate Active Directory (AD) credentials.
+   - Modify the RDS SQL Server DB instance to use the directory for Windows authentication. Create appropriate new logins.
+   - Use the AWS Management Console to create an AWS Managed Microsoft AD. Create a trust relationship with the corporate AD
+   - Configure the AWS Managed Microsoft AD domain controller Security Group.
+   - ADConnector not supported here with RDS
+
+1. To use cloud formation to handle rds secrets and rotation AWS::SecretsManager::Secret
+   -> specify the GenerateSecretString property
+   -> define the database user name in the SecureStringTemplate template.
+   -> Create a resource for the database
+   -> reference the secret string for the MasterUserName and MasterUserPassword properties.
+   -> add a resource of type AWS::SecretsManagerSecretTargetAttachment with the SecretId and TargetId properties set to the Amazon Resource Names (ARNs) of the secret and the database.
+
+1. If your workload is unpredictable, you can enable storage autoscaling for an Amazon RDS DB instance. With storage autoscaling enabled, when Amazon RDS detects that you are running out of free database space it automatically scales up your storage.
+
+1. There's no Amazon RDS for MySQL DB instance autoscaling service (it's only available for Aurora). You can do storage autoscaling for RDS
+
+1. cannot modify storage until EITHER 6 hours have passed OR the "storage-optimization" status is complete (instance will show "storage-optimization" happens after previous storage capacity has increased -it CAN take more than 6 hours)
+
+1. Your DB instance must be in the AVAILABLE state for automated backups to occur. Automated backups don't occur while your DB instance is in a state other than AVAILABLE, for example STORAGE_FULL.
+
+1. Automated backups don't occur while a DB snapshot copy is running in the same AWS Region for the same DB instance.
+
+1. Amazon RDS Proxy allows applications to pool and share connections established with the database, improving database efficiency and application scalability. With RDS Proxy, failover times for Aurora and RDS databases are reduced by up to 66% and database credentials, authentication, and access can be managed through integration with AWS Secrets Manager and AWS Identity and Access Management (IAM).
+
+1. DMS can only use databases and S3 as sources
+
+1. If onprem source is not DB, Use AWS DataSync to transfer the data from on premises to the S3 bucket. Use the Loader command for Neptune to move the data in bulk from the S3 bucket to the Neptune DB instance.
+
 1. You can set up the DMS replication instance in the same VPC, Availability Zone, and AWS Region of either the source or target database. However, if you are only migrating or replicating a subset of data using filters or transformations, it is recommended that you launch the replication instance on the same VPC and Availability Zone where the source database is, to optimize the processing. Most of the time, the amount of data transferred over the network to the target database is less compared with the source database.
 
 1. AWS Database Migration Services (DMS) provides support for data validation to ensure that your data was migrated accurately from the source to the target. If you enable it for a task, AWS DMS begins comparing the source and target data immediately after a full load is performed for a table, and reports any mismatches. Also, for a CDC-enabled task, AWS DMS compares the incremental changes and reports any mismatches. 
@@ -170,6 +217,11 @@ If you want to improve the performance when migrating a large table, you can bre
 
 1. TABLE – Logs the tables that were affected by query execution.
 
+1. To migrate rds postgresql to aurora postgresql - You can migrate data directly from an RDS for PostgreSQL DB snapshot to an Aurora PostgreSQL DB cluster. You can also migrate from an RDS for PostgreSQL DB instance by creating an Aurora PostgreSQL read replica of an RDS for PostgreSQL DB instance. When the replica lag between the RDS for PostgreSQL DB instance and the Aurora PostgreSQL read replica is zero, you can stop replication. At this point, you can make the Aurora read replica a standalone Aurora PostgreSQL DB cluster for reading and writing.   Replica method will be the fastest
+
+1. you can now create custom endpoints for Amazon Aurora databases. This allows you to distribute and load balance workloads across different sets of database instances in your Aurora cluster.
+
+1. Amazon Aurora Serverless is a simple, cost-effective option for infrequent, intermittent, or unpredictable workloads.
 
 1. Each DB instance in an Amazon Aurora DB cluster uses local solid-state drive (SSD) storage to store temporary tables for a session. This local storage for temporary tables doesn’t automatically grow like the Aurora cluster volume. Instead, the amount of local storage is limited. The limit is based on the DB instance class for DB instances in your DB cluster.
 
@@ -257,6 +309,27 @@ Local storage for each Aurora instance in the cluster, based on the instance cla
 
 1. You can reduce the cost of your provisioned DynamoDB by purchasing reserved capacity in advance. By reserving your read and write capacity units ahead of time, you will get significant cost savings compared to on-demand provisioned throughput settings. Any capacity that you provision in excess of your reserved capacity is billed at standard provisioned capacity rates.
 
+1. The following items need to be reconfigured after restoring the DynamoDB table.
+   --AutoScaling policy
+   --IAM policy
+   --CloudWatch settings
+   --Tags
+   --Stream settings
+   --TTL
+
+1. Is it possible to change partition key in DynamoDB? No. Once the table is setup, you cannot modify its Key Schema. You can only provision a new table, move data there, and then remove the first table
+
+1. DynamoDB to S3 is possible by EMR, AWS Glue, or AWS Data Pipeline.
+
+1. DynamoDB cannot be a source of DMS
+
+1. You can migrate your DynamoDB tables to a different AWS account by choosing one of the following methods depending on your use case:
+   - AWS Backup
+   - DynamoDB import and export to Amazon Simple Storage Service (Amazon S3)
+   - Amazon S3 and AWS Glue
+   - AWS Data Pipeline
+   - Amazon EMR
+
 1. DynamoDB backups do not guarantee causal consistency across items; however, the skew between updates in a backup is usually much less than a second.
 
 1. While a backup is in progress, you cannot do the following:
@@ -292,6 +365,8 @@ Local storage for each Aurora instance in the cluster, based on the instance cla
 
 1. Loading flat files with LOAD DATA LOCAL INFILE can be the fastest and least costly method of loading data as long as transactions are kept relatively small. Compared to loading the same data with SQL, flat files usually require less network traffic, lowering transmission costs, and load much faster due to the reduced overhead in the database.
 
+1. When Using an Amazon Redshift database as a target for AWS Database Migration Service, The Amazon Redshift cluster must be in the same AWS account and same AWS Region as the replication instance
+
 1. Amazon Redshift also includes Amazon Redshift Spectrum, allowing you to run SQL queries directly against exabytes of unstructured data in Amazon S3 data lakes. No loading or transformation is required, and you can use open data formats, including Avro, CSV, Grok, Amazon Ion, JSON, ORC, Parquet, RCFile, RegexSerDe, Sequence, Text, and TSV. Redshift Spectrum automatically scales query compute capacity based on the data retrieved, so queries against Amazon S3 run fast, regardless of data set size.
 
 1. Concurrency Scaling is a feature in Amazon Redshift that provides consistently fast query performance, even with thousands of concurrent queries. With this feature, Amazon Redshift automatically adds transient capacity when needed to handle heavy demand. Amazon Redshift automatically routes queries to scaling clusters, which are provisioned in seconds and begin processing queries immediately.
@@ -299,4 +374,6 @@ Local storage for each Aurora instance in the cluster, based on the instance cla
 1. When you launch an Amazon Redshift cluster, you can choose to encrypt it with a master key from the AWS Key Management Service (AWS KMS). AWS KMS keys are specific to a region. If you want to enable cross-region snapshot copy for an AWS KMS-encrypted cluster, you must configure a snapshot copy grant for a master key in the destination region so that Amazon Redshift can perform encryption operations in the destination region.
 
 1. Amazon Redshift uses the Amazon Simple Notification Service (Amazon SNS) to communicate notifications of Amazon Redshift events. You enable notifications by creating an Amazon Redshift event subscription. In the Amazon Redshift subscription, you specify a set of filters for Amazon Redshift events and an Amazon SNS topic.
+
+1. Amazon CloudWatch Application Insights uses machine learning classification algorithms to analyze metrics and identify signs of problems with your applications. Windows Event Viewer and SQL Server Error logs are included in the analysis. To receive notifications, you can create an Amazon EventBridge
 
