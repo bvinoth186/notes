@@ -377,3 +377,6 @@ Local storage for each Aurora instance in the cluster, based on the instance cla
 
 1. Amazon CloudWatch Application Insights uses machine learning classification algorithms to analyze metrics and identify signs of problems with your applications. Windows Event Viewer and SQL Server Error logs are included in the analysis. To receive notifications, you can create an Amazon EventBridge
 
+1. You can create an RDS for Oracle DB instance with a 5 TB gp2 storage volume. However, gp2 volumes have a maximum of 16,000 IOPS and cannot provide the DB instance with the required 18,000 IOPS.
+
+1. Gremlin uses Neptune .csv files to import property graphs into Neptune.  Neptune does not use the .orc file format. Apache Hive uses this format. SPARQL uses the .rdf/.xml file format
