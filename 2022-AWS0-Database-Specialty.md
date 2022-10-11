@@ -142,7 +142,8 @@ If you want to improve the performance when migrating a large table, you can bre
 1. DeleteAutomatedBackup – A value that indicates whether to remove automated backups immediately after the DB instance is deleted. This parameter isn’t case-sensitive. The default is to remove automated backups immediately after the DB instance is deleted. 
 
 1. Amazon RDS for MySQL uses asynchronous replication and sometimes the replica isn’t able to keep up with the primary DB instance. This can cause a replication lag.
-   - Reasons for replication lag
+
+1. Reasons for replication lag
    - Long-running queries on the primary DB instance
    - Insufficient DB instance class size or storage
    - Parallel queries executed on the primary DB instance
@@ -159,11 +160,16 @@ If you want to improve the performance when migrating a large table, you can bre
 1. autoscaling feature can’t completely prevent storage-full situations because further storage modifications can’t be made until six hours after the storage optimization has completed.
 
 1. You can only enable encryption for an Amazon RDS DB instance when you create it, not after the DB instance is created. As a workaround, you can encrypt a copy of an unencrypted DB snapshot, then restore a DB instance from the encrypted snapshot.
-   – DB instances that are encrypted can’t be modified to disable encryption.
-   – You can’t have an encrypted read replica of an unencrypted DB instance or an unencrypted read replica of an encrypted DB instance.
-   – Encrypted read replicas must be encrypted with the same key as the source DB instance when both are in the same AWS Region.
-   – You can’t restore an unencrypted backup or snapshot to an encrypted DB instance.
-   – To copy an encrypted snapshot from one AWS Region to another, you must specify the KMS key identifier of the destination AWS Region. This is because KMS encryption keys are specific to the AWS Region that they are created in.
+
+1. DB instances that are encrypted can’t be modified to disable encryption.
+
+1. You can’t have an encrypted read replica of an unencrypted DB instance or an unencrypted read replica of an encrypted DB instance.
+
+1. Encrypted read replicas must be encrypted with the same key as the source DB instance when both are in the same AWS Region.
+   
+1. You can’t restore an unencrypted backup or snapshot to an encrypted DB instance.
+   
+1. To copy an encrypted snapshot from one AWS Region to another, you must specify the KMS key identifier of the destination AWS Region. This is because KMS encryption keys are specific to the AWS Region that they are created in.
 
 1. Rds - for minimal application downtime during failover - Enable Aurora DB cluster cache management in the associated parameter group. Set the TCP keepalive parameters for the DB and the application client to a low value.
 
