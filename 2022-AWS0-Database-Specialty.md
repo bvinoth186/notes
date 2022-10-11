@@ -49,7 +49,8 @@
 1. If you have a Multi-AZ deployment that has two or more subnets in a subnet group, then you can launch the DB instance in any of the subnets of the two Availability Zones. If you have a Single-AZ deployment that has two or more subnets in the subnet group, then you can specify the Availability Zone when you create a DB instance. If you didn’t specify the Availability Zone when you created the DB instance, then the DB instance is launched in any of the subnets of the two Availability Zones.
 
 1. To delete a subnet from a DB subnet group, isolate the subnet by moving the DB instance to another subnet. Then, remove the subnet from the DB subnet group
-   - If the primary instance in a DB cluster using single-master replication fails, Aurora automatically fails over to a new primary instance in one of two ways:
+
+1. If the primary instance in a DB cluster using single-master replication fails, Aurora automatically fails over to a new primary instance in one of two ways:
    - By promoting an existing Aurora Replica to the new primary instance
    - By creating a new primary instance
 
